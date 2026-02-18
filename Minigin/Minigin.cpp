@@ -1,6 +1,8 @@
 ﻿#include <stdexcept>
 #include <sstream>
 #include <iostream>
+#include <chrono>
+#include <thread>
 
 #if WIN32
 #define WIN32_LEAN_AND_MEAN 
@@ -89,10 +91,22 @@ dae::Minigin::~Minigin()
 
 void dae::Minigin::Run(const std::function<void()>& load)
 {
+
 	load();
 #ifndef __EMSCRIPTEN__
+
+	long long ms_per_frame{ 1 / 60 };
+
+	m_last_time = std::chrono::high_resolution_clock::now() ;
+	m_lag = 0.0f;
 	while (!m_quit)
+	{
 		RunOneFrame();
+
+		const auto sleep_time = m_last_time + std::chrono::milliseconds(ms_per_frame) - std::chrono::high_resolution_clock::now();
+		std::this_thread::sleep_for(sleep_time);
+	}
+		
 #else
 	emscripten_set_main_loop_arg(&LoopCallback, this, 0, true);
 #endif
@@ -100,7 +114,19 @@ void dae::Minigin::Run(const std::function<void()>& load)
 
 void dae::Minigin::RunOneFrame()
 {
+	const auto current_time{ std::chrono::high_resolution_clock::now() };
+	m_deltaTime = std::chrono::duration<float>(current_time - m_last_time).count();
+	m_last_time = current_time;
+	m_lag += m_deltaTime;
+
 	m_quit = !InputManager::GetInstance().ProcessInput();
-	SceneManager::GetInstance().Update();
+
+	while (m_lag >= m_fixed_time_step)
+	{
+		SceneManager::GetInstance().FixedUpdate(m_fixed_time_step);
+		m_lag -= m_fixed_time_step;
+	}
+
+	SceneManager::GetInstance().Update(m_deltaTime);
 	Renderer::GetInstance().Render();
 }
