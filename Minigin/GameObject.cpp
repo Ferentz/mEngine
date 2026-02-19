@@ -10,6 +10,8 @@
 #include "Font.h"
 #include "Texture2D.h"
 
+#include <iostream>
+
 
 
 dae::GameObject::~GameObject() = default;
@@ -32,16 +34,18 @@ void dae::GameObject::SetPosition(float x, float y)
 	m_transform.SetPosition(x, y, 0.0f);
 }
 
-void dae::GameObject::AddTextComponent(const std::string& text,
+void dae::GameObject::AddComponent(/*const std::string& text,
 	std::shared_ptr<Font> font,
-	const SDL_Color& color)
+	const SDL_Color& color*/)
 {
-	//m_components.push_back(std::make_unique<GameComponent>(this));
+	m_components.reserve(10);
+	std::cout << "hi";
+	m_components.emplace_back(std::move(std::make_unique<GameComponent>(this)));
 	//TextComponent(GameObject* parent,
 	// const std::string& text,
 	// std::shared_ptr<Font> font,
 	// const SDL_Color& color = { 255, 255, 255, 255 });
-	m_components.push_back(std::make_unique<TextComponent>(this,text, font, color));
+	//m_components.push_back(std::make_unique<TextComponent>(this,text, font, color));
 }
 
 void dae::GameObject::GetComponent(int index, GameComponent* out)

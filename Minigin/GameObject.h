@@ -21,9 +21,9 @@ namespace dae
 		void SetTexture(const std::string& filename);
 		void SetPosition(float x, float y);
 
-		void AddTextComponent(const std::string& text,
+		void AddComponent(/*const std::string& text,
 			 std::shared_ptr<Font> font,
-			 const SDL_Color& color = { 255, 255, 255, 255 });
+			 const SDL_Color& color = { 255, 255, 255, 255 }*/);
 		void GetComponent(int index, GameComponent* out);
 		void RemoveComponent(int index);
 

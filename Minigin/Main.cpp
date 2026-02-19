@@ -19,7 +19,7 @@ static void load()
 	auto& scene = dae::SceneManager::GetInstance().CreateScene();
 
 	auto go = std::make_unique<dae::GameObject>();
-	
+	go->AddComponent();
 	go->SetTexture("background.png");
 	scene.Add(std::move(go));
 
@@ -38,7 +38,7 @@ static void load()
 		// std::shared_ptr<Font> font,
 		// const SDL_Color& color = { 255, 255, 255, 255 }
 	std::string fps{ "FPS" };
-	go->AddTextComponent(fps, font);
+	
 }
 
 int main(int, char*[]) {

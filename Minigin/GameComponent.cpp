@@ -1,10 +1,10 @@
 #include "GameComponent.h"
-#include <stdexcept>
-#include <SDL3_ttf/SDL_ttf.h>
-#include "TextObject.h"
-#include "Renderer.h"
-#include "Font.h"
-#include "Texture2D.h"
+//#include <stdexcept>
+//#include <SDL3_ttf/SDL_ttf.h>
+//#include "TextObject.h"
+//#include "Renderer.h"
+//#include "Font.h"
+//#include "Texture2D.h"
 
 namespace dae
 {
@@ -21,7 +21,7 @@ namespace dae
 	{
 	}
 
-	TextComponent::TextComponent(GameObject* parent, const std::string& text, std::shared_ptr<Font> font, const SDL_Color& color)
+	/*TextComponent::TextComponent(GameObject* parent, const std::string& text, std::shared_ptr<Font> font, const SDL_Color& color)
 		: GameComponent(parent),
 		m_needsUpdate(true),
 		m_text(text),
@@ -73,7 +73,7 @@ namespace dae
 	{
 		m_color = color;
 		m_needsUpdate = true;
-	}
+	}*/
 
 	template<class T, typename... Args>
 		requires std::is_base_of_v<GameComponent, T>
