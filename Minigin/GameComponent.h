@@ -1,47 +1,79 @@
+#include <string>
 #include <memory>
-
-//#include <string>
-//#include "GameObject.h"
-//#include "Transform.h"
 
 namespace dae
 {
 	class GameObject;
+	class Texture2D;
 
 	class GameComponent
 	{
 	public:
-		virtual ~GameComponent() noexcept = default;
-		template<class T, typename... Args>
-			requires std::is_base_of_v<GameComponent, T>
-		friend std::unique_ptr<GameComponent> MakeComponent(GameObject* parent, Args&&...);
+		virtual ~GameComponent() = default;
+		explicit GameComponent(GameObject& parent);
 
-		GameComponent(const GameComponent& other) = default;
-		GameComponent(GameComponent&& other) = default;
-		GameComponent& operator=(const GameComponent& other) = default;
-		GameComponent& operator=(GameComponent&& other) = default;
+		void SetParent(GameObject& parent);
+		void Update(float) {};
 
-	//protected:
-		GameObject* const m_pParent;
-		GameComponent(GameObject* parent);
+	protected:
+		GameObject const* GetParent() const;
+
+	private:
+		GameObject* m_pParent;
+		
+		GameComponent(const GameComponent& other) = delete;
+		GameComponent(GameComponent&& other) = delete;
+		GameComponent& operator=(const GameComponent& other) = delete;
+		GameComponent& operator=(GameComponent&& other) = delete;
 	};
+
 
 	class derivedComponent final : public GameComponent
 	{
 	public:
 		virtual ~derivedComponent() override = default;
-		template<class T, typename... Args>
-			requires std::is_base_of_v<GameComponent, T>
-		friend std::unique_ptr<GameComponent> MakeComponent(GameObject* parent, Args&&...);
-		
-		derivedComponent(const derivedComponent& other) = default;
-		derivedComponent(derivedComponent&& other) = default;
-		derivedComponent& operator=(const derivedComponent& other) = default;
-		derivedComponent& operator=(derivedComponent&& other) = default;
+		explicit derivedComponent(GameObject& parent, float val);
 
-	//protected: // i tried something, it didnt work. i need fps
+
+	protected: // i tried something, it didnt work. i need fps
 		float m_val{};
-		derivedComponent(GameObject* parent, float val);
+		
+		derivedComponent(const derivedComponent& other) = delete;
+		derivedComponent(derivedComponent&& other) = delete;
+		derivedComponent& operator=(const derivedComponent& other) = delete;
+		derivedComponent& operator=(derivedComponent&& other) = delete;
+	};
+
+	class RenderComponent : public GameComponent
+	{
+	public:
+		virtual ~RenderComponent() = default;
+		explicit RenderComponent(GameObject& parent)
+			:GameComponent(parent)
+		{
+		}
+
+		virtual void Render() const
+		{
+
+		}
+
+	};
+
+	class TextureComponent final : public RenderComponent
+	{
+	public:
+		virtual ~TextureComponent() override = default;
+		explicit TextureComponent(GameObject& parent);
+
+		virtual void Render() const override;
+		//virtual void Render()const override {}
+		void SetTexture(const std::string& filename);
+
+	protected:
+
+	private:
+		std::shared_ptr<Texture2D> m_texture{};
 	};
 
 	/*class TextComponent final : public GameComponent
@@ -68,10 +100,4 @@ namespace dae
 
 	};*/
 
-
-		
-	template<class T, typename... Args>
-		requires std::is_base_of_v<GameComponent, T>
-	std::unique_ptr<GameComponent> MakeComponent(GameObject* parent, Args&&...);
-	
 }

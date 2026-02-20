@@ -12,6 +12,7 @@
 #include "Scene.h"
 
 #include <filesystem>
+#include "GameComponent.h"
 namespace fs = std::filesystem;
 
 static void load()
@@ -19,12 +20,16 @@ static void load()
 	auto& scene = dae::SceneManager::GetInstance().CreateScene();
 
 	auto go = std::make_unique<dae::GameObject>();
-	go->AddComponent();
-	go->SetTexture("background.png");
+	//go->AddComponent<dae::derivedComponent>(7.f);
+	go->AddComponent<dae::TextureComponent>();
+	go->GetComponents<dae::TextureComponent>()[0]->SetTexture("background.png");
+	//go->SetTexture("background.png");
 	scene.Add(std::move(go));
 
 	go = std::make_unique<dae::GameObject>();
-	go->SetTexture("logo.png");
+	go->AddComponent<dae::TextureComponent>();
+	go->GetLatestComponent<dae::TextureComponent>()->SetTexture("logo.png");
+	//go->SetTexture("logo.png");
 	go->SetPosition(358, 180);
 	scene.Add(std::move(go));
 

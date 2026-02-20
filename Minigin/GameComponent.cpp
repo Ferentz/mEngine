@@ -1,21 +1,27 @@
 #include "GameComponent.h"
-//#include <stdexcept>
-//#include <SDL3_ttf/SDL_ttf.h>
-//#include "TextObject.h"
-//#include "Renderer.h"
-//#include "Font.h"
-//#include "Texture2D.h"
+#include "GameObject.h"
+#include "Renderer.h"
+#include "ResourceManager.h"
 
 namespace dae
 {
 	
-
-	GameComponent::GameComponent(GameObject* parent)
-		:m_pParent{parent}
+	GameComponent::GameComponent(GameObject& parent)
+		:m_pParent{&parent}
 	{
 	}
 
-	derivedComponent::derivedComponent(GameObject* parent, float val)
+	void GameComponent::SetParent(GameObject& parent)
+	{
+		m_pParent = &parent;
+	}
+
+	GameObject const* GameComponent::GetParent() const
+	{
+		return m_pParent;
+	}
+
+	derivedComponent::derivedComponent(GameObject& parent, float val)
 		:GameComponent(parent),
 		m_val{val}
 	{
@@ -75,13 +81,20 @@ namespace dae
 		m_needsUpdate = true;
 	}*/
 
-	template<class T, typename... Args>
-		requires std::is_base_of_v<GameComponent, T>
-	std::unique_ptr<GameComponent> MakeComponent(GameObject* parent, Args&&... args)
+	void TextureComponent::Render() const
 	{
-		return std::make_unique<T>(parent, std::forward<Args>(args)...);
+		const auto& pos = GetParent()->GetTransform()->GetPosition();
+		Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
 	}
 
+	TextureComponent::TextureComponent(GameObject& parent)
+		:RenderComponent(parent)
+	{
+	}
 
+	void TextureComponent::SetTexture(const std::string& filename)
+	{
+		m_texture = ResourceManager::GetInstance().LoadTexture(filename);
+	}
 }
 

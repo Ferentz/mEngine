@@ -3,35 +3,64 @@
 #include <memory>
 #include "Transform.h"
 
-#include "GameComponent.h"
-
 namespace dae
 {
+	class GameComponent;
 	class Font;
 	class Texture2D;
 	class GameObject 
 	{
 		Transform m_transform{};
-		std::shared_ptr<Texture2D> m_texture{};
+		
 		std::vector<std::unique_ptr<GameComponent>> m_components{};
+
 	public:
 		virtual void Update(float deltaTime);
 		virtual void Render() const;
 
-		void SetTexture(const std::string& filename);
+		
 		void SetPosition(float x, float y);
+		Transform const * GetTransform() const;
 
-		void AddComponent(/*const std::string& text,
-			 std::shared_ptr<Font> font,
-			 const SDL_Color& color = { 255, 255, 255, 255 }*/);
-		void GetComponent(int index, GameComponent* out);
+		template<class T, typename ...Args>
+			requires std::is_base_of_v<dae::GameComponent, T>
+		inline void AddComponent(Args&& ...args)
+		{
+			m_components.emplace_back(std::make_unique<T>(*this, std::forward<Args>(args)...));
+		}
+
+		template<class T>
+			requires std::is_base_of_v<GameComponent, T>
+		std::vector<T*> GetComponents()
+		{
+			std::vector<T*> result;
+
+			for (auto& component : m_components)
+			{
+				if (auto ptr = dynamic_cast<T*>(component.get()))
+				{
+					result.push_back(ptr);
+				}
+			}
+
+			return result;
+		}
+
+		template<class T>
+			requires std::is_base_of_v<GameComponent, T>
+		T* GetLatestComponent()
+		{
+			return dynamic_cast<T*>(m_components.back().get());
+		}
+
 		void RemoveComponent(int index);
 
-		GameObject() = default;
+		GameObject();
 		virtual ~GameObject();
 		GameObject(const GameObject& other) = delete;
 		GameObject(GameObject&& other) = delete;
 		GameObject& operator=(const GameObject& other) = delete;
 		GameObject& operator=(GameObject&& other) = delete;
 	};
+	
 }

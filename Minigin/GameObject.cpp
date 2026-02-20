@@ -1,5 +1,5 @@
 #include <string>
-#include "GameObject.h"
+
 #include "ResourceManager.h"
 #include "Renderer.h"
 
@@ -12,51 +12,68 @@
 
 #include <iostream>
 
+#include "GameObject.h"
+
+#include "GameComponent.h"
 
 
-dae::GameObject::~GameObject() = default;
-
-void dae::GameObject::Update(float deltaTime){}
-
-void dae::GameObject::Render() const
+namespace dae
 {
-	const auto& pos = m_transform.GetPosition();
-	Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
-}
+	GameObject::GameObject() = default;
 
-void dae::GameObject::SetTexture(const std::string& filename)
-{
-	m_texture = ResourceManager::GetInstance().LoadTexture(filename);
-}
+	GameObject::~GameObject() = default;
 
-void dae::GameObject::SetPosition(float x, float y)
-{
-	m_transform.SetPosition(x, y, 0.0f);
-}
-
-void dae::GameObject::AddComponent(/*const std::string& text,
-	std::shared_ptr<Font> font,
-	const SDL_Color& color*/)
-{
-	m_components.reserve(10);
-	std::cout << "hi";
-	m_components.emplace_back(std::move(std::make_unique<GameComponent>(this)));
-	//TextComponent(GameObject* parent,
-	// const std::string& text,
-	// std::shared_ptr<Font> font,
-	// const SDL_Color& color = { 255, 255, 255, 255 });
-	//m_components.push_back(std::make_unique<TextComponent>(this,text, font, color));
-}
-
-void dae::GameObject::GetComponent(int index, GameComponent* out)
-{
-	out = m_components[index].get();
-}
-
-void dae::GameObject::RemoveComponent(int index)
-{
-	if (index < m_components.size() && index >= 0)
+	void GameObject::Update(float deltaTime)
 	{
-		m_components.erase(m_components.begin() + index);
+		for (std::unique_ptr<GameComponent>& pComponent : m_components)
+		{
+			pComponent->Update(deltaTime);
+			RenderComponent* pRenderComponent = dynamic_cast<RenderComponent*>(pComponent.get());
+
+			if (pRenderComponent != nullptr)
+				pRenderComponent->Render();
+		}
+	}
+
+	void GameObject::Render() const
+	{
+		/*const auto& pos = m_transform.GetPosition();
+		Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);*/
+		for (std::unique_ptr<GameComponent>  const & pComponent : m_components)
+		{
+			RenderComponent* pRenderComponent = dynamic_cast<RenderComponent*>(pComponent.get());
+
+			if (pRenderComponent != nullptr)
+				pRenderComponent->Render();
+		}
+	}
+
+	
+
+	void GameObject::SetPosition(float x, float y)
+	{
+		m_transform.SetPosition(x, y, 0.0f);
+	}
+
+	Transform const * GameObject::GetTransform() const
+	{
+		return &m_transform;
+	}
+
+
+	/*template<class T, typename ...Args>
+		requires std::is_base_of_v<dae::GameComponent, T>
+	inline void GameObject::AddComponent(Args&& ...args)
+	{
+		m_components.emplace_back(std::make_unique<T>(*this, std::forward<Args>(args)...));
+	}*/
+
+
+	void GameObject::RemoveComponent(int index)
+	{
+		if (index < m_components.size() && index >= 0)
+		{
+			m_components.erase(m_components.begin() + index);
+		}
 	}
 }
