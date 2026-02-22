@@ -53,7 +53,7 @@ namespace dae
 			return dynamic_cast<T*>(m_components.back().get());
 		}
 
-		void RemoveComponent(int index);
+		void RemoveComponent(size_t index);
 
 		GameObject();
 		virtual ~GameObject();

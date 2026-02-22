@@ -69,7 +69,7 @@ namespace dae
 	}*/
 
 
-	void GameObject::RemoveComponent(int index)
+	void GameObject::RemoveComponent(size_t index)
 	{
 		if (index < m_components.size() && index >= 0)
 		{
