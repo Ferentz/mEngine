@@ -39,6 +39,10 @@ static void load()
 	to->SetPosition(292, 20);
 	scene.Add(std::move(to));
 
+	go = std::make_unique<dae::GameObject>();
+	go->AddComponent<dae::FPSComponent>("FPS", font);
+	scene.Add(std::move(go));
+
 	//const std::string& text,
 		// std::shared_ptr<Font> font,
 		// const SDL_Color& color = { 255, 255, 255, 255 }

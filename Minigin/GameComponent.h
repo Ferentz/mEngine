@@ -1,11 +1,18 @@
+#pragma once
 #include <string>
 #include <memory>
 
+#include "GameObject.h"
+#include "Transform.h"
+
+#include <SDL3/SDL_pixels.h>
+
 namespace dae
 {
-	class GameObject;
+	//class GameObject;
 	class Texture2D;
-
+	class Font;
+	
 	class GameComponent
 	{
 	public:
@@ -13,7 +20,7 @@ namespace dae
 		explicit GameComponent(GameObject& parent);
 
 		void SetParent(GameObject& parent);
-		void Update(float) {};
+		virtual void Update(float) {};
 
 	protected:
 		GameObject const* GetParent() const;
@@ -53,6 +60,11 @@ namespace dae
 		{
 		}
 
+		RenderComponent(const RenderComponent& other) = delete;
+		RenderComponent(RenderComponent&& other) = delete;
+		RenderComponent& operator=(const RenderComponent& other) = delete;
+		RenderComponent& operator=(RenderComponent&& other) = delete;
+
 		virtual void Render() const
 		{
 
@@ -60,44 +72,65 @@ namespace dae
 
 	};
 
-	class TextureComponent final : public RenderComponent
+	class TextureComponent : public RenderComponent
 	{
 	public:
 		virtual ~TextureComponent() override = default;
 		explicit TextureComponent(GameObject& parent);
+
+		TextureComponent(const TextureComponent& other) = delete;
+		TextureComponent(TextureComponent&& other) = delete;
+		TextureComponent& operator=(const TextureComponent& other) = delete;
+		TextureComponent& operator=(TextureComponent&& other) = delete;
 
 		virtual void Render() const override;
 		//virtual void Render()const override {}
 		void SetTexture(const std::string& filename);
 
 	protected:
-
-	private:
 		std::shared_ptr<Texture2D> m_texture{};
+	private:
+		
 	};
 
-	/*class TextComponent final : public GameComponent
+	class TextComponent : public TextureComponent
 	{
 	public:
-		TextComponent(GameObject* parent, const std::string& text, std::shared_ptr<Font> font, const SDL_Color& color = { 255, 255, 255, 255 });
 		virtual ~TextComponent() override = default;
 
+		explicit TextComponent(GameObject& parent,
+			const std::string& text, std::shared_ptr<Font> font, const SDL_Color& color = { 255, 255, 255, 255 });
 
-		void Update(float deltaTime) ;
-		void Render() const ;
+		virtual void Update(float) override;
 
 		void SetText(const std::string& text);
-		void SetPosition(float x, float y);
 		void SetColor(const SDL_Color& color);
+
+	protected:
 
 	private:
 		bool m_needsUpdate{};
 		std::string m_text{};
 		SDL_Color m_color{ 255, 255, 255, 255 };
-		Transform m_transform{};
 		std::shared_ptr<Font> m_font{};
-		std::shared_ptr<Texture2D> m_textTexture{};
+	};
 
-	};*/
+	class FPSComponent final : public TextComponent
+	{
+	public:
+		virtual ~FPSComponent() override = default;
+
+		explicit FPSComponent(GameObject& parent,
+			const std::string& text, std::shared_ptr<Font> font, const SDL_Color& color = { 255, 255, 255, 255 });
+
+		virtual void Update(float) override;
+
+	protected:
+
+	private:
+		float m_accTime{};
+		int m_frameCount{};
+		float m_prevDelta{};
+	};
 
 }
