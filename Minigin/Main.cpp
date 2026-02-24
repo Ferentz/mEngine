@@ -27,25 +27,23 @@ static void load()
 	scene.Add(std::move(go));
 
 	go = std::make_unique<dae::GameObject>();
-	go->AddComponent<dae::TextureComponent>();
-	go->GetLatestComponent<dae::TextureComponent>()->SetTexture("logo.png");
-	//go->SetTexture("logo.png");
-	go->SetPosition(358, 180);
+	auto component = go->AddNGetComponent<dae::TextureComponent>();
+	component->SetTexture("logo.png");
+	component->SetPosition(358, 180);
 	scene.Add(std::move(go));
 
 	auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
-	auto to = std::make_unique<dae::TextObject>("Programming 4 Assignment", font);
-	to->SetColor({ 255, 255, 0, 255 });
-	to->SetPosition(292, 20);
-	scene.Add(std::move(to));
+
+	go = std::make_unique<dae::GameObject>();
+	auto textComponent = go->AddNGetComponent<dae::TextComponent>("Programming 4 Assignment", font);
+	textComponent->SetPosition(292, 20);
+	textComponent->SetColor({ 255, 255, 0, 255 });
+	scene.Add(std::move(go));
 
 	go = std::make_unique<dae::GameObject>();
 	go->AddComponent<dae::FPSComponent>("FPS", font);
 	scene.Add(std::move(go));
 
-	//const std::string& text,
-		// std::shared_ptr<Font> font,
-		// const SDL_Color& color = { 255, 255, 255, 255 }
 	std::string fps{ "FPS" };
 	
 }

@@ -6,6 +6,7 @@
 #include "Transform.h"
 
 #include <SDL3/SDL_pixels.h>
+#include <glm/glm.hpp>
 
 namespace dae
 {
@@ -23,6 +24,9 @@ namespace dae
 		virtual void Update(float) {};
 
 	protected:
+		explicit GameComponent(GameObject* parent)
+			:m_pParent{parent}
+		{}
 		GameObject const* GetParent() const;
 
 	private:
@@ -51,12 +55,33 @@ namespace dae
 		derivedComponent& operator=(derivedComponent&& other) = delete;
 	};
 
+	class TransformComponent final : GameComponent
+	{
+	public:
+		TransformComponent(GameObject& parent)
+			:GameComponent(parent),
+			m_position{}
+		{
+		}
+		TransformComponent()
+			:GameComponent(nullptr),
+			m_position{}
+		{
+		}
+		const glm::vec3& GetPosition() const { return m_position; }
+		void SetPosition(float x, float y, float z = 0);
+		void SetPosition(const glm::vec3& position);
+	private:
+		glm::vec3 m_position;
+	};
+
 	class RenderComponent : public GameComponent
 	{
 	public:
 		virtual ~RenderComponent() = default;
 		explicit RenderComponent(GameObject& parent)
-			:GameComponent(parent)
+			:GameComponent(parent),
+			m_transform{}
 		{
 		}
 
@@ -67,9 +92,13 @@ namespace dae
 
 		virtual void Render() const
 		{
-
 		}
 
+		void SetPosition(float x, float y);
+		TransformComponent const* GetTransform() const;
+
+	private:
+		TransformComponent m_transform;
 	};
 
 	class TextureComponent : public RenderComponent

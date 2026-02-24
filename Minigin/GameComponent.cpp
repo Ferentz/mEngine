@@ -33,11 +33,33 @@ namespace dae
 	{
 	}
 
+	void TransformComponent::SetPosition(const float x, const float y, const float z)
+	{
+		m_position.x = x;
+		m_position.y = y;
+		m_position.z = z;
+	}
+
+	void dae::TransformComponent::SetPosition(const glm::vec3& position)
+	{
+		m_position = position;
+	}
+
+	void RenderComponent::SetPosition(float x, float y)
+	{
+		m_transform.SetPosition(x, y, 0.0f);
+	}
+
+	TransformComponent const* RenderComponent::GetTransform() const
+	{
+		return &m_transform;
+	}
+
 	void TextureComponent::Render() const
 	{
 		if (m_texture != nullptr)
 		{
-			const auto& pos = GetParent()->GetTransform()->GetPosition();
+			const auto& pos = GetTransform()->GetPosition();
 			Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
 		}
 	}
@@ -67,8 +89,7 @@ namespace dae
 	{
 		if (m_needsUpdate)
 		{
-			SDL_Color color{ 255, 255, 255, 255 };
-			const auto surf = TTF_RenderText_Blended(m_font->GetFont(), m_text.c_str(), m_text.length(), color);
+			const auto surf = TTF_RenderText_Blended(m_font->GetFont(), m_text.c_str(), m_text.length(), m_color);
 			if (surf == nullptr)
 			{
 				throw std::runtime_error(std::string("Render text failed: ") + SDL_GetError());
@@ -105,7 +126,7 @@ namespace dae
 		if (m_accTime >= 1.f)
 		{
 			if (const float fps{ m_frameCount / m_accTime };
-				std::abs(m_prevDelta - fps) >= 0.01f)
+				m_prevDelta - fps >= 0.01f || m_prevDelta - fps <= -0.01f)
 			{
 				SetText(std::format("FPS: {:.2f}", fps));
 				m_prevDelta = fps;

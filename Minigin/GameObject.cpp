@@ -19,7 +19,10 @@
 
 namespace dae
 {
-	GameObject::GameObject() = default;
+	GameObject::GameObject()
+		:m_transform{ std::make_unique<TransformComponent>(*this) }
+	{
+	}
 
 	GameObject::~GameObject() = default;
 
@@ -52,22 +55,13 @@ namespace dae
 
 	void GameObject::SetPosition(float x, float y)
 	{
-		m_transform.SetPosition(x, y, 0.0f);
+		m_transform->SetPosition(x, y, 0.0f);
 	}
 
-	Transform const * GameObject::GetTransform() const
+	TransformComponent const * GameObject::GetTransform() const
 	{
-		return &m_transform;
+		return m_transform.get();
 	}
-
-
-	/*template<class T, typename ...Args>
-		requires std::is_base_of_v<dae::GameComponent, T>
-	inline void GameObject::AddComponent(Args&& ...args)
-	{
-		m_components.emplace_back(std::make_unique<T>(*this, std::forward<Args>(args)...));
-	}*/
-
 
 	void GameObject::RemoveComponent(size_t index)
 	{

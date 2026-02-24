@@ -6,11 +6,12 @@
 namespace dae
 {
 	class GameComponent;
+	class TransformComponent;
 	class Font;
 	class Texture2D;
 	class GameObject 
 	{
-		Transform m_transform{};
+		std::unique_ptr<TransformComponent> m_transform;
 		
 		std::vector<std::unique_ptr<GameComponent>> m_components{};
 
@@ -20,7 +21,7 @@ namespace dae
 
 		
 		void SetPosition(float x, float y);
-		Transform const * GetTransform() const;
+		TransformComponent const * GetTransform() const;
 
 		template<class T, typename ...Args>
 			requires std::is_base_of_v<dae::GameComponent, T>
@@ -51,6 +52,14 @@ namespace dae
 		T* GetLatestComponent()
 		{
 			return dynamic_cast<T*>(m_components.back().get());
+		}
+
+		template<class T, typename ...Args>
+			requires std::is_base_of_v<dae::GameComponent, T>
+		T* AddNGetComponent(Args&& ...args)
+		{
+			AddComponent<T>(std::forward<Args>(args)...);
+			return GetLatestComponent<T>();
 		}
 
 		void RemoveComponent(size_t index);
