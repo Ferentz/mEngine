@@ -26,6 +26,18 @@ namespace dae
 			return out;
 		}
 
+		Transform operator-(Transform const& in)
+		{
+			Transform out{};
+
+			float dx = this->m_position.x - in.m_position.x;
+			float dy = this->m_position.y - in.m_position.y;
+
+			out.m_position.x = dx * cos(in.m_rotation_radians) + dy * sin(in.m_rotation_radians);
+			out.m_position.y = -dx * sin(in.m_rotation_radians) + dy * cos(in.m_rotation_radians);
+			return out;
+		}
+
 	private:
 
 		glm::vec3 m_position{};
@@ -45,6 +57,8 @@ namespace dae
 		Transform const * GetWorldTransform() const;
 
 		float GetRotation() { return m_local.GetRotation(); }
+
+		void Rebase(Transform const * newBase);
 
 		void MakeDirty();
 

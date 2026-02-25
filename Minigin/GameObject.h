@@ -22,7 +22,7 @@ namespace dae
 		virtual void Update(float deltaTime);
 		virtual void Render() const;
 
-		void SetParent( GameObject & newParent, bool keepWorldPos = true);
+		void SetParent( GameObject & newParent, bool keepWorldPos = false);
 		bool AddChild(GameObject* newChild);
 		void SetPosition(float x, float y);
 		auto GetTransform() const -> SmartTransform const*;
@@ -31,6 +31,8 @@ namespace dae
 		Transform const* QueryWorldTransform();
 		Transform const* GetWorldTransform() const;
 		void MakeDirty();
+		void MarkForDelete( bool excludeChildren = false);
+		bool WillBeDeleted() const { return m_toDelete; }
 
 	// COMPONENT FUNCTIONS
 		void RemoveComponent(size_t index);
@@ -74,9 +76,10 @@ namespace dae
 			return GetLatestComponent<T>();
 		}
 	protected:
-		bool m_Dirty{};
+		bool m_Dirty{true};
 		SmartTransform m_transform{};
 	private:
+		bool m_toDelete{};
 		GameObject* m_pParent;
 		std::vector<std::unique_ptr<GameComponent>> m_components{};
 		std::vector<GameObject*> m_children{};

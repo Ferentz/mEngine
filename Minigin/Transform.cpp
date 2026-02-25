@@ -69,6 +69,13 @@ dae::Transform const * dae::SmartTransform::GetWorldTransform() const
 	return &m_global;
 }
 
+void dae::SmartTransform::Rebase(Transform const * newBase)
+{
+	float rotation = m_local.GetRotation();
+	m_local = m_global - *newBase;
+	m_local.SetRotation(rotation);
+}
+
 void dae::SmartTransform::MakeDirty()
 {
 	m_dirty = true;

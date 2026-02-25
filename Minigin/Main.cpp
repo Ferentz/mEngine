@@ -52,7 +52,7 @@ static void load()
 
 	auto aco1 = std::make_unique<dae::RotatingObject>();
 	aco1->SetPosition(70, 0);
-	aco1->SetRotationSpeed(2.5);
+	aco1->SetRotationSpeed(-2.5);
 	auto acocomponent = aco1->AddNGetComponent<dae::TextureComponent>();
 	acocomponent->SetTexture("SPOSA1.png");
 	aco1->SetParent(*rotBase);

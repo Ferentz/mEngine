@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <vector>
 #include "Scene.h"
 
 using namespace dae;
@@ -28,6 +29,10 @@ void Scene::RemoveAll()
 
 void Scene::Update(float deltatime)
 {
+	std::erase_if(m_objects, [](std::unique_ptr<GameObject> const & obj) {
+		return obj->WillBeDeleted();
+		});
+
 	for(auto& object : m_objects)
 	{
 		object->Update(deltatime);

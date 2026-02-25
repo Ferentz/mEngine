@@ -59,13 +59,11 @@ namespace dae
 
 		if (keepWorldPos)
 		{
-			//rebase pos
-			m_transform.
+			m_transform.Rebase(parent.QueryWorldTransform());
+			//this->MakeDirty();
 		}
-		else
-		{
-			this->MakeDirty();
-		}
+		this->MakeDirty();
+		
 		this->m_pParent = &parent;
 		
 	}
@@ -127,6 +125,23 @@ namespace dae
 		for (GameObject* pChild : m_children)
 		{
 			pChild->MakeDirty();
+		}
+	}
+
+	void GameObject::MarkForDelete(bool excludeChildren)
+	{
+		m_toDelete = true;
+		if (excludeChildren)
+		{
+			for (GameObject* child : m_children)
+			{
+				child->SetParent(*m_pParent);
+			}
+			// set children parent to curent parent
+		}
+		for (GameObject* child : m_children)
+		{
+			child->MarkForDelete();
 		}
 	}
 
