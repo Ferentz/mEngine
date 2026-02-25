@@ -86,7 +86,7 @@ namespace dae
 	public:
 		virtual ~RenderComponent() = default;
 		explicit RenderComponent(GameObject& parent)
-			:GameComponent(parent),
+			:GameComponent{ parent },
 			m_transform{}
 		{
 		}

@@ -32,7 +32,7 @@ namespace dae
 	}
 
 	derivedComponent::derivedComponent(GameObject& parent, float val)
-		:GameComponent(parent),
+		:GameComponent{ parent },
 		m_val{val}
 	{
 	}
@@ -96,7 +96,7 @@ namespace dae
 	}
 
 	TextureComponent::TextureComponent(GameObject& parent)
-		:RenderComponent(parent),
+		:RenderComponent{ parent },
 		m_texture(nullptr)
 	{
 	}
@@ -149,7 +149,7 @@ namespace dae
 		m_needsUpdate = true;
 	}
 	FPSComponent::FPSComponent(GameObject& parent, const std::string& text, std::shared_ptr<Font> font, const SDL_Color& color)
-		:TextComponent(parent, text, font, color)
+		:TextComponent{ parent, text, font, color }
 	{
 	}
 	void FPSComponent::Update(float deltaTime)

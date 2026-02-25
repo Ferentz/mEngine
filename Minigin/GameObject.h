@@ -80,7 +80,7 @@ namespace dae
 		SmartTransform m_transform{};
 	private:
 		bool m_toDelete{};
-		GameObject* m_pParent;
+		GameObject* m_pParent{};
 		std::vector<std::unique_ptr<GameComponent>> m_components{};
 		std::vector<GameObject*> m_children{};
 	};
