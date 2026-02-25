@@ -34,15 +34,38 @@ static void load()
 
 	auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
 
-	go = std::make_unique<dae::GameObject>();
-	auto textComponent = go->AddNGetComponent<dae::TextComponent>("Programming 4 Assignment", font);
+	auto go2 = std::make_unique<dae::GameObject>();
+	//go2->SetParent(*go.get());
+	auto textComponent = go2->AddNGetComponent<dae::TextComponent>("Programming 4 Assignment", font);
 	textComponent->SetPosition(292, 20);
 	textComponent->SetColor({ 255, 255, 0, 255 });
-	scene.Add(std::move(go));
+	scene.Add(std::move(go2));
+
+	
 
 	go = std::make_unique<dae::GameObject>();
 	go->AddComponent<dae::FPSComponent>("FPS", font);
 	scene.Add(std::move(go));
+
+	auto rotBase = std::make_unique<dae::RotatingObject>();
+	rotBase->SetPosition(200, 200);
+
+	auto aco1 = std::make_unique<dae::RotatingObject>();
+	aco1->SetPosition(70, 0);
+	aco1->SetRotationSpeed(2.5);
+	auto acocomponent = aco1->AddNGetComponent<dae::TextureComponent>();
+	acocomponent->SetTexture("SPOSA1.png");
+	aco1->SetParent(*rotBase);
+
+	auto aco2 = std::make_unique<dae::GameObject>();
+	aco2->SetPosition(20, 0);
+	auto acocomponent2 = aco2->AddNGetComponent<dae::TextureComponent>();
+	acocomponent2->SetTexture("SPOSA1.png");
+	aco2->SetParent(*aco1);
+
+	scene.Add(std::move(rotBase));
+	scene.Add(std::move(aco1));
+	scene.Add(std::move(aco2));
 
 	std::string fps{ "FPS" };
 	

@@ -21,6 +21,10 @@ namespace dae
 	{
 		m_pParent = &parent;
 	}
+	void GameComponent::MakeDirty()
+	{
+		m_dirty = true;
+	}
 
 	GameObject const* GameComponent::GetParent() const
 	{
@@ -33,7 +37,7 @@ namespace dae
 	{
 	}
 
-	void TransformComponent::SetPosition(const float x, const float y, const float z)
+	/*void TransformComponent::SetPosition(const float x, const float y, const float z)
 	{
 		m_position.x = x;
 		m_position.y = y;
@@ -43,23 +47,50 @@ namespace dae
 	void dae::TransformComponent::SetPosition(const glm::vec3& position)
 	{
 		m_position = position;
+	}*/
+
+	void RenderComponent::Update(float)
+	{
+		if (m_dirty)
+		{
+			QueryWorldTransform();
+			m_dirty = false;
+		}
+	}
+
+	void RenderComponent::MakeDirty()
+	{
+		GameComponent::MakeDirty();
+		m_transform.MakeDirty();
+
 	}
 
 	void RenderComponent::SetPosition(float x, float y)
 	{
+		MakeDirty();
 		m_transform.SetPosition(x, y, 0.0f);
 	}
 
-	TransformComponent const* RenderComponent::GetTransform() const
+	Transform const* RenderComponent::GetLocalTransform() const
 	{
-		return &m_transform;
+		return m_transform.GetLocalTransform();
+	}
+
+	Transform const* RenderComponent::GetWorldTransform() const
+	{
+		return m_transform.GetWorldTransform();
+	}
+
+	Transform const * RenderComponent::QueryWorldTransform()
+	{
+		return m_transform.QueryWorldTransform(GetParent()->GetWorldTransform());
 	}
 
 	void TextureComponent::Render() const
 	{
 		if (m_texture != nullptr)
 		{
-			const auto& pos = GetTransform()->GetPosition();
+			const auto& pos = GetWorldTransform()->GetPosition();
 			Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
 		}
 	}
@@ -87,6 +118,7 @@ namespace dae
 
 	void TextComponent::Update(float)
 	{
+		RenderComponent::Update({});
 		if (m_needsUpdate)
 		{
 			const auto surf = TTF_RenderText_Blended(m_font->GetFont(), m_text.c_str(), m_text.length(), m_color);
@@ -104,6 +136,7 @@ namespace dae
 			m_needsUpdate = false;
 		}
 	}
+	
 	void TextComponent::SetText(const std::string& text)
 	{
 		m_text = text;

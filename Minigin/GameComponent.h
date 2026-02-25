@@ -2,7 +2,7 @@
 #include <string>
 #include <memory>
 
-#include "GameObject.h"
+//#include "GameObject.h"
 #include "Transform.h"
 
 #include <SDL3/SDL_pixels.h>
@@ -10,7 +10,9 @@
 
 namespace dae
 {
-	//class GameObject;
+	
+
+	class GameObject;
 	class Texture2D;
 	class Font;
 	
@@ -21,7 +23,9 @@ namespace dae
 		explicit GameComponent(GameObject& parent);
 
 		void SetParent(GameObject& parent);
-		virtual void Update(float) {};
+		virtual void Update(float) { if (m_dirty) m_dirty = false; };
+
+		virtual void MakeDirty();
 
 	protected:
 		explicit GameComponent(GameObject* parent)
@@ -29,8 +33,10 @@ namespace dae
 		{}
 		GameObject const* GetParent() const;
 
+		bool m_dirty{ true };
 	private:
 		GameObject* m_pParent;
+		
 		
 		GameComponent(const GameComponent& other) = delete;
 		GameComponent(GameComponent&& other) = delete;
@@ -55,7 +61,7 @@ namespace dae
 		derivedComponent& operator=(derivedComponent&& other) = delete;
 	};
 
-	class TransformComponent final : GameComponent
+	/*class TransformComponent final : GameComponent
 	{
 	public:
 		TransformComponent(GameObject& parent)
@@ -73,7 +79,7 @@ namespace dae
 		void SetPosition(const glm::vec3& position);
 	private:
 		glm::vec3 m_position;
-	};
+	};*/
 
 	class RenderComponent : public GameComponent
 	{
@@ -89,16 +95,18 @@ namespace dae
 		RenderComponent(RenderComponent&& other) = delete;
 		RenderComponent& operator=(const RenderComponent& other) = delete;
 		RenderComponent& operator=(RenderComponent&& other) = delete;
-
-		virtual void Render() const
-		{
-		}
+		
+		virtual void Render() const = 0;
+		virtual void Update(float) override;
+		virtual void MakeDirty() override;
 
 		void SetPosition(float x, float y);
-		TransformComponent const* GetTransform() const;
+		Transform const* GetLocalTransform() const;
+		Transform const * QueryWorldTransform();
+		Transform const* GetWorldTransform() const;
 
 	private:
-		TransformComponent m_transform;
+		SmartTransform m_transform;
 	};
 
 	class TextureComponent : public RenderComponent
