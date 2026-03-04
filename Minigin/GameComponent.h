@@ -147,9 +147,9 @@ namespace dae
 			for (int trie{}; trie < m_tries; trie++)
 			{
 				int step{};
-				for (int stepsize{ 1 }; stepsize <= 1024; stepsize *= 2)
+				for (size_t stepsize{ 1 }; stepsize <= 1024; stepsize *= 2)
 				{
-					for (int i{}; i < buffer.size(); i += stepsize)
+					for (size_t i{}; i < buffer.size(); i += stepsize)
 					{
 						buffer[i].id *= 2;
 					}
