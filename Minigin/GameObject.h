@@ -19,8 +19,8 @@ namespace dae
 		GameObject& operator=(const GameObject& other) = delete;
 		GameObject& operator=(GameObject&& other) = delete;
 
-		virtual void Update(float deltaTime);
-		virtual void Render();
+		void Update(float deltaTime);
+		void Render();
 
 		void SetParent(GameObject& newParent, bool keepWorldPos = false);
 		
