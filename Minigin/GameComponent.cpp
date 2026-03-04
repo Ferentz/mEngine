@@ -21,12 +21,9 @@ namespace dae
 	{
 		m_pParent = &parent;
 	}
-	void GameComponent::MakeDirty()
-	{
-		m_dirty = true;
-	}
+	
 
-	GameObject const* GameComponent::GetParent() const
+	GameObject* GameComponent::GetParent() const
 	{
 		return m_pParent;
 	}
@@ -37,30 +34,46 @@ namespace dae
 	{
 	}
 
-	/*void TransformComponent::SetPosition(const float x, const float y, const float z)
+	RotatorComponent::RotatorComponent(GameObject& parent)
+		:GameComponent{ parent }
 	{
-		m_position.x = x;
-		m_position.y = y;
-		m_position.z = z;
 	}
 
-	void dae::TransformComponent::SetPosition(const glm::vec3& position)
+	void RotatorComponent::Update(float deltaTime)
 	{
-		m_position = position;
+		SmartTransform* transform{ GetParent()->GetTransform() };
+		transform->SetRotation(transform->GetRotation() + m_rotatingSpeed * deltaTime);
+		//transform->MakeDirty();
+		GetParent()->MakeDirty();
+	}
+
+	void RotatorComponent::SetRotationSpeed(float speed)
+	{
+		m_rotatingSpeed = speed;
+	}
+
+	/*void RotatingObject::Update(float deltaTime)
+	{
+		m_transform.SetRotation(m_transform.GetRotation() + m_rotatingSpeed * deltaTime);
+		MakeDirty();
+		GameObject::Update(deltaTime);
+	}
+	void RotatingObject::SetRotationSpeed(float speed)
+	{
+		m_rotatingSpeed = speed;
 	}*/
 
 	void RenderComponent::Update(float)
 	{
-		if (m_dirty)
+		/*if (m_dirty)
 		{
 			QueryWorldTransform();
 			m_dirty = false;
-		}
+		}*/
 	}
 
 	void RenderComponent::MakeDirty()
 	{
-		GameComponent::MakeDirty();
 		m_transform.MakeDirty();
 
 	}
@@ -83,14 +96,14 @@ namespace dae
 
 	Transform const * RenderComponent::QueryWorldTransform()
 	{
-		return m_transform.QueryWorldTransform(GetParent()->GetWorldTransform());
+		return m_transform.QueryWorldTransform(GetParent()->QueryWorldTransform());
 	}
 
-	void TextureComponent::Render() const
+	void TextureComponent::Render()
 	{
 		if (m_texture != nullptr)
 		{
-			const auto& pos = GetWorldTransform()->GetPosition();
+			const auto& pos = QueryWorldTransform()->GetPosition();
 			Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
 		}
 	}
@@ -169,5 +182,6 @@ namespace dae
 			m_frameCount = 0;
 		}
 	}
+	
 }
 

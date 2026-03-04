@@ -24,26 +24,26 @@ namespace dae
 
 	void GameObject::Update(float deltaTime)
 	{
-		if (m_Dirty)
-		{
-			//variable = (condition) ? expressionTrue : expressionFalse;
-			Transform const * pass{ (m_pParent == nullptr) ? nullptr : m_pParent->QueryWorldTransform()};
-			m_transform.QueryWorldTransform(pass);
-		}
+		
 		for (std::unique_ptr<GameComponent>& pComponent : m_components)
 		{
 			pComponent->Update(deltaTime);
 		}
-		
+		//if (m_Dirty)
+		//{
+		//	//variable = (condition) ? expressionTrue : expressionFalse;
+		//	Transform const* pass{ (m_pParent == nullptr) ? nullptr : m_pParent->QueryWorldTransform() };
+		//	m_transform.QueryWorldTransform(pass);
+		//}
 	}
 
-	void GameObject::Render() const
+	void GameObject::Render()
 	{
-		/*const auto& pos = m_transform.GetPosition();
-		Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);*/
-		for (std::unique_ptr<GameComponent>  const & pComponent : m_components)
+		// TODO change
+
+		for (RenderComponent* pRenderComponent : m_renderComponents)
 		{
-			RenderComponent* pRenderComponent = dynamic_cast<RenderComponent*>(pComponent.get());
+			//RenderComponent* pRenderComponent = dynamic_cast<RenderComponent*>(pComponent.get());
 
 			if (pRenderComponent != nullptr)
 				pRenderComponent->Render();
@@ -53,8 +53,13 @@ namespace dae
 
 	void GameObject::SetParent(GameObject& parent, bool keepWorldPos)
 	{
-		if (&parent == m_pParent) return;
+		// if the new parent is already the parent of the object
+		if (&parent == this->m_pParent) return;
 
+		// if the new parent is a child of the object
+		if (this->IsChild(&parent)) return;
+
+		//if the object is in the child list of the parent - SHOULD BE REDUNDANT
 		if (!parent.AddChild(this)) return;
 
 		if (keepWorldPos)
@@ -79,17 +84,33 @@ namespace dae
 		return true;
 	}
 
+	void GameObject::RemoveChild(GameObject* toRemove)
+	{
+		// checks whole vector. remove " m_children.end()" as an erase argument and it will only remove 1 instance.
+		m_children.erase(std::remove(m_children.begin(), m_children.end(), toRemove), m_children.end());
+	}
+
+	bool GameObject::IsChild(GameObject* object)
+	{
+		for (GameObject* child : m_children)
+		{
+			if ( object == child ) return true;
+			if ( child->IsChild(object) ) return true;
+		}
+		return false;
+	}
+
 	void GameObject::SetPosition(float x, float y)
 	{
 		m_transform.SetPosition(x, y);
-		for (std::unique_ptr<GameComponent>& component : m_components)
+		for (RenderComponent * component : m_renderComponents)
 		{
 			component->MakeDirty();
 		}
 		//m_transform->SetPosition(x, y, 0.0f);
 	}
 
-	SmartTransform const * GameObject::GetTransform() const
+	SmartTransform * GameObject::GetTransform()
 	{
 		return &m_transform;
 	}
@@ -104,21 +125,22 @@ namespace dae
 		return m_transform.GetWorldTransform();
 	}
 
-	Transform const* GameObject::QueryWorldTransform()
+	Transform * GameObject::QueryWorldTransform()
 	{
-		if (m_Dirty)
+		Transform* temp{ nullptr };
+		if (m_pParent != nullptr)
 		{
-			m_transform.QueryWorldTransform(nullptr);
-			m_Dirty = false;
+			temp = m_pParent->QueryWorldTransform();
 		}
-		return m_transform.GetWorldTransform();
+		m_Dirty = false;
+		return m_transform.QueryWorldTransform(temp);
 	}
 
 	void GameObject::MakeDirty()
 	{
 		m_Dirty = true;
 		m_transform.MakeDirty();
-		for (std::unique_ptr<GameComponent>& pComponent : m_components)
+		for (RenderComponent* pComponent : m_renderComponents)
 		{
 			pComponent->MakeDirty();
 		}
@@ -151,16 +173,5 @@ namespace dae
 		{
 			m_components.erase(m_components.begin() + index);
 		}
-	}
-
-	void RotatingObject::Update(float deltaTime)
-	{
-		m_transform.SetRotation(m_transform.GetRotation() + m_rotatingSpeed * deltaTime);
-		MakeDirty();
-		GameObject::Update(deltaTime);
-	}
-	void RotatingObject::SetRotationSpeed(float speed)
-	{
-		m_rotatingSpeed = speed;
 	}
 }

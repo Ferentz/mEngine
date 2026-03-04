@@ -47,12 +47,15 @@ static void load()
 	go->AddComponent<dae::FPSComponent>("FPS", font);
 	scene.Add(std::move(go));
 
-	auto rotBase = std::make_unique<dae::RotatingObject>();
+	auto rotBase = std::make_unique<dae::GameObject>();
 	rotBase->SetPosition(200, 200);
+	rotBase->AddComponent<dae::RotatorComponent>();
+	//rotatorComp1->SetRotationSpeed(-2.5);
 
-	auto aco1 = std::make_unique<dae::RotatingObject>();
+	auto aco1 = std::make_unique<dae::GameObject>();
+	auto rotatorComp2 = aco1->AddNGetComponent<dae::RotatorComponent>();
 	aco1->SetPosition(70, 0);
-	aco1->SetRotationSpeed(-2.5);
+	rotatorComp2->SetRotationSpeed(-2.5);
 	auto acocomponent = aco1->AddNGetComponent<dae::TextureComponent>();
 	acocomponent->SetTexture("SPOSA1.png");
 	aco1->SetParent(*rotBase);

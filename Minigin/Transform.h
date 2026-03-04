@@ -53,7 +53,7 @@ namespace dae
 
 		Transform const * GetLocalTransform() const;
 
-		Transform const * QueryWorldTransform(Transform const* const parentWorldTransform);
+		Transform * QueryWorldTransform(Transform const* const parentWorldTransform);
 		Transform const * GetWorldTransform() const;
 
 		float GetRotation() { return m_local.GetRotation(); }

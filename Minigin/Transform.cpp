@@ -42,7 +42,7 @@ dae::Transform const * dae::SmartTransform::GetLocalTransform() const
 	return &m_local;
 }
 
-dae::Transform const* dae::SmartTransform::QueryWorldTransform(Transform const * const parentWorldTransform)
+dae::Transform * dae::SmartTransform::QueryWorldTransform(Transform const * const parentWorldTransform)
 {
 	if (parentWorldTransform == nullptr)
 	{
@@ -51,7 +51,7 @@ dae::Transform const* dae::SmartTransform::QueryWorldTransform(Transform const *
 			m_dirty = false;
 			m_global = m_local;
 		}
-		return GetLocalTransform();
+		return &m_local;
 	}
 
 	//Transform const * world{ GetWorldTransform() };

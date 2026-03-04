@@ -23,17 +23,14 @@ namespace dae
 		explicit GameComponent(GameObject& parent);
 
 		void SetParent(GameObject& parent);
-		virtual void Update(float) { if (m_dirty) m_dirty = false; };
+		virtual void Update(float) {};
 
-		virtual void MakeDirty();
 
 	protected:
 		explicit GameComponent(GameObject* parent)
 			:m_pParent{parent}
 		{}
-		GameObject const* GetParent() const;
-
-		bool m_dirty{ true };
+		GameObject* GetParent() const;
 	private:
 		GameObject* m_pParent;
 		
@@ -61,25 +58,24 @@ namespace dae
 		derivedComponent& operator=(derivedComponent&& other) = delete;
 	};
 
-	/*class TransformComponent final : GameComponent
+	class RotatorComponent final : public GameComponent
 	{
 	public:
-		TransformComponent(GameObject& parent)
-			:GameComponent(parent),
-			m_position{}
-		{
-		}
-		TransformComponent()
-			:GameComponent(nullptr),
-			m_position{}
-		{
-		}
-		const glm::vec3& GetPosition() const { return m_position; }
-		void SetPosition(float x, float y, float z = 0);
-		void SetPosition(const glm::vec3& position);
-	private:
-		glm::vec3 m_position;
-	};*/
+		virtual ~RotatorComponent() override = default;
+		explicit RotatorComponent(GameObject& parent);
+
+		virtual void Update(float) override;
+
+		void SetRotationSpeed(float speed);
+
+	protected: // i tried something, it didnt work. i need fps
+		float m_rotatingSpeed{ 1.f };
+
+		RotatorComponent(const RotatorComponent& other) = delete;
+		RotatorComponent(RotatorComponent&& other) = delete;
+		RotatorComponent& operator=(const RotatorComponent& other) = delete;
+		RotatorComponent& operator=(RotatorComponent&& other) = delete;
+	};
 
 	class RenderComponent : public GameComponent
 	{
@@ -96,9 +92,9 @@ namespace dae
 		RenderComponent& operator=(const RenderComponent& other) = delete;
 		RenderComponent& operator=(RenderComponent&& other) = delete;
 		
-		virtual void Render() const = 0;
+		virtual void Render() = 0;
 		virtual void Update(float) override;
-		virtual void MakeDirty() override;
+		void MakeDirty();
 
 		void SetPosition(float x, float y);
 		Transform const* GetLocalTransform() const;
@@ -120,7 +116,7 @@ namespace dae
 		TextureComponent& operator=(const TextureComponent& other) = delete;
 		TextureComponent& operator=(TextureComponent&& other) = delete;
 
-		virtual void Render() const override;
+		virtual void Render() override;
 		//virtual void Render()const override {}
 		void SetTexture(const std::string& filename);
 

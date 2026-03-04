@@ -9,7 +9,7 @@ namespace dae
 	class TransformComponent;
 	class Font;
 	class Texture2D;
-	class GameObject 
+	class GameObject final
 	{
 	public:
 		GameObject() = default;
@@ -20,28 +20,38 @@ namespace dae
 		GameObject& operator=(GameObject&& other) = delete;
 
 		virtual void Update(float deltaTime);
-		virtual void Render() const;
+		virtual void Render();
 
-		void SetParent( GameObject & newParent, bool keepWorldPos = false);
-		bool AddChild(GameObject* newChild);
+		void SetParent(GameObject& newParent, bool keepWorldPos = false);
+		
+		bool IsChild(GameObject* object);
 		void SetPosition(float x, float y);
-		auto GetTransform() const -> SmartTransform const*;
+		auto GetTransform() -> SmartTransform*;
+
 
 		Transform const* GetLocalTransform() const;
-		Transform const* QueryWorldTransform();
+		Transform * QueryWorldTransform();
 		Transform const* GetWorldTransform() const;
+
 		void MakeDirty();
-		void MarkForDelete( bool excludeChildren = false);
+		void MarkForDelete(bool excludeChildren = false);
 		bool WillBeDeleted() const { return m_toDelete; }
 
-	// COMPONENT FUNCTIONS
+		// COMPONENT FUNCTIONS
 		void RemoveComponent(size_t index);
 
 		template<class T, typename ...Args>
 			requires std::is_base_of_v<dae::GameComponent, T>
 		inline void AddComponent(Args&& ...args)
 		{
+
 			m_components.emplace_back(std::make_unique<T>(*this, std::forward<Args>(args)...));
+
+			if constexpr (std::derived_from<T, RenderComponent>)
+			{
+				m_renderComponents.emplace_back(static_cast<RenderComponent*>(m_components.back().get()));
+			}
+			
 		}
 
 		template<class T>
@@ -65,7 +75,7 @@ namespace dae
 			requires std::is_base_of_v<GameComponent, T>
 		T* GetLatestComponent()
 		{
-			return dynamic_cast<T*>(m_components.back().get());
+				return dynamic_cast<T*>(m_components.back().get());
 		}
 
 		template<class T, typename ...Args>
@@ -75,28 +85,20 @@ namespace dae
 			AddComponent<T>(std::forward<Args>(args)...);
 			return GetLatestComponent<T>();
 		}
+
 	protected:
-		bool m_Dirty{true};
+		bool m_Dirty{ true };
 		SmartTransform m_transform{};
+
 	private:
 		bool m_toDelete{};
 		GameObject* m_pParent{};
 		std::vector<std::unique_ptr<GameComponent>> m_components{};
+		std::vector<RenderComponent*> m_renderComponents{};
 		std::vector<GameObject*> m_children{};
-	};
-	
-
-	class RotatingObject final : public GameObject
-	{
-	public:
-		RotatingObject() = default;
-		virtual ~RotatingObject() override = default;
-
-		virtual void Update(float deltaTime) override;
-
-		void SetRotationSpeed(float speed);
 
 	private:
-		float m_rotatingSpeed{1.f};
+		bool AddChild(GameObject* newChild);
+		void RemoveChild(GameObject* toRemove);
 	};
 }
