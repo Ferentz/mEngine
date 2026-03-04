@@ -13,6 +13,8 @@
 
 #include <filesystem>
 #include "GameComponent.h"
+
+
 namespace fs = std::filesystem;
 
 static void load()
@@ -41,11 +43,15 @@ static void load()
 	textComponent->SetColor({ 255, 255, 0, 255 });
 	scene.Add(std::move(go2));
 
-	
-
 	go = std::make_unique<dae::GameObject>();
 	go->AddComponent<dae::FPSComponent>("FPS", font);
 	scene.Add(std::move(go));
+
+	go = std::make_unique<dae::GameObject>();
+	go->AddComponent<dae::UIComponent>("exercise 1");
+	go->AddComponent<dae::UIComponent_2>("exercise 2");
+	scene.Add(std::move(go));
+
 
 	auto rotBase = std::make_unique<dae::GameObject>();
 	rotBase->SetPosition(200, 200);
@@ -69,6 +75,8 @@ static void load()
 	scene.Add(std::move(rotBase));
 	scene.Add(std::move(aco1));
 	scene.Add(std::move(aco2));
+
+
 
 	std::string fps{ "FPS" };
 	

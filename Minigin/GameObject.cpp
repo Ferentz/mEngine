@@ -59,16 +59,24 @@ namespace dae
 		// if the new parent is a child of the object
 		if (this->IsChild(&parent)) return;
 
-		//if the object is in the child list of the parent - SHOULD BE REDUNDANT
-		if (!parent.AddChild(this)) return;
-
+		//if the object is in the child list of the parent
+		
+		//rebase transforms
 		if (keepWorldPos)
 		{
 			m_transform.Rebase(parent.QueryWorldTransform());
 			//this->MakeDirty();
 		}
 		this->MakeDirty();
+
+
+		// - should always return true atm. failsafe in function should be posible to remove
+		if (!parent.AddChild(this)) return;
+
+		//remove from old parent
+		if (m_pParent) m_pParent->RemoveChild(this);
 		
+		// officialy set new parent;
 		this->m_pParent = &parent;
 		
 	}
