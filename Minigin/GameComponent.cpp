@@ -143,7 +143,7 @@ namespace dae
 	{
 		if (m_run_trash1)
 		{
-			RunTrash(m_timings);
+			RunTrash<int>(m_timings);
 			//RunTrash1();
 			m_run_trash1 = false;
 		}
@@ -187,42 +187,42 @@ namespace dae
 		ImGui::End(); // everything you begin, you must end.
 	}
 
-	void UIComponent::RunTrash(std::vector<float>& toFill)
-	{
-		std::vector<int> buffer(m_bufferSize);
-		auto start = std::chrono::high_resolution_clock::now();
+	//void UIComponent::RunTrash(std::vector<float>& toFill)
+	//{
+	//	std::vector<int> buffer(m_bufferSize);
+	//	auto start = std::chrono::high_resolution_clock::now();
 
-		toFill.resize(m_timingsAmount);
-		std::fill(toFill.begin(), toFill.end(), 0.f);
+	//	toFill.resize(m_timingsAmount);
+	//	std::fill(toFill.begin(), toFill.end(), 0.f);
 
-		for (int trie{}; trie < m_tries; trie++)
-		{
-			size_t step{};
-			for (size_t stepsize{ 1 }; stepsize <= 1024; stepsize *= 2)
-			{
-				for (size_t i{}; i < buffer.size(); i += stepsize)
-				{
-					buffer[i] *= 2;
-				}
-				const auto current_time{ std::chrono::high_resolution_clock::now() };
-				float m_deltaTime = std::chrono::duration<float>(current_time - start).count();
-				//std::cout << m_deltaTime << "\n";
+	//	for (int trie{}; trie < m_tries; trie++)
+	//	{
+	//		size_t step{};
+	//		for (size_t stepsize{ 1 }; stepsize <= 1024; stepsize *= 2)
+	//		{
+	//			for (size_t i{}; i < buffer.size(); i += stepsize)
+	//			{
+	//				buffer[i] *= 2;
+	//			}
+	//			const auto current_time{ std::chrono::high_resolution_clock::now() };
+	//			float m_deltaTime = std::chrono::duration<float>(current_time - start).count();
+	//			//std::cout << m_deltaTime << "\n";
 
-				toFill[step] += m_deltaTime;
-				step++;
-				if (step >= toFill.size())
-				{
-					break;
-				}
-				start = current_time;
-			}
-		}
+	//			toFill[step] += m_deltaTime;
+	//			step++;
+	//			if (step >= toFill.size())
+	//			{
+	//				break;
+	//			}
+	//			start = current_time;
+	//		}
+	//	}
 
-		for (float& val : toFill)
-		{
-			val /= m_tries;
-		}
-	}
+	//	for (float& val : toFill)
+	//	{
+	//		val /= m_tries;
+	//	}
+	//}
 
 	UIComponent_2::UIComponent_2(GameObject& parent, char const* name)
 		:UIComponent{ parent , name}

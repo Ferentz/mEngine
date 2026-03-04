@@ -131,7 +131,7 @@ namespace dae
 		static int const m_timingsAmount{ 10 };
 		std::vector<float> m_timings{ };
 
-		void RunTrash(std::vector<float>& toFill);
+		//void RunTrash(std::vector<float>& toFill);
 		/*void RunTrash1();
 		void RunTrash2();*/
 
@@ -151,7 +151,16 @@ namespace dae
 				{
 					for (size_t i{}; i < buffer.size(); i += stepsize)
 					{
-						buffer[i].id *= 2;
+						if constexpr (requires{T::id; })
+						{
+							buffer[i].id *= 2;
+						}
+						else
+						{
+							buffer[i] *= 2;
+						}
+
+						
 					}
 					const auto current_time{ std::chrono::high_resolution_clock::now() };
 					float m_deltaTime = std::chrono::duration<float>(current_time - start).count();
