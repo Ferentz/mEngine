@@ -115,6 +115,27 @@ namespace dae
 		auto buttonChanges = m_currentState.Gamepad.wButtons ^ m_previousState.Gamepad.wButtons;
 		m_buttonsPressedThisFrame = buttonChanges & m_currentState.Gamepad.wButtons;
 		m_buttonsReleasedThisFrame = buttonChanges & (~m_currentState.Gamepad.wButtons);
+		for (auto& binding : m_actions)
+		{
+			if (binding->m_state == KeyState::presed &&
+				IsPressedThisFrame(binding->m_button))
+			{
+				binding->m_commands->Execute();
+			}
+
+			if (binding->m_state == KeyState::released &&
+				IsReleasedThisFrame(binding->m_button))
+			{
+				binding->m_commands->Execute();
+			}
+
+			if (binding->m_state == KeyState::down &&
+				IsDown(binding->m_button))
+			{
+				binding->m_commands->Execute();
+			}
+		}
+
 		return true;
 	}
 
