@@ -9,6 +9,10 @@
 #include <windows.h>
 #endif
 
+#include <Xinput.h>
+
+#pragma comment(lib, "xinput.lib")
+
 #include <SDL3/SDL.h>
 //#include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
@@ -97,10 +101,21 @@ void dae::Minigin::Run(const std::function<void()>& load)
 
 	long long ms_per_frame{ 1 / 60 };
 
+	/*XINPUT_STATE currentState{};
+	int controllerIndex{};*/
+
 	m_last_time = std::chrono::high_resolution_clock::now() ;
 	m_lag = 0.0f;
 	while (!m_quit)
 	{
+		/*ZeroMemory(&currentState, sizeof(XINPUT_STATE));
+		XInputGetState(controllerIndex, &currentState);
+
+		std::cout << "\rsThumbLX: " << currentState.Gamepad.sThumbLX
+			<< " - sThumbRX: " << currentState.Gamepad.sThumbRX;
+
+		if (currentState.Gamepad.wButtons & XINPUT_GAMEPAD_B) break;*/
+
 		RunOneFrame();
 
 		const auto sleep_time = m_last_time + std::chrono::milliseconds(ms_per_frame) - std::chrono::high_resolution_clock::now();

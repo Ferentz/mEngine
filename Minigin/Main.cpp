@@ -8,11 +8,14 @@
 #include "Minigin.h"
 #include "SceneManager.h"
 #include "ResourceManager.h"
-#include "TextObject.h"
+//#include "TextObject.h"
 #include "Scene.h"
 
 #include <filesystem>
-#include "GameComponent.h"
+#include "components/GameComponent.h"
+
+#include "InputManager.h"
+#include "Comand.h"
 
 
 namespace fs = std::filesystem;
@@ -47,30 +50,71 @@ static void load()
 	go->AddComponent<dae::FPSComponent>("FPS", font);
 	scene.Add(std::move(go));
 
-	go = std::make_unique<dae::GameObject>();
+	/*go = std::make_unique<dae::GameObject>();
 	go->AddComponent<dae::UIComponent>("exercise 1");
 	go->AddComponent<dae::UIComponent_2>("exercise 2");
-	scene.Add(std::move(go));
+	scene.Add(std::move(go));*/
 
 
 	auto rotBase = std::make_unique<dae::GameObject>();
 	rotBase->SetPosition(200, 200);
-	rotBase->AddComponent<dae::RotatorComponent>();
+	//rotBase->AddComponent<dae::RotatorComponent>();
+	
+
 	//rotatorComp1->SetRotationSpeed(-2.5);
 
 	auto aco1 = std::make_unique<dae::GameObject>();
-	auto rotatorComp2 = aco1->AddNGetComponent<dae::RotatorComponent>();
+	//auto rotatorComp2 = aco1->AddNGetComponent<dae::RotatorComponent>();
 	aco1->SetPosition(70, 0);
-	rotatorComp2->SetRotationSpeed(-2.5);
+	//rotatorComp2->SetRotationSpeed(-2.5);
 	auto acocomponent = aco1->AddNGetComponent<dae::TextureComponent>();
 	acocomponent->SetTexture("SPOSA1.png");
 	aco1->SetParent(*rotBase);
 
+	auto moveComponent = aco1->AddNGetComponent<dae::MoveComponent>(10.f);
+	auto& inputManager = dae::InputManager::GetInstance();
+	inputManager.GetInputMethod(0)->AddAction(
+		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::left),
+		unsigned int(SDL_SCANCODE_A), dae::KeyState::down);
+	inputManager.GetInputMethod(0)->AddAction(
+		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::up),
+		unsigned int(SDL_SCANCODE_W), dae::KeyState::down);
+	inputManager.GetInputMethod(0)->AddAction(
+		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::right),
+		unsigned int(SDL_SCANCODE_D), dae::KeyState::down);
+	inputManager.GetInputMethod(0)->AddAction(
+		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::down),
+		unsigned int(SDL_SCANCODE_S), dae::KeyState::down);
+
+
 	auto aco2 = std::make_unique<dae::GameObject>();
-	aco2->SetPosition(20, 0);
+	aco2->SetPosition(200, 100);
 	auto acocomponent2 = aco2->AddNGetComponent<dae::TextureComponent>();
 	acocomponent2->SetTexture("SPOSA1.png");
-	aco2->SetParent(*aco1);
+	//aco2->SetParent(*aco1);
+
+	/*
+	DPAD_RIGHT = 0x800,
+    DPAD_LEFT = 0x400,
+    DPAD_DOWN = 0x200,
+    DPAD_UP = 0x100,
+	*/
+
+	moveComponent = aco2->AddNGetComponent<dae::MoveComponent>(10.f);
+	inputManager.GetInputMethod(1)->AddAction(
+		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::left),
+		unsigned int(XINPUT_GAMEPAD_DPAD_LEFT), dae::KeyState::down);
+	inputManager.GetInputMethod(1)->AddAction(
+		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::up),
+		unsigned int(XINPUT_GAMEPAD_DPAD_UP), dae::KeyState::down);
+	inputManager.GetInputMethod(1)->AddAction(
+		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::right),
+		unsigned int(XINPUT_GAMEPAD_DPAD_RIGHT), dae::KeyState::down);
+	inputManager.GetInputMethod(1)->AddAction(
+		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::down),
+		unsigned int(XINPUT_GAMEPAD_DPAD_DOWN), dae::KeyState::down);
+
+
 
 	scene.Add(std::move(rotBase));
 	scene.Add(std::move(aco1));

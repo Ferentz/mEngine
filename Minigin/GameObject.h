@@ -2,7 +2,7 @@
 #include <string>
 #include <memory>
 #include "Transform.h"
-#include "GameComponent.h"
+#include "Components.h"
 namespace dae
 {
 	//class GameComponent;

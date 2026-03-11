@@ -5,8 +5,6 @@
 
 #include <stdexcept>
 #include <SDL3_ttf/SDL_ttf.h>
-#include "TextObject.h"
-#include "Renderer.h"
 #include "Font.h"
 #include "Texture2D.h"
 
@@ -14,7 +12,8 @@
 
 #include "GameObject.h"
 
-#include "GameComponent.h"
+//#include "components/GameComponent.h"
+//#include "components/RenderComponent.h"
 
 
 namespace dae
