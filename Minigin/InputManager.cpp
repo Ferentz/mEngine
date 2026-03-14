@@ -35,7 +35,7 @@ namespace dae
 
 	InputMethod* InputManager::GetInputMethod(int const idx)
 	{
-		if (idx >= m_inputs.size()) return nullptr;
+		if (size_t(idx) >= m_inputs.size()) return nullptr;
 		return m_inputs[idx].get();
 	}
 

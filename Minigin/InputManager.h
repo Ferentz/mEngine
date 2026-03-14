@@ -40,6 +40,9 @@ namespace dae
 	class InputMethod
 	{
 	public:
+		InputMethod() = default;
+		virtual ~InputMethod() = default;
+
 		virtual bool ProcessInput() = 0;
 
 		virtual bool IsPressedThisFrame(unsigned int button) const = 0;
@@ -62,7 +65,7 @@ namespace dae
 		std::unique_ptr<ControllerImpl> m_impl;
 	public:
 		ControllerInput();
-		~ControllerInput();
+		virtual ~ControllerInput() override;
 		virtual bool ProcessInput() override;
 
 		virtual bool IsPressedThisFrame(unsigned int button) const override;
@@ -77,6 +80,9 @@ namespace dae
 		const bool* m_currentState{ nullptr };
 		const bool* m_previousState{ nullptr };
 	public:
+		KeyBoardInput() = default;
+		virtual ~KeyBoardInput() override = default;
+
 		virtual bool ProcessInput() override;
 
 		virtual bool IsPressedThisFrame(unsigned int button) const override;
