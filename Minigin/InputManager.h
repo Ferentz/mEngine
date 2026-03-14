@@ -3,20 +3,13 @@
 #include <vector>
 #include <memory>
 
-#if WIN32
-#define WIN32_LEAN_AND_MEAN 
-#include <windows.h>
-#endif
+//#include <xinput.h>
 
-#include <Xinput.h>
 
-#pragma comment(lib, "xinput.lib")
 #include "Comand.h"
 
 namespace dae
 {
-	
-	
 	enum class KeyState
 	{
 		presed,
@@ -62,15 +55,14 @@ namespace dae
 		std::vector<std::unique_ptr<BaseAction>> m_actions;
 	};
 
-	class XInputMethod final : public InputMethod
+	class ControllerInput final : public InputMethod
 	{
-		XINPUT_STATE m_currentState{};
-		XINPUT_STATE m_previousState{};
-		DWORD m_controllerIndex{};
-		int m_buttonsPressedThisFrame{};
-		int m_buttonsReleasedThisFrame{};
+		class ControllerImpl;
 
+		std::unique_ptr<ControllerImpl> m_impl;
 	public:
+		ControllerInput();
+		~ControllerInput();
 		virtual bool ProcessInput() override;
 
 		virtual bool IsPressedThisFrame(unsigned int button) const override;
@@ -80,7 +72,7 @@ namespace dae
 		virtual void AddAction(std::unique_ptr<Command> command, unsigned int keybind, KeyState triggerState) override;
 	};
 
-	class SDLInputMethod final : public InputMethod
+	class KeyBoardInput final : public InputMethod
 	{
 		const bool* m_currentState{ nullptr };
 		const bool* m_previousState{ nullptr };
@@ -97,22 +89,26 @@ namespace dae
 	class InputManager final : public Singleton<InputManager>
 	{
 	public:
+
+		enum class controllerButtons;
+
 		bool ProcessInput();
 
 		InputManager()
 		{
+			m_inputs.emplace_back(std::make_unique<KeyBoardInput>());
+			#if __EMSCRIPTEN__
 			m_inputs.emplace_back(std::make_unique<SDLInputMethod>());
-			m_inputs.emplace_back(std::make_unique<XInputMethod>());
+			#else
+			m_inputs.emplace_back(std::make_unique<ControllerInput>());
+			#endif
+			
 		}
 
 		std::vector<std::unique_ptr<InputMethod>> m_inputs{};//std::unique_ptr<InputMethod> m_controlerInput{std::make_unique<XInputMethod>()};
 		//std::unique_ptr<InputMethod> m_keyboardInput;
 
 		InputMethod* GetInputMethod(int const idx);
-
-		bool IsPressedThisFrame(unsigned int button) const;
-		bool IsReleasedThisFrame(unsigned int button) const;
-		bool IsDown(unsigned int button) const;
 
 	private:
 		

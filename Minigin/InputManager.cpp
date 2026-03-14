@@ -7,8 +7,6 @@
 
 namespace dae
 {
-
-
 	bool InputManager::ProcessInput()
 	{
 		SDL_Event e;
@@ -42,7 +40,7 @@ namespace dae
 	}
 
 
-	bool SDLInputMethod::ProcessInput()
+	bool KeyBoardInput::ProcessInput()
 	{
 		//SDL_PumpEvents();  // <-- add this
 
@@ -73,7 +71,7 @@ namespace dae
 		return true;
 	}
 
-	bool  SDLInputMethod::IsPressedThisFrame(unsigned int button) const
+	bool  KeyBoardInput::IsPressedThisFrame(unsigned int button) const
 	{
 		if (m_previousState == nullptr)
 			return m_currentState[button];
@@ -82,7 +80,7 @@ namespace dae
 		return buttonChange && m_currentState[button];
 	}
 
-	bool  SDLInputMethod::IsReleasedThisFrame(unsigned int button) const
+	bool  KeyBoardInput::IsReleasedThisFrame(unsigned int button) const
 	{
 		if (m_previousState == nullptr)
 			return !m_currentState[button];
@@ -92,74 +90,16 @@ namespace dae
 
 	}
 
-	bool  SDLInputMethod::IsDown(unsigned int button) const
+	bool  KeyBoardInput::IsDown(unsigned int button) const
 	{
 		return m_currentState[button];
 	}
 
-	void  SDLInputMethod::AddAction(std::unique_ptr< Command> command, unsigned int keybind,  KeyState triggerState)
+	void  KeyBoardInput::AddAction(std::unique_ptr< Command> command, unsigned int keybind,  KeyState triggerState)
 	{
 		m_actions.emplace_back(std::make_unique< BaseAction>(std::move(command), keybind, triggerState));
 	}
 
-
-
-
-
-	bool  XInputMethod::ProcessInput()
-	{
-		CopyMemory(&m_previousState, &m_currentState, sizeof(XINPUT_STATE));
-		ZeroMemory(&m_currentState, sizeof(XINPUT_STATE));
-		XInputGetState(m_controllerIndex, &m_currentState);
-
-		auto buttonChanges = m_currentState.Gamepad.wButtons ^ m_previousState.Gamepad.wButtons;
-		m_buttonsPressedThisFrame = buttonChanges & m_currentState.Gamepad.wButtons;
-		m_buttonsReleasedThisFrame = buttonChanges & (~m_currentState.Gamepad.wButtons);
-		for (auto& binding : m_actions)
-		{
-			if (binding->m_state == KeyState::presed &&
-				IsPressedThisFrame(binding->m_button))
-			{
-				binding->m_commands->Execute();
-			}
-
-			if (binding->m_state == KeyState::released &&
-				IsReleasedThisFrame(binding->m_button))
-			{
-				binding->m_commands->Execute();
-			}
-
-			if (binding->m_state == KeyState::down &&
-				IsDown(binding->m_button))
-			{
-				binding->m_commands->Execute();
-			}
-		}
-
-		return true;
-	}
-
-
-
-	bool  XInputMethod::IsPressedThisFrame(unsigned int button) const
-	{
-		return m_buttonsPressedThisFrame & button;
-	}
-
-	bool  XInputMethod::IsReleasedThisFrame(unsigned int button) const
-	{
-		return m_buttonsReleasedThisFrame & button;
-	}
-
-	bool  XInputMethod::IsDown(unsigned int button) const
-	{
-		return m_currentState.Gamepad.wButtons & button;
-	}
-
-	void  XInputMethod::AddAction(std::unique_ptr<Command> command, unsigned int keybind, KeyState triggerState)
-	{
-		m_actions.emplace_back(std::make_unique<BaseAction>(std::move(command), keybind, triggerState));
-
-	}
+	
 
 }

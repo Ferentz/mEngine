@@ -1,5 +1,6 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <SDL3/SDL_gamepad.h>
 
 #if _DEBUG && __has_include(<vld.h>)
 #include <vld.h>
@@ -73,15 +74,19 @@ static void load()
 
 	auto moveComponent = aco1->AddNGetComponent<dae::MoveComponent>(10.f);
 	auto& inputManager = dae::InputManager::GetInstance();
+
 	inputManager.GetInputMethod(0)->AddAction(
 		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::left),
 		unsigned int(SDL_SCANCODE_A), dae::KeyState::down);
+
 	inputManager.GetInputMethod(0)->AddAction(
 		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::up),
 		unsigned int(SDL_SCANCODE_W), dae::KeyState::down);
+
 	inputManager.GetInputMethod(0)->AddAction(
 		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::right),
 		unsigned int(SDL_SCANCODE_D), dae::KeyState::down);
+
 	inputManager.GetInputMethod(0)->AddAction(
 		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::down),
 		unsigned int(SDL_SCANCODE_S), dae::KeyState::down);
@@ -103,16 +108,16 @@ static void load()
 	moveComponent = aco2->AddNGetComponent<dae::MoveComponent>(10.f);
 	inputManager.GetInputMethod(1)->AddAction(
 		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::left),
-		unsigned int(XINPUT_GAMEPAD_DPAD_LEFT), dae::KeyState::down);
+		13, dae::KeyState::down);
 	inputManager.GetInputMethod(1)->AddAction(
 		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::up),
-		unsigned int(XINPUT_GAMEPAD_DPAD_UP), dae::KeyState::down);
+		unsigned int(SDL_GAMEPAD_BUTTON_DPAD_UP), dae::KeyState::down);
 	inputManager.GetInputMethod(1)->AddAction(
 		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::right),
-		unsigned int(XINPUT_GAMEPAD_DPAD_RIGHT), dae::KeyState::down);
+		unsigned int(SDL_GAMEPAD_BUTTON_DPAD_RIGHT), dae::KeyState::down);
 	inputManager.GetInputMethod(1)->AddAction(
 		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::down),
-		unsigned int(XINPUT_GAMEPAD_DPAD_DOWN), dae::KeyState::down);
+		unsigned int(SDL_GAMEPAD_BUTTON_DPAD_DOWN), dae::KeyState::down);
 
 
 

@@ -20,6 +20,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   Minigin/components/RenderComponent.cpp
   Minigin/components/UIComponent.cpp
   Minigin/components/CommandComponent.cpp
+  Minigin/contInput/xInput.cpp
   Minigin/GameObject.cpp
   Minigin/InputManager.cpp
   Minigin/Comand.cpp
@@ -32,6 +33,11 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   Minigin/Texture2D.cpp
   Minigin/Transform.cpp
 )
+
+if(NOT EMSCRIPTEN)
+  message("Using xinput for input!")
+  list(APPEND ${TARGET_PARAM} Minigin/contInput/xInput.cpp)
+endif()
 
 # enable c++20 features
 target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
