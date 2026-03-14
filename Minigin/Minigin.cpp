@@ -9,9 +9,9 @@
 #include <windows.h>
 #endif
 
-#include <Xinput.h>
-
-#pragma comment(lib, "xinput.lib")
+//#include <Xinput.h>
+//
+//#pragma comment(lib, "xinput.lib")
 
 #include <SDL3/SDL.h>
 //#include <SDL3_image/SDL_image.h>
