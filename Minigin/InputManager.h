@@ -98,7 +98,7 @@ namespace dae
 		{
 			m_inputs.emplace_back(std::make_unique<KeyBoardInput>());
 			#if __EMSCRIPTEN__
-			m_inputs.emplace_back(std::make_unique<SDLInputMethod>());
+			m_inputs.emplace_back(std::make_unique<KeyBoardInput>());
 			#else
 			m_inputs.emplace_back(std::make_unique<ControllerInput>());
 			#endif

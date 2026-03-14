@@ -1,3 +1,6 @@
+
+#if __EMSCRIPTEN__
+#else
 #include "InputManager.h"
 
 #if WIN32
@@ -128,3 +131,5 @@ namespace dae
 	ControllerInput::~ControllerInput() = default;
 
 }
+
+#endif
