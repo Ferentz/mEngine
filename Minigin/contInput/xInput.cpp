@@ -101,7 +101,7 @@ namespace dae
 		return m_impl->ProcessInput(m_actions);
 	}
 
-	bool  ControllerInput::IsPressedThisFrame(unsigned int button) const
+	/*bool  ControllerInput::IsPressedThisFrame(unsigned int button) const
 	{
 		return m_impl->m_buttonsPressedThisFrame & button;
 	}
@@ -114,7 +114,7 @@ namespace dae
 	bool  ControllerInput::IsDown(unsigned int button) const
 	{
 		return m_impl->m_currentState.Gamepad.wButtons & button;
-	}
+	}*/
 
 	void  ControllerInput::AddAction(std::unique_ptr<Command> command, unsigned int keybind, KeyState triggerState)
 	{

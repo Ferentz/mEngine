@@ -45,9 +45,9 @@ namespace dae
 
 		virtual bool ProcessInput() = 0;
 
-		virtual bool IsPressedThisFrame(unsigned int button) const = 0;
+		/*virtual bool IsPressedThisFrame(unsigned int button) const = 0;
 		virtual bool IsReleasedThisFrame(unsigned int button) const = 0;
-		virtual bool IsDown(unsigned int button) const = 0;
+		virtual bool IsDown(unsigned int button) const = 0;*/
 
 		//template<class T, typename ...Args>
 		virtual void AddAction(std::unique_ptr<Command> command, unsigned int keybind, KeyState triggerState) = 0;
@@ -68,9 +68,9 @@ namespace dae
 		virtual ~ControllerInput() override;
 		virtual bool ProcessInput() override;
 
-		virtual bool IsPressedThisFrame(unsigned int button) const override;
+		/*virtual bool IsPressedThisFrame(unsigned int button) const override;
 		virtual bool IsReleasedThisFrame(unsigned int button) const override;
-		virtual bool IsDown(unsigned int button) const override;
+		virtual bool IsDown(unsigned int button) const override;*/
 
 		virtual void AddAction(std::unique_ptr<Command> command, unsigned int keybind, KeyState triggerState) override;
 	};
@@ -85,9 +85,9 @@ namespace dae
 
 		virtual bool ProcessInput() override;
 
-		virtual bool IsPressedThisFrame(unsigned int button) const override;
-		virtual bool IsReleasedThisFrame(unsigned int button) const override;
-		virtual bool IsDown(unsigned int button) const override;
+		virtual bool IsPressedThisFrame(unsigned int button) const ;
+		virtual bool IsReleasedThisFrame(unsigned int button) const ;
+		virtual bool IsDown(unsigned int button) const ;
 		virtual void AddAction(std::unique_ptr<Command> command, unsigned int keybind, KeyState triggerState) override;
 	};
 
@@ -103,11 +103,11 @@ namespace dae
 		InputManager()
 		{
 			m_inputs.emplace_back(std::make_unique<KeyBoardInput>());
-			#if __EMSCRIPTEN__
+			/*#if __EMSCRIPTEN__
 			m_inputs.emplace_back(std::make_unique<KeyBoardInput>());
-			#else
+			#else*/
 			m_inputs.emplace_back(std::make_unique<ControllerInput>());
-			#endif
+			//#endif
 			
 		}
 

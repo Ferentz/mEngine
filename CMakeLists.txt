@@ -13,14 +13,14 @@ else()
   set(TARGET_PARAM WIN32)
 endif()
 
-# list source files here
-add_executable(${TARGET_NAME} ${TARGET_PARAM}
+
+set(SOURCES
   Minigin/Font.cpp
   Minigin/components/GameComponent.cpp
   Minigin/components/RenderComponent.cpp
   Minigin/components/UIComponent.cpp
   Minigin/components/CommandComponent.cpp
-  Minigin/contInput/xInput.cpp
+ # Minigin/contInput/sdlInput.cpp
   Minigin/GameObject.cpp
   Minigin/InputManager.cpp
   Minigin/Comand.cpp
@@ -34,10 +34,46 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   Minigin/Transform.cpp
 )
 
-if(NOT EMSCRIPTEN)
-  message("Using xinput for input!")
-  list(APPEND ${TARGET_PARAM} Minigin/contInput/xInput.cpp)
+if(EMSCRIPTEN)
+  message("Using SDL input")
+  list(APPEND SOURCES Minigin/contInput/sdlInput.cpp)
+else()
+  message("Using XInput")
+  list(APPEND SOURCES Minigin/contInput/xInput.cpp)
 endif()
+
+#if(EMSCRIPTEN)
+ # message("Using sdl for input!")
+  #list(APPEND TARGET_PARAM Minigin/contInput/sdlInput.cpp)
+  #else()
+  #message("Using xinput for input!")
+  #list(APPEND TARGET_PARAM Minigin/contInput/xInput.cpp)
+#endif()
+
+add_executable(${TARGET_NAME} ${TARGET_PARAM} ${SOURCES})
+
+# list source files here
+#add_executable(${TARGET_NAME} ${TARGET_PARAM}
+#  Minigin/Font.cpp
+#  Minigin/components/GameComponent.cpp
+#  Minigin/components/RenderComponent.cpp
+#  Minigin/components/UIComponent.cpp
+#  Minigin/components/CommandComponent.cpp
+# # Minigin/contInput/sdlInput.cpp
+#  Minigin/GameObject.cpp
+#  Minigin/InputManager.cpp
+#  Minigin/Comand.cpp
+#  Minigin/Main.cpp
+#  Minigin/Minigin.cpp
+#  Minigin/Renderer.cpp
+#  Minigin/ResourceManager.cpp
+#  Minigin/Scene.cpp
+#  Minigin/SceneManager.cpp
+#  Minigin/Texture2D.cpp
+#  Minigin/Transform.cpp
+#)
+
+
 
 # enable c++20 features
 target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
