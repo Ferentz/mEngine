@@ -83,12 +83,12 @@ namespace dae
 		KeyBoardInput() = default;
 		virtual ~KeyBoardInput() override = default;
 
-		virtual bool ProcessInput() override;
+		 bool ProcessInput() override;
 
-		virtual bool IsPressedThisFrame(unsigned int button) const ;
-		virtual bool IsReleasedThisFrame(unsigned int button) const ;
-		virtual bool IsDown(unsigned int button) const ;
-		virtual void AddAction(std::unique_ptr<Command> command, unsigned int keybind, KeyState triggerState) override;
+		 bool IsPressedThisFrame(unsigned int button) const ;
+		 bool IsReleasedThisFrame(unsigned int button) const ;
+		 bool IsDown(unsigned int button) const ;
+		 void AddAction(std::unique_ptr<Command> command, unsigned int keybind, KeyState triggerState) override;
 	};
 
 
