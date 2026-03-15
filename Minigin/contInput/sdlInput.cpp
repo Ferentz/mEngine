@@ -200,7 +200,7 @@ namespace dae
 	void  ControllerInput::AddAction(std::unique_ptr<Command> command, unsigned int keybind, KeyState triggerState)
 	{
 		m_impl->m_buttonStates.push_back(KeyState::up);
-		m_actions.emplace_back(std::make_unique<BaseAction>(std::move(command), unsigned int(keybind), triggerState));
+		m_actions.emplace_back(std::make_unique<BaseAction>(std::move(command), keybind, triggerState));
 
 	}
 
