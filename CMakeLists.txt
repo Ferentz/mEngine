@@ -19,8 +19,6 @@ set(SOURCES
   Minigin/components/GameComponent.cpp
   Minigin/components/RenderComponent.cpp
   Minigin/components/UIComponent.cpp
-  Minigin/components/CommandComponent.cpp
- # Minigin/contInput/sdlInput.cpp
   Minigin/GameObject.cpp
   Minigin/InputManager.cpp
   Minigin/Comand.cpp

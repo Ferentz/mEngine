@@ -26,7 +26,7 @@ namespace dae
 	void RenderComponent::SetPosition(float x, float y)
 	{
 		MakeDirty();
-		m_transform.SetPosition(x, y, 0.0f);
+		m_transform.SetLocalPosition(x, y, 0.0f);
 	}
 
 	Transform const* RenderComponent::GetLocalTransform() const

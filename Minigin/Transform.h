@@ -1,8 +1,12 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <variant>
 
 namespace dae
 {
+	class GameObject;
+	class RenderComponent;
+
 	class Transform final
 	{
 	public:
@@ -47,13 +51,15 @@ namespace dae
 	class SmartTransform final
 	{
 	public:
-		void SetTransform(Transform& newTransform);
-		void SetPosition(float x, float y, float z = 0);
-		void SetRotation(float x);
+		SmartTransform(std::variant<GameObject*, RenderComponent*> owner);
+
+		void SetLocalTransform(Transform& newTransform);
+		void SetLocalPosition(float x, float y, float z = 0);
+		void SetLocalRotation(float x);
 
 		Transform const * GetLocalTransform() const;
 
-		Transform * QueryWorldTransform(Transform const* const parentWorldTransform);
+		Transform const * QueryWorldTransform(Transform const* const parentWorldTransform);
 		Transform const * GetWorldTransform() const;
 
 		float GetRotation() { return m_local.GetRotation(); }
@@ -61,8 +67,10 @@ namespace dae
 		void Rebase(Transform const * newBase);
 
 		void MakeDirty();
+		bool IsDirty() { return m_dirty; }
 
 	private:
+		std::variant<GameObject*, RenderComponent*> m_parent;
 		bool m_dirty{ true };
 		Transform m_local{};
 		Transform m_global{};

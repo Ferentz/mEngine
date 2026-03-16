@@ -18,7 +18,11 @@
 
 namespace dae
 {
+	GameObject::GameObject()
+		:m_transform{this}
+	{
 
+	}
 	GameObject::~GameObject() = default;
 
 	void GameObject::Update(float deltaTime)
@@ -109,7 +113,7 @@ namespace dae
 
 	void GameObject::SetPosition(float x, float y)
 	{
-		m_transform.SetPosition(x, y);
+		m_transform.SetLocalPosition(x, y);
 		for (RenderComponent * component : m_renderComponents)
 		{
 			component->MakeDirty();
@@ -132,21 +136,19 @@ namespace dae
 		return m_transform.GetWorldTransform();
 	}
 
-	Transform * GameObject::QueryWorldTransform()
+	Transform const * GameObject::QueryWorldTransform()
 	{
-		Transform* temp{ nullptr };
+		Transform const * temp{ nullptr };
 		if (m_pParent != nullptr)
 		{
 			temp = m_pParent->QueryWorldTransform();
 		}
-		m_Dirty = false;
 		return m_transform.QueryWorldTransform(temp);
 	}
 
 	void GameObject::MakeDirty()
 	{
-		m_Dirty = true;
-		m_transform.MakeDirty();
+		
 		for (RenderComponent* pComponent : m_renderComponents)
 		{
 			pComponent->MakeDirty();
@@ -155,6 +157,10 @@ namespace dae
 		{
 			pChild->MakeDirty();
 		}
+
+		if (m_transform.IsDirty()) return;
+
+		m_transform.MakeDirty();
 	}
 
 	void GameObject::MarkForDelete(bool excludeChildren)

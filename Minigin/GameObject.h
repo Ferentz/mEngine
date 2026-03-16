@@ -12,7 +12,7 @@ namespace dae
 	class GameObject final
 	{
 	public:
-		GameObject() = default;
+		GameObject();
 		~GameObject();
 		GameObject(const GameObject& other) = delete;
 		GameObject(GameObject&& other) = delete;
@@ -30,7 +30,7 @@ namespace dae
 
 
 		Transform const* GetLocalTransform() const;
-		Transform * QueryWorldTransform();
+		Transform const * QueryWorldTransform();
 		Transform const* GetWorldTransform() const;
 
 		void MakeDirty();
@@ -87,8 +87,7 @@ namespace dae
 		}
 
 	protected:
-		bool m_Dirty{ true };
-		SmartTransform m_transform{};
+		SmartTransform m_transform;
 
 	private:
 		bool m_toDelete{};

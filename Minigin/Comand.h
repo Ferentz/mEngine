@@ -1,9 +1,10 @@
 #pragma once
-#include "components/CommandComponent.h"
+//#include "components/CommandComponent.h"
+
 
 namespace dae
 {
-	class GameComponent;
+	class GameObject;
 
 
 	class Command
@@ -17,31 +18,34 @@ namespace dae
 
 	class GameObjectCommand : public Command
 	{
-		GameComponent* m_component;
+		GameObject* m_component;
 	protected:
-		GameComponent* GetComponent() const { return m_component; }
+		GameObject* GetObject() const { return m_component; }
 	public:
-		GameObjectCommand(GameComponent* object) :m_component{ object } {};
+		GameObjectCommand(GameObject* object) :m_component{ object } {};
 		virtual ~GameObjectCommand() override = default;
 	};
 
 
-	
+	enum class Direction
+	{
+		up,
+		down,
+		left,
+		right
+	};
 
 	class MoveCommand : public GameObjectCommand
 	{
 	public:
-		MoveCommand(GameComponent* object, Direction direction)
+		MoveCommand(GameObject* object, Direction direction)
 			:GameObjectCommand(object),
 			m_moveDirection{ direction }
 		{
 		}
 		virtual ~MoveCommand() override = default;
 
-		virtual void Execute() override
-		{
-			static_cast<MoveComponent*>(GetComponent())->Move(m_moveDirection);
-		}
+		virtual void Execute() override;
 	private:
 		Direction m_moveDirection;
 	};

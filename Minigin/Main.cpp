@@ -72,23 +72,23 @@ static void load()
 	acocomponent->SetTexture("SPOSA1.png");
 	aco1->SetParent(*rotBase);
 
-	auto moveComponent = aco1->AddNGetComponent<dae::MoveComponent>(10.f);
+	//auto moveComponent = aco1->AddNGetComponent<dae::MoveComponent>(10.f);
 	auto& inputManager = dae::InputManager::GetInstance();
 
 	inputManager.GetInputMethod(0)->AddAction(
-		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::left),
+		std::make_unique<dae::MoveCommand>(aco1.get(), dae::Direction::left),
 		static_cast<unsigned int>(SDL_SCANCODE_A), dae::KeyState::down);
 
 	inputManager.GetInputMethod(0)->AddAction(
-		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::up),
+		std::make_unique<dae::MoveCommand>(aco1.get(), dae::Direction::up),
 		static_cast<unsigned int>(SDL_SCANCODE_W), dae::KeyState::down);
 
 	inputManager.GetInputMethod(0)->AddAction(
-		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::right),
+		std::make_unique<dae::MoveCommand>(aco1.get(), dae::Direction::right),
 		static_cast<unsigned int>(SDL_SCANCODE_D), dae::KeyState::down);
 
 	inputManager.GetInputMethod(0)->AddAction(
-		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::down),
+		std::make_unique<dae::MoveCommand>(aco1.get(), dae::Direction::down),
 		static_cast<unsigned int>(SDL_SCANCODE_S), dae::KeyState::down);
 
 
@@ -105,18 +105,18 @@ static void load()
     DPAD_UP = 0x100,
 	*/
 
-	moveComponent = aco2->AddNGetComponent<dae::MoveComponent>(10.f);
+	//moveComponent = aco2->AddNGetComponent<dae::MoveComponent>(10.f);
 	inputManager.GetInputMethod(1)->AddAction(
-		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::left),
+		std::make_unique<dae::MoveCommand>(aco2.get(), dae::Direction::left),
 		static_cast<unsigned int>(SDL_GAMEPAD_BUTTON_DPAD_LEFT), dae::KeyState::down);
 	inputManager.GetInputMethod(1)->AddAction(
-		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::up),
+		std::make_unique<dae::MoveCommand>(aco2.get(), dae::Direction::up),
 		static_cast<unsigned int>(SDL_GAMEPAD_BUTTON_DPAD_UP), dae::KeyState::down);
 	inputManager.GetInputMethod(1)->AddAction(
-		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::right),
+		std::make_unique<dae::MoveCommand>(aco2.get(), dae::Direction::right),
 		static_cast<unsigned int>(SDL_GAMEPAD_BUTTON_DPAD_RIGHT), dae::KeyState::down);
 	inputManager.GetInputMethod(1)->AddAction(
-		std::make_unique<dae::MoveCommand>(moveComponent, dae::Direction::down),
+		std::make_unique<dae::MoveCommand>(aco2.get(), dae::Direction::down),
 		static_cast<unsigned int>(SDL_GAMEPAD_BUTTON_DPAD_DOWN), dae::KeyState::down);
 
 

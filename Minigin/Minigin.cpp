@@ -145,3 +145,9 @@ void dae::Minigin::RunOneFrame()
 	SceneManager::GetInstance().Update(m_deltaTime);
 	Renderer::GetInstance().Render();
 }
+
+float  dae::Minigin::m_deltaTime{};
+float dae::Minigin::GetDeltaTime()
+{
+	return m_deltaTime;
+}

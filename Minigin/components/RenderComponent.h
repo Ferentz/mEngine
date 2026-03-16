@@ -9,7 +9,7 @@ namespace dae
 		virtual ~RenderComponent() = default;
 		explicit RenderComponent(GameObject& parent)
 			:GameComponent{ parent },
-			m_transform{}
+			m_transform{this}
 		{
 		}
 

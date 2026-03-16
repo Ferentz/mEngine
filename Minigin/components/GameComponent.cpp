@@ -40,7 +40,7 @@ namespace dae
 	void RotatorComponent::Update(float deltaTime)
 	{
 		SmartTransform* transform{ GetParent()->GetTransform() };
-		transform->SetRotation(transform->GetRotation() + m_rotatingSpeed * deltaTime);
+		transform->SetLocalRotation(transform->GetRotation() + m_rotatingSpeed * deltaTime);
 		//transform->MakeDirty();
 		GetParent()->MakeDirty();
 	}
