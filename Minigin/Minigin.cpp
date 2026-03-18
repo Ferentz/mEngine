@@ -18,12 +18,8 @@
 #include "SceneManager.h"
 #include "Renderer.h"
 #include "ResourceManager.h"
-
-#if USE_STEAMWORKS
 #include "mSteam.h"
 #include "SteamAchievementListener.h"
-#endif
-
 
 SDL_Window* g_window{};
 
