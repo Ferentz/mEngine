@@ -1,4 +1,5 @@
 #include <SDL3/SDL.h>
+//#include <SDL3_image/SDL_image.h>
 #include "Texture2D.h"
 #include "Renderer.h"
 #include <stdexcept>
@@ -22,7 +23,12 @@ SDL_Texture* dae::Texture2D::GetSDLTexture() const
 
 dae::Texture2D::Texture2D(const std::string &fullPath)
 {
+    //SDL_Surface* surface = IMG_Load(fullPath.c_str());
     SDL_Surface* surface = SDL_LoadPNG(fullPath.c_str());
+    if (!surface)
+    {
+        surface = SDL_LoadBMP(fullPath.c_str());
+    }
     if (!surface)
     {
         throw std::runtime_error(

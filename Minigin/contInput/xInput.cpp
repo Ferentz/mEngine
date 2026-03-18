@@ -17,13 +17,7 @@
 
 namespace dae
 {
-	enum class InputManager::controllerButtons
-	{
-		controller_up = XINPUT_GAMEPAD_DPAD_UP,
-		controller_right = XINPUT_GAMEPAD_DPAD_RIGHT,
-		controller_down = XINPUT_GAMEPAD_DPAD_DOWN,
-		controller_left = XINPUT_GAMEPAD_DPAD_LEFT,
-	};
+	
 
 	class ControllerInput::ControllerImpl
 	{
@@ -60,7 +54,9 @@ namespace dae
 	{SDL_GAMEPAD_BUTTON_DPAD_LEFT, XINPUT_GAMEPAD_DPAD_LEFT},
 	{SDL_GAMEPAD_BUTTON_DPAD_RIGHT, XINPUT_GAMEPAD_DPAD_RIGHT},
 	{SDL_GAMEPAD_BUTTON_DPAD_DOWN, XINPUT_GAMEPAD_DPAD_DOWN},
-	{SDL_GAMEPAD_BUTTON_DPAD_UP, XINPUT_GAMEPAD_DPAD_UP}
+	{SDL_GAMEPAD_BUTTON_DPAD_UP, XINPUT_GAMEPAD_DPAD_UP},
+	{SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, XINPUT_GAMEPAD_RIGHT_SHOULDER},
+	{SDL_GAMEPAD_BUTTON_LEFT_SHOULDER, XINPUT_GAMEPAD_LEFT_SHOULDER}
 	};
 
 	bool  ControllerInput::ControllerImpl::ProcessInput(std::vector<std::unique_ptr<BaseAction>>& actions)

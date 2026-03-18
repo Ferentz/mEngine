@@ -69,7 +69,7 @@ namespace dae
 
 		void SetRotationSpeed(float speed);
 
-	protected: // i tried something, it didnt work. i need fps
+	private: // i tried something, it didnt work. i need fps
 		float m_rotatingSpeed{ 1.f };
 
 		RotatorComponent(const RotatorComponent& other) = delete;
@@ -78,5 +78,4 @@ namespace dae
 		RotatorComponent& operator=(RotatorComponent&& other) = delete;
 	};
 
-	
 }

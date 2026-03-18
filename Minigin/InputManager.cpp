@@ -39,12 +39,22 @@ namespace dae
 		return m_inputs[idx].get();
 	}
 
+	KeyBoardInput::KeyBoardInput()
+		:InputMethod()
+	{
+		// Get current state + size
+		m_currentState = SDL_GetKeyboardState(&m_numKeys);
+
+		m_previousState.resize(m_numKeys, 0);
+		
+	}
 
 	bool KeyBoardInput::ProcessInput()
 	{
 		//SDL_PumpEvents();  // <-- add this
 
-		m_previousState = m_currentState;
+		//m_previousState = m_currentState;
+		
 		m_currentState = SDL_GetKeyboardState(nullptr);
 
 		for (auto& binding : m_actions)
@@ -68,13 +78,16 @@ namespace dae
 			}
 		}
 
+		std::copy(m_currentState, m_currentState + m_numKeys, m_previousState.begin());
+
+
 		return true;
 	}
 
 	bool  KeyBoardInput::IsPressedThisFrame(unsigned int button) const
 	{
-		if (m_previousState == nullptr)
-			return m_currentState[button];
+		/*if (m_previousState == nullptr)
+			return m_currentState[button];*/
 		bool buttonChange = m_currentState[button] ^ m_previousState[button];
 
 		return buttonChange && m_currentState[button];
@@ -82,8 +95,8 @@ namespace dae
 
 	bool  KeyBoardInput::IsReleasedThisFrame(unsigned int button) const
 	{
-		if (m_previousState == nullptr)
-			return !m_currentState[button];
+		/*if (m_previousState == nullptr)
+			return !m_currentState[button];*/
 		bool buttonChange = m_currentState[button] ^ m_previousState[button];
 
 		return buttonChange && !m_currentState[button];

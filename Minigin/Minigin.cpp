@@ -9,18 +9,17 @@
 #include <windows.h>
 #endif
 
-//#include <Xinput.h>
-//
-//#pragma comment(lib, "xinput.lib")
+
 
 #include <SDL3/SDL.h>
-//#include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include "Minigin.h"
 #include "InputManager.h"
 #include "SceneManager.h"
 #include "Renderer.h"
 #include "ResourceManager.h"
+#include "mSteam.h"
+#include "SteamAchievementListener.h"
 
 SDL_Window* g_window{};
 
@@ -60,6 +59,17 @@ void PrintSDLVersion()
 	LogSDLVersion("Linked with SDL_ttf ", SDL_VERSIONNUM_MAJOR(version), SDL_VERSIONNUM_MINOR(version),	SDL_VERSIONNUM_MICRO(version));
 }
 
+Achievement_t dae::Minigin::g_Achievements[]
+{
+	_ACH_ID(ACH_WIN_ONE_GAME, "Winner"),
+	_ACH_ID(ACH_WIN_100_GAMES, "Champion"),
+	_ACH_ID(ACH_TRAVEL_FAR_ACCUM, "Interstellar"),
+	_ACH_ID(ACH_TRAVEL_FAR_SINGLE, "Orbiter"),
+};
+
+std::unique_ptr<CSteamAchievements> dae::Minigin::SteamAchievements = nullptr;
+std::unique_ptr <SteamEventListener> dae::Minigin::SteamListener = nullptr;
+
 dae::Minigin::Minigin(const std::filesystem::path& dataPath)
 {
 	PrintSDLVersion();
@@ -95,6 +105,13 @@ dae::Minigin::~Minigin()
 
 void dae::Minigin::Run(const std::function<void()>& load)
 {
+#if USE_STEAMWORKS
+	if (!SteamAPI_Init())
+		throw std::runtime_error(std::string("Fatal Error - Steam must be running to play this game (SteamAPI_Init() failed)."));
+
+	SteamAchievements.reset(new CSteamAchievements(g_Achievements, 4));
+	SteamListener.reset(new SteamEventListener);
+#endif
 
 	load();
 #ifndef __EMSCRIPTEN__
@@ -103,6 +120,12 @@ void dae::Minigin::Run(const std::function<void()>& load)
 
 	/*XINPUT_STATE currentState{};
 	int controllerIndex{};*/
+
+
+
+
+
+
 
 	m_last_time = std::chrono::high_resolution_clock::now() ;
 	m_lag = 0.0f;
@@ -118,9 +141,16 @@ void dae::Minigin::Run(const std::function<void()>& load)
 
 		RunOneFrame();
 
+#if USE_STEAMWORKS
+		SteamAPI_RunCallbacks();
+#endif 
 		const auto sleep_time = m_last_time + std::chrono::milliseconds(ms_per_frame) - std::chrono::high_resolution_clock::now();
 		std::this_thread::sleep_for(sleep_time);
 	}
+
+#if USE_STEAMWORKS
+	SteamAPI_Shutdown();
+#endif
 		
 #else
 	emscripten_set_main_loop_arg(&LoopCallback, this, 0, true);

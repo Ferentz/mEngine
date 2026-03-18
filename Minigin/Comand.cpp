@@ -1,6 +1,9 @@
 #include "GameObject.h"
 #include "Comand.h"
 #include "Minigin.h"
+
+#include "components/EventComponent.h"
+
 void dae::MoveCommand::Execute()
 {
 	glm::vec3 m_moveVec{};
@@ -23,11 +26,23 @@ void dae::MoveCommand::Execute()
 
 	auto transform{ GetObject()->GetTransform() };
 	glm::vec3 const& r_pos{ transform->GetLocalTransform()->GetPosition() };
-	float m_speed{5.f};
+	float m_speed{20.f};
 	transform->SetLocalPosition(
 		r_pos.x + m_moveVec.x * m_speed * dae::Minigin::GetDeltaTime(),
 		r_pos.y + m_moveVec.y * m_speed * dae::Minigin::GetDeltaTime());
 	//GetComponent()->MakeDirty(); // why doesnt set position make everything dirty yet T.T
 	//m_moveVec = {};
 
+}
+
+void dae::HurtCommand::Execute()
+{
+	if (m_doesSubtract)
+	{
+		m_healthComponent->SubtractValue(1);
+	}
+	else
+	{
+		m_healthComponent->AddValue(1);
+	}
 }

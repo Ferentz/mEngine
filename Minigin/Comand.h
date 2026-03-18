@@ -50,6 +50,26 @@ namespace dae
 		Direction m_moveDirection;
 	};
 
+
+	class IntTracker;
+
+	class HurtCommand : public GameObjectCommand
+	{
+	public:
+		HurtCommand(GameObject* object, IntTracker* health, bool subtract = true)
+			:GameObjectCommand(object),
+			m_healthComponent{ health },
+			m_doesSubtract{subtract}
+		{
+		}
+		virtual ~HurtCommand() override = default;
+
+		virtual void Execute() override;
+	private:
+		IntTracker* m_healthComponent;
+		bool m_doesSubtract;
+	};
+
 	/*
 
 	we want to attch input to objects, and make it do things.

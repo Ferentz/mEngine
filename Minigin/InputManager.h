@@ -78,9 +78,10 @@ namespace dae
 	class KeyBoardInput final : public InputMethod
 	{
 		const bool* m_currentState{ nullptr };
-		const bool* m_previousState{ nullptr };
+		std::vector<bool> m_previousState{};
+		int m_numKeys{};
 	public:
-		KeyBoardInput() = default;
+		KeyBoardInput();
 		virtual ~KeyBoardInput() override = default;
 
 		 bool ProcessInput() override;

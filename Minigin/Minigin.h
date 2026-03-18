@@ -2,6 +2,10 @@
 #include <string>
 #include <functional>
 #include <filesystem>
+#include "mSteam.h"
+
+
+class SteamEventListener;
 
 namespace dae
 {
@@ -24,5 +28,13 @@ namespace dae
 		Minigin(Minigin&& other) = delete;
 		Minigin& operator=(const Minigin& other) = delete;
 		Minigin& operator=(Minigin&& other) = delete;
+
+		// Achievement array which will hold data about the achievements and their state
+		static Achievement_t g_Achievements[];
+
+		// Global access to Achievements object
+		static std::unique_ptr<CSteamAchievements>  SteamAchievements;
+
+		static std::unique_ptr<SteamEventListener> SteamListener;
 	};
 }

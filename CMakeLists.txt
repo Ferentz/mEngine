@@ -19,6 +19,7 @@ set(SOURCES
   Minigin/components/GameComponent.cpp
   Minigin/components/RenderComponent.cpp
   Minigin/components/UIComponent.cpp
+  Minigin/components/EventComponent.cpp
   Minigin/GameObject.cpp
   Minigin/InputManager.cpp
   Minigin/Comand.cpp
@@ -30,6 +31,10 @@ set(SOURCES
   Minigin/SceneManager.cpp
   Minigin/Texture2D.cpp
   Minigin/Transform.cpp
+  Minigin/eventsystem/BroadCaster.cpp
+  Minigin/eventsystem/Listener.cpp
+  Minigin/mSteam.cpp
+  Minigin/SteamAchievementListener.cpp
 )
 
 if(EMSCRIPTEN)
