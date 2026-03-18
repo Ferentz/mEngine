@@ -31,11 +31,17 @@ set(SOURCES
   Minigin/SceneManager.cpp
   Minigin/Texture2D.cpp
   Minigin/Transform.cpp
-  Minigin/eventsystem/BroadCaster.cpp
-  Minigin/eventsystem/Listener.cpp
-  Minigin/mSteam.cpp
+  Minigin/eventSystem/BroadCaster.cpp
+  Minigin/eventSystem/Listener.cpp
   Minigin/SteamAchievementListener.cpp
 )
+
+if(Steamworks_FOUND)
+list(APPEND SOURCES
+    Minigin/mSteam.cpp
+    )
+endif()
+
 
 if(EMSCRIPTEN)
   message("Using SDL input")
