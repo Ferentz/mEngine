@@ -28,11 +28,9 @@ set(STEAMWORKS_ROOT "" CACHE PATH
 # we search for a directory named steamworks_sdk_* in the root 
 # of the project.
 # ------------------------------------------------------------
-message("trying steam")
-message(${CMAKE_CURRENT_SOURCE_DIR})
+
 
 if(NOT STEAMWORKS_ROOT)
-    message("auto root")
     file(GLOB _STEAMWORKS_CANDIDATES
         RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
         "${CMAKE_CURRENT_SOURCE_DIR}/steamworks_sdk_*"
@@ -40,7 +38,7 @@ if(NOT STEAMWORKS_ROOT)
 
     list(LENGTH _STEAMWORKS_CANDIDATES _sdk_count)
 
-    message(${_STEAMWORKS_CANDIDATES})
+    #message(${_STEAMWORKS_CANDIDATES})
     if(_sdk_count EQUAL 1)
         set(STEAMWORKS_ROOT
             "${CMAKE_CURRENT_SOURCE_DIR}/${_STEAMWORKS_CANDIDATES}"
