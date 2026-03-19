@@ -4,7 +4,7 @@
 #include <filesystem>
 #include "mSteam.h"
 
-
+class CSteamAchievements;
 class SteamEventListener;
 
 namespace dae

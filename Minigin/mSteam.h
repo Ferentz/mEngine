@@ -19,6 +19,7 @@ struct Achievement_t
 	int m_iIconImage;
 };
 
+#if USE_STEAMWORKS
 class CSteamAchievements
 {
 private:
@@ -39,7 +40,11 @@ public:
 	STEAM_CALLBACK(CSteamAchievements, OnAchievementStored,
 		UserAchievementStored_t, m_CallbackAchievementStored);
 };
-
+#else
+class CSteamAchievements
+{
+};
+#endif
 // Defining our achievements
 enum EAchievements
 {
