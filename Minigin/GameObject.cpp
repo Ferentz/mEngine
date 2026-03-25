@@ -182,7 +182,7 @@ namespace dae
 
 	void GameObject::RemoveComponent(size_t index)
 	{
-		if (index < m_components.size() && index >= 0)
+		if (index < m_components.size())
 		{
 			m_components.erase(m_components.begin() + index);
 		}

@@ -47,7 +47,7 @@ list(APPEND SOURCES Minigin/mSteam.cpp)
 
 endif()
 
-if(EMSCRIPTEN)
+if(WIN32)
   message("Using SDL input")
   list(APPEND SOURCES Minigin/contInput/sdlInput.cpp)
 else()
