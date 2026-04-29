@@ -5,6 +5,7 @@
 #include "components/RenderComponent.h"
 #include "eventSystem/BroadCaster.h"
 #include "eventSystem/Listener.h"
+#include "eventSystem/EventTypes.h"
 
 #include <string>
 
@@ -34,13 +35,15 @@ namespace dae
 		int m_maxValue;
 	};
 
-	class HealthDisplay final : public TextComponent
+	class HealthDisplay final : public TextComponent , public Listener
 	{
 	public:
 		HealthDisplay(GameObject& parent, const std::string& text,  std::shared_ptr<Font> font, IntTracker& healthComponent);
 		void SetLife();
-		Listener m_listener;
+		//Listener m_listener;
+		void TuneIn(EventId event, GameObject* subject);
 	private:
+
 		const std::string m_base;
 		IntTracker* m_healthComponent;
 	};

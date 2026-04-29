@@ -13,6 +13,7 @@ else()
   set(TARGET_PARAM WIN32)
 endif()
 
+set(PROJ_NAME gimigin)
 
 set(SOURCES
   Minigin/Font.cpp
@@ -21,9 +22,9 @@ set(SOURCES
   Minigin/components/UIComponent.cpp
   Minigin/components/EventComponent.cpp
   Minigin/GameObject.cpp
-  Minigin/InputManager.cpp
+  Minigin/inputsystems/InputManager.cpp
   Minigin/Comand.cpp
-  Minigin/Main.cpp
+  #Minigin/Main.cpp
   Minigin/Minigin.cpp
   Minigin/Renderer.cpp
   Minigin/ResourceManager.cpp
@@ -32,7 +33,12 @@ set(SOURCES
   Minigin/Texture2D.cpp
   Minigin/Transform.cpp
   Minigin/eventSystem/BroadCaster.cpp
-  Minigin/eventSystem/Listener.cpp
+  #Minigin/eventSystem/Listener.cpp
+  Minigin/eventSystem/EventStack.cpp
+  Minigin/sound/sound.cpp
+  Minigin/sound/soundImpl.cpp
+  Minigin/components/ServiceComponent.cpp
+  Minigin/ServiceLocator.cpp
   
   Minigin/SteamAchievementListener.cpp
 )
@@ -49,47 +55,23 @@ endif()
 
 if(WIN32)
   message("Using SDL input")
-  list(APPEND SOURCES Minigin/contInput/sdlInput.cpp)
+  list(APPEND SOURCES Minigin/inputsystems/sdlInput.cpp)
 else()
   message("Using XInput")
-  list(APPEND SOURCES Minigin/contInput/xInput.cpp)
+  list(APPEND SOURCES Minigin/inputsystems/xInput.cpp)
 endif()
 
-#if(EMSCRIPTEN)
- # message("Using sdl for input!")
-  #list(APPEND TARGET_PARAM Minigin/contInput/sdlInput.cpp)
-  #else()
-  #message("Using xinput for input!")
-  #list(APPEND TARGET_PARAM Minigin/contInput/xInput.cpp)
-#endif()
+ADD_LIBRARY( ${TARGET_NAME} STATIC
+            ${SOURCES})
 
-add_executable(${TARGET_NAME} ${TARGET_PARAM} ${SOURCES})
-
-# list source files here
-#add_executable(${TARGET_NAME} ${TARGET_PARAM}
-#  Minigin/Font.cpp
-#  Minigin/components/GameComponent.cpp
-#  Minigin/components/RenderComponent.cpp
-#  Minigin/components/UIComponent.cpp
-#  Minigin/components/CommandComponent.cpp
-# # Minigin/contInput/sdlInput.cpp
-#  Minigin/GameObject.cpp
-#  Minigin/InputManager.cpp
-#  Minigin/Comand.cpp
-#  Minigin/Main.cpp
-#  Minigin/Minigin.cpp
-#  Minigin/Renderer.cpp
-#  Minigin/ResourceManager.cpp
-#  Minigin/Scene.cpp
-#  Minigin/SceneManager.cpp
-#  Minigin/Texture2D.cpp
-#  Minigin/Transform.cpp
-#)
-
-
+add_executable(${PROJ_NAME} ${TARGET_PARAM} Minigin/Main.cpp)
+TARGET_LINK_LIBRARIES( ${PROJ_NAME}
+                       ${TARGET_NAME} )
 
 # enable c++20 features
-target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
+target_compile_features(${PROJ_NAME} PUBLIC cxx_std_23)
+target_compile_features(${TARGET_NAME} PUBLIC cxx_std_23)
+
 
 include(FetchContent)
 # add glm
@@ -174,7 +156,41 @@ if (WIN32)
   find_package(VLD CONFIG)
 endif()
 
+#FetchContent_Declare(
+#  SDL3_mixer
+#  GIT_REPOSITORY https://github.com/libsdl-org/SDL_mixer.git
+#  GIT_SHALLOW TRUE
+#)
+#FetchContent_MakeAvailable(SDL3_mixer)
 
+# Add SDL3_mixer
+find_package(SDL3_mixer CONFIG QUIET)
+
+if(NOT SDL3_mixer_FOUND)
+  if (WIN32)
+    FetchContent_Declare(
+      SDL3_mixer
+      URL https://www.libsdl.org/projects/SDL_mixer/release/SDL3_mixer-devel-3.2.0-VC.zip
+      DOWNLOAD_NO_PROGRESS ON
+      DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/downloads
+    )
+    FetchContent_MakeAvailable(SDL3_mixer)
+
+    list(PREPEND CMAKE_PREFIX_PATH "${sdl3_mixer_SOURCE_DIR}")
+    find_package(SDL3_mixer CONFIG REQUIRED)
+
+  else()
+    FetchContent_Declare(
+      SDL3_mixer
+      GIT_REPOSITORY https://github.com/libsdl-org/SDL_mixer.git
+      GIT_TAG release-3.0.0
+      GIT_SHALLOW TRUE
+      GIT_PROGRESS TRUE
+    )
+
+    FetchContent_MakeAvailable(SDL3_mixer)
+  endif()
+endif()
 
 #target_include_directories("${TARGET_NAME}" PUBLIC
 #  ${CMAKE_SOURCE_DIR}/Minigin/
@@ -235,6 +251,7 @@ target_include_directories("${TARGET_NAME}" PUBLIC
   ${sdl3_SOURCE_DIR}/include
   ${sdl3_image_SOURCE_DIR}/include
   ${sdl3_ttf_SOURCE_DIR}/include
+  ${sdl3_mixer_SOURCE_DIR}/include
   ${imgui_SOURCE_DIR}
   ${implot_SOURCE_DIR}
   ${VLD_INCLUDE_DIR}
@@ -244,6 +261,7 @@ target_include_directories("${TARGET_NAME}" PUBLIC
 target_link_libraries("${TARGET_NAME}" PUBLIC
   SDL3::SDL3
   SDL3_ttf::SDL3_ttf
+  SDL3_mixer::SDL3_mixer
   glm::glm
   imgui
   implot

@@ -1,6 +1,6 @@
 #include "BroadCaster.h"
 #include "Listener.h"
-#include "EventTypes.h"
+#include "GameObject.h"
 
 namespace dae
 {
@@ -8,7 +8,7 @@ namespace dae
 	{
 		for (Listener* listener : m_subscribers)
 		{
-			listener->TuneIn(event, subject);
+			listener->TuneIn(event, subject); //TuneIn(event, subject);
 		}
 	}
 	void BroadCaster::Register(Listener& listener)

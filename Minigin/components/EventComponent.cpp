@@ -1,7 +1,8 @@
 #include "EventComponent.h"
+#include "EventComponent.h"
 #include "components/EventComponent.h"
 #include "eventSystem/EventHash.h"
-
+#include <eventSystem/EventStack.h>
 //#include "mSteam.h"
 //#include <format>
 #include "Minigin.h"
@@ -17,6 +18,8 @@ namespace dae
 			m_value = m_minValue;
 			return m_value;
 		}
+		//explicit Event(EventId _id, GameComponent const * _subject)
+		EventStack::GetEventStack().PushEvent(Event{ make_sdbm_hash("health changed"), this->GetParent()});
 		m_signal.BroadCast(make_sdbm_hash("health changed"), GetParent());
 		return m_value;
 	}
@@ -41,17 +44,18 @@ namespace dae
 		m_healthComponent{&healthComponent }
 	{
 		SetText(m_base + std::format(": {}", m_healthComponent->GetValue()));
-		m_listener.AddEvent(make_sdbm_hash("health changed"),this,  &HealthDisplay::SetLife);
-		m_listener.Subscribe(healthComponent.m_signal);
+		//m_listener.AddEvent(make_sdbm_hash("health changed"),this,  &HealthDisplay::SetLife);
+		healthComponent.m_signal.Register(*this);
+		//m_listener.Subscribe(healthComponent.m_signal);
 	}
 	void dae::HealthDisplay::SetLife()
 	{
-//#if USE_STEAMWORKS
-//		if (dae::Minigin::g_SteamAchievements)
-//			dae::Minigin::g_SteamAchievements->SetAchievement("ACH_WIN_100_GAMES");
-//#endif 
 		
 		SetText(m_base + std::format(": {}", m_healthComponent->GetValue()));
 		//return m_healthComponent->GetValue();
+	}
+	void dae::HealthDisplay::TuneIn(EventId , GameObject* )
+	{
+		SetText(m_base + std::format(": {}", m_healthComponent->GetValue()));
 	}
 }

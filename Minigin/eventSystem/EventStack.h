@@ -10,17 +10,23 @@ namespace dae
 	class EventStack
 	{
 	public:
-		EventStack(size_t size);
+		static EventStack& GetEventStack();
 		void PushEvent(Event event);
-		void Register(EventId events, Listener&);
-		void Unregister(EventId events, Listener*);
-		void Unregister(Listener*);
+		void Register(Listener& listener);
+		//void Unregister(EventId events, Listener*);
+		void Unregister(Listener* listener);
 
 	private:
-		void BroadCastEvent(size_t index);
-		size_t m_index;
+		EventStack(size_t size);
+		void BroadCastEvents();
+		size_t m_broadcastIndex;
+		size_t m_fillIndex;
 		std::vector<Event> m_stack;
-		std::vector<EventId> m_registeredEvents;
-		std::vector<std::vector<Listener*>>> m_registeredListeners;
+		//std::vector<EventId> m_registeredEvents;
+		std::vector<Listener*> m_registeredListeners;
+
+		//think on how to best make it so a listener can pick up an event that allows the broadcasting to happen threaded.
+		/*bool m_eventGotPickedUp{ false };
+		Listener * */
 	};
 }

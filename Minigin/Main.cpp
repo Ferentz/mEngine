@@ -15,10 +15,13 @@
 #include <filesystem>
 #include "components/GameComponent.h"
 
-#include "InputManager.h"
+#include "inputsystems/InputManager.h"
 #include "Comand.h"
 #include "SteamAchievementListener.h"
 #include "eventSystem/EventHash.h"
+
+#include <serviceLocator.h>
+#include <sound/sound.h>
 
 
 
@@ -26,6 +29,10 @@ namespace fs = std::filesystem;
 
 static void load()
 {
+	std::vector<std::string> paths{};
+	dae::servicelocator soundService{};
+	soundService.register_sound_system(std::make_unique<dae::SoundSystem_Logging>(std::move(paths)));
+
 	auto& scene = dae::SceneManager::GetInstance().CreateScene();
 
 	auto go = std::make_unique<dae::GameObject>();
@@ -139,6 +146,7 @@ static void load()
 	auto pointsDisplayComponent =
 		player1_HealthDisplay->AddNGetComponent<dae::HealthDisplay>("points", font, *pointsComponent);
 	pointsDisplayComponent->SetPosition(100, 55);
+	player1_HealthDisplay->AddComponent<dae::ServiceComponent>();
 
 	scene.Add(std::move(player1_HealthDisplay));
 
@@ -160,9 +168,11 @@ static void load()
 
 #if USE_STEAMWORKS
 	
-	dae::Minigin::SteamListener->m_listener.AddEvent(dae::make_sdbm_hash("won"), dae::Minigin::SteamListener.get(), &SteamEventListener::WinnerAchievement);
-	dae::Minigin::SteamListener->m_listener.Subscribe(pointsComponent->m_signal);
-	dae::Minigin::SteamListener->m_listener.Subscribe(pointsComponent2->m_signal);
+	//dae::Minigin::SteamListener->m_listener.AddEvent(dae::make_sdbm_hash("won"), dae::Minigin::SteamListener.get(), &SteamEventListener::WinnerAchievement);
+	//dae::Minigin::SteamListener->m_listener.Subscribe(pointsComponent->m_signal);
+	pointsComponent->m_signal.Register(*dae::Minigin::SteamListener);
+	//dae::Minigin::SteamListener->m_listener.Subscribe(pointsComponent2->m_signal);
+	pointsComponent2->m_signal.Register(*dae::Minigin::SteamListener);
 #endif
 	
 }

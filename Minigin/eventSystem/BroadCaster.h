@@ -16,6 +16,7 @@ namespace dae
 		void BroadCast(EventId event, GameObject* subject);
 		void Register(Listener& listener);
 		void UnRegister(Listener* listener);
+
 	private:
 		//Event m_event(make_sdbm_hash("PlayerDied"));
 		std::forward_list<Listener*> m_subscribers;

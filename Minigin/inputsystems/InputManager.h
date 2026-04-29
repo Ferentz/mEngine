@@ -104,30 +104,14 @@ namespace dae
 		InputManager()
 		{
 			m_inputs.emplace_back(std::make_unique<KeyBoardInput>());
-			/*#if __EMSCRIPTEN__
-			m_inputs.emplace_back(std::make_unique<KeyBoardInput>());
-			#else*/
 			m_inputs.emplace_back(std::make_unique<ControllerInput>());
-			//#endif
-			
 		}
-
-		std::vector<std::unique_ptr<InputMethod>> m_inputs{};//std::unique_ptr<InputMethod> m_controlerInput{std::make_unique<XInputMethod>()};
-		//std::unique_ptr<InputMethod> m_keyboardInput;
+		
+		std::vector<std::unique_ptr<InputMethod>> m_inputs{};
 
 		InputMethod* GetInputMethod(int const idx);
 
 	private:
 		
 	};
-
-
-	
 }
-
-
-/*
-	
-
-
-*/

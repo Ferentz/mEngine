@@ -9,17 +9,20 @@
 #include <windows.h>
 #endif
 
+#undef USE_STEAMWORKS
 
 
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include "Minigin.h"
-#include "InputManager.h"
+#include "inputsystems/InputManager.h"
 #include "SceneManager.h"
 #include "Renderer.h"
 #include "ResourceManager.h"
 #include "mSteam.h"
 #include "SteamAchievementListener.h"
+
+#include <print>
 
 SDL_Window* g_window{};
 
@@ -105,12 +108,14 @@ dae::Minigin::~Minigin()
 
 void dae::Minigin::Run(const std::function<void()>& load)
 {
+
+	std::print("found print");
 #if USE_STEAMWORKS
 	if (!SteamAPI_Init())
 		throw std::runtime_error(std::string("Fatal Error - Steam must be running to play this game (SteamAPI_Init() failed)."));
 
 	SteamAchievements.reset(new CSteamAchievements(g_Achievements, 4));
-	SteamListener.reset(new SteamEventListener);
+	SteamListener.reset(new SteamEventListener());
 #endif
 
 	load();
