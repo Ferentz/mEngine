@@ -168,6 +168,7 @@ find_package(SDL3_mixer CONFIG QUIET)
 
 if(NOT SDL3_mixer_FOUND)
   if (WIN32)
+    message("sdl not found fetching from sdl...")
     FetchContent_Declare(
       SDL3_mixer
       URL https://www.libsdl.org/projects/SDL_mixer/release/SDL3_mixer-devel-3.2.0-VC.zip
@@ -180,6 +181,7 @@ if(NOT SDL3_mixer_FOUND)
     find_package(SDL3_mixer CONFIG REQUIRED)
 
   else()
+  message("sdl not found fetching from gihub...")
     FetchContent_Declare(
       SDL3_mixer
       GIT_REPOSITORY https://github.com/libsdl-org/SDL_mixer.git
@@ -319,6 +321,7 @@ elseif(WIN32)
   set(SDL_RUNTIME_DLLS
     SDL3::SDL3
     SDL3_ttf::SDL3_ttf
+    SDL3_mixer::SDL3_mixer
   )
 
   foreach(dllTarget IN LISTS SDL_RUNTIME_DLLS)

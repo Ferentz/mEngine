@@ -15,12 +15,13 @@ namespace dae
 		void Register(Listener& listener);
 		//void Unregister(EventId events, Listener*);
 		void Unregister(Listener* listener);
+		void BroadCastEvents();
 
 	private:
 		EventStack(size_t size);
-		void BroadCastEvents();
-		size_t m_broadcastIndex;
-		size_t m_fillIndex;
+		
+		size_t m_broadcastIndex{0};
+		size_t m_fillIndex{0};
 		std::vector<Event> m_stack;
 		//std::vector<EventId> m_registeredEvents;
 		std::vector<Listener*> m_registeredListeners;

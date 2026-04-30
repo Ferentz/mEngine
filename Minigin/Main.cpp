@@ -13,7 +13,6 @@
 #include "Scene.h"
 
 #include <filesystem>
-#include "components/GameComponent.h"
 
 #include "inputsystems/InputManager.h"
 #include "Comand.h"
@@ -23,15 +22,22 @@
 #include <serviceLocator.h>
 #include <sound/sound.h>
 
+#include <GameObject.h>
+#include <Components.h>
 
+#include <vector>
+#include <string>
+#include <memory>
+#include <utility>
 
 namespace fs = std::filesystem;
 
 static void load()
 {
-	std::vector<std::string> paths{};
+	std::vector<std::string> paths{"sci_fi_door-6451.mp3"};
 	dae::servicelocator soundService{};
-	soundService.register_sound_system(std::make_unique<dae::SoundSystem_Logging>(std::move(paths)));
+
+	soundService.register_sound_system(std::make_unique<dae::SoundSystem_Logging>(paths));
 
 	auto& scene = dae::SceneManager::GetInstance().CreateScene();
 
@@ -163,6 +169,7 @@ static void load()
 	auto pointsDisplayComponent2 =
 		player2_HealthDisplay->AddNGetComponent<dae::HealthDisplay>("points", font, *pointsComponent2);
 	pointsDisplayComponent2->SetPosition(100, 55);
+	player2_HealthDisplay->AddComponent<dae::ServiceComponent>();
 
 	scene.Add(std::move(player2_HealthDisplay));
 

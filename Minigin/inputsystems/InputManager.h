@@ -2,6 +2,7 @@
 #include "Singleton.h"
 #include <vector>
 #include <memory>
+#include <utility>
 
 //#include <xinput.h>
 

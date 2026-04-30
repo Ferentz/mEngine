@@ -1,11 +1,12 @@
-
+#pragma once
 #include <memory>
 #include <vector>
 #include <string>
+
+
+
 namespace  dae
 {
-
-
 	using sound_id = unsigned short;
 	class SoundSystem
 	{
@@ -40,9 +41,9 @@ namespace  dae
 		std::vector<std::string> m_audioPaths;
 
 	public:
-		SoundSystem_Pimpled(std::vector<std::string>&& paths);
+		SoundSystem_Pimpled(std::vector<std::string>& paths);
 
-		virtual ~SoundSystem_Pimpled() override = default;
+		virtual ~SoundSystem_Pimpled() override;
 		virtual void Load(sound_id id) override;
 		virtual void Play(sound_id id, float volume) override;
 	};
@@ -51,7 +52,7 @@ namespace  dae
 	{
 
 	public:
-		SoundSystem_Logging(std::vector<std::string>&& paths);
+		SoundSystem_Logging(std::vector<std::string>& paths);
 		virtual ~SoundSystem_Logging() override = default;
 		virtual void Load(sound_id id) override;
 		virtual void Play(sound_id id, float volume) override;
