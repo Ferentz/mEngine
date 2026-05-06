@@ -1,5 +1,6 @@
-
+// if this happes to get loaded by emcription, where it shouldnt, cuz xinput only works for windows, it will be undefined
 #if __EMSCRIPTEN__
+
 #else
 #include "InputManager.h"
 

@@ -318,6 +318,15 @@ if(EMSCRIPTEN)
     COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/web" "$<TARGET_FILE_DIR:${LIBRARY_PROJECT_NAME}>/"
   )
 
+  #make sure the properties are set for the eecutable
+  target_link_options(${GAME_PROJ_NAME} PRIVATE
+    -sUSE_FREETYPE=1
+    -sUSE_HARFBUZZ=1
+    -sALLOW_MEMORY_GROWTH
+    --preload-file "${CMAKE_SOURCE_DIR}/Data@/"
+    -g
+  )
+
   # Have emscripten generate a html page too.
   set(CMAKE_EXECUTABLE_SUFFIX ".html")
 
