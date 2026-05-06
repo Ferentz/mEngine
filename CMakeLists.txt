@@ -191,7 +191,7 @@ if(NOT SDL3_mixer_FOUND)
     FetchContent_Declare(
       SDL3_mixer
       GIT_REPOSITORY https://github.com/libsdl-org/SDL_mixer.git
-      GIT_TAG release-3.0.0
+      #GIT_TAG release-3.0.0
       GIT_SHALLOW TRUE
       GIT_PROGRESS TRUE
     )
