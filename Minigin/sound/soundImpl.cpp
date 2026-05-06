@@ -43,10 +43,11 @@ namespace  dae
 
                 // this will now wait untill it's notified,
                 // and only if the que isnt empty will it exxecute.
-                loadVar.wait(lck, [&] {return !m_audioLoadQueue.empty(); });
+                loadVar.wait(lck, [&] {return (!m_audioLoadQueue.empty()) || stopToken.stop_requested(); });
 
                 if (stopToken.stop_requested())
                 {
+                    lck.unlock();
                     loadVar.notify_all();
                     continue;
                 }
@@ -99,13 +100,14 @@ namespace  dae
                 playVar.wait(lck, [&] {
                     bool empty{ m_audioPlayQueue.empty() };
                     if (!empty)
-                   {
-                       return m_audioFiles[m_audioPlayQueue.front()].second; // dont pass if the sound isnt loaded
+                    {
+                        return m_audioFiles[m_audioPlayQueue.front()].second; // dont pass if the sound isnt loaded
                     }
-                    return false; });
+                    return stopToken.stop_requested(); });
 
                 if (stopToken.stop_requested())
                 {
+                    lck.unlock();
                     playVar.notify_all();
                     continue;
                 }
@@ -136,9 +138,9 @@ namespace  dae
         ~SoundImpl()
         {
             stopSource.request_stop();
-            m_audioLoadQueue.push(0);
+            //m_audioLoadQueue.push(0);
             loadVar.notify_all();
-            m_audioPlayQueue.push(0);
+            //m_audioPlayQueue.push(0);
             playVar.notify_all();
 
             for (auto& thread : loadThreads)

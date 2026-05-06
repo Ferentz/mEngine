@@ -6,14 +6,14 @@ if(EMSCRIPTEN)
 endif()
 
 if(EMSCRIPTEN)
-  set(TARGET_NAME minigin_web)
-  set(TARGET_PARAM )
+  set(LIBRARY_PROJECT_NAME minigin_web)
+  set(LIBRARY_PARAM )
 else()
-  set(TARGET_NAME minigin)
-  set(TARGET_PARAM WIN32)
+  set(LIBRARY_PROJECT_NAME minigin)
+  set(LIBRARY_PARAM WIN32)
 endif()
 
-set(PROJ_NAME gimigin)
+set(GAME_PROJ_NAME gimigin)
 
 set(SOURCES
   Minigin/Font.cpp
@@ -61,16 +61,22 @@ else()
   list(APPEND SOURCES Minigin/inputsystems/xInput.cpp)
 endif()
 
-ADD_LIBRARY( ${TARGET_NAME} STATIC
+ADD_LIBRARY( ${LIBRARY_PROJECT_NAME} STATIC
             ${SOURCES})
 
-add_executable(${PROJ_NAME} ${TARGET_PARAM} Minigin/Main.cpp)
-TARGET_LINK_LIBRARIES( ${PROJ_NAME}
-                       ${TARGET_NAME} )
+set(GAME_SOURCES
+  Game/Main.cpp
+  Game/Goldbag.cpp
+)
+
+
+add_executable(${GAME_PROJ_NAME} ${LIBRARY_PARAM} ${GAME_SOURCES})
+TARGET_LINK_LIBRARIES( ${GAME_PROJ_NAME}
+                       ${LIBRARY_PROJECT_NAME} )
 
 # enable c++20 features
-target_compile_features(${PROJ_NAME} PUBLIC cxx_std_23)
-target_compile_features(${TARGET_NAME} PUBLIC cxx_std_23)
+target_compile_features(${GAME_PROJ_NAME} PUBLIC cxx_std_23)
+target_compile_features(${LIBRARY_PROJECT_NAME} PUBLIC cxx_std_23)
 
 
 include(FetchContent)
@@ -247,7 +253,7 @@ target_compile_features(imgui PUBLIC cxx_std_20)
 
 target_link_libraries(implot PUBLIC imgui)
 
-target_include_directories("${TARGET_NAME}" PUBLIC 
+target_include_directories("${LIBRARY_PROJECT_NAME}" PUBLIC 
   ${CMAKE_SOURCE_DIR}/Minigin/
   ${glm_SOURCE_DIR}
   ${sdl3_SOURCE_DIR}/include
@@ -260,7 +266,7 @@ target_include_directories("${TARGET_NAME}" PUBLIC
 )
 
 
-target_link_libraries("${TARGET_NAME}" PUBLIC
+target_link_libraries("${LIBRARY_PROJECT_NAME}" PUBLIC
   SDL3::SDL3
   SDL3_ttf::SDL3_ttf
   SDL3_mixer::SDL3_mixer
@@ -270,6 +276,9 @@ target_link_libraries("${TARGET_NAME}" PUBLIC
   ${VLD_LIBRARIES}
 )
 
+target_include_directories("${GAME_PROJ_NAME}" PUBLIC 
+  ${CMAKE_SOURCE_DIR}/Game/
+)
 # Optional: Set IMGUI_INCLUDE_DIR to the path of imgui sources, if different from the default. 
 #set(imgui_SOURCE_DIR ${imgui_SOURCE_DIR})
 #FetchContent_Declare(
@@ -286,9 +295,9 @@ target_link_libraries("${TARGET_NAME}" PUBLIC
 
 if(MSVC)
   # compile at warning level 4 + treat warnings as errors
-  target_compile_options(${TARGET_NAME} PRIVATE /W4 /WX)
+  target_compile_options(${LIBRARY_PROJECT_NAME} PRIVATE /W4 /WX)
 else()
-  target_compile_options(${TARGET_NAME} PRIVATE -Wall -Wextra -Werror)
+  target_compile_options(${LIBRARY_PROJECT_NAME} PRIVATE -Wall -Wextra -Werror)
 endif()
 
 if(EMSCRIPTEN)
@@ -299,13 +308,13 @@ if(EMSCRIPTEN)
   set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/cmake/EmscriptenToolchain.cmake)
 
   # Additional settings for Emscripten build
-  set_target_properties(${TARGET_NAME} PROPERTIES
+  set_target_properties(${LIBRARY_PROJECT_NAME} PROPERTIES
       COMPILE_FLAGS "${EMSCRIPTEN_COMPILE_FLAGS}"
       LINK_FLAGS "${EMSCRIPTEN_LINK_FLAGS}"
   )
 
-  add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-    COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/web" "$<TARGET_FILE_DIR:${TARGET_NAME}>/"
+  add_custom_command(TARGET ${LIBRARY_PROJECT_NAME} POST_BUILD
+    COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/web" "$<TARGET_FILE_DIR:${LIBRARY_PROJECT_NAME}>/"
   )
 
   # Have emscripten generate a html page too.
@@ -313,9 +322,9 @@ if(EMSCRIPTEN)
 
 elseif(WIN32)
   # Set minigin as the default startup project
-  set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${TARGET_NAME})
+  set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${LIBRARY_PROJECT_NAME})
   # Set working directory to output folder
-  set_target_properties(${TARGET_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:${TARGET_NAME}>")
+  set_target_properties(${LIBRARY_PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:${LIBRARY_PROJECT_NAME}>")
 
   # Copy SDL dlls to output folder
   set(SDL_RUNTIME_DLLS
@@ -326,73 +335,73 @@ elseif(WIN32)
 
   foreach(dllTarget IN LISTS SDL_RUNTIME_DLLS)
     add_custom_command(
-      TARGET ${TARGET_NAME} POST_BUILD
+      TARGET ${LIBRARY_PROJECT_NAME} POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
           "$<TARGET_FILE:${dllTarget}>"
-          "$<TARGET_FILE_DIR:${TARGET_NAME}>"
+          "$<TARGET_FILE_DIR:${LIBRARY_PROJECT_NAME}>"
       VERBATIM
     )
   endforeach()
 
   if(Steamworks_FOUND)
-    target_link_libraries("${TARGET_NAME}" PUBLIC Steamworks::Steamworks)
-    target_compile_definitions(${TARGET_NAME} PRIVATE USE_STEAMWORKS)
-    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-      COMMAND "${CMAKE_COMMAND}" -E copy "${Steamworks_RUNTIME_DLL}" "$<TARGET_FILE_DIR:${TARGET_NAME}>")
-    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-      COMMAND "${CMAKE_COMMAND}" -E echo "480" > "$<TARGET_FILE_DIR:${TARGET_NAME}>/steam_appid.txt"
+    target_link_libraries("${LIBRARY_PROJECT_NAME}" PUBLIC Steamworks::Steamworks)
+    target_compile_definitions(${LIBRARY_PROJECT_NAME} PRIVATE USE_STEAMWORKS)
+    add_custom_command(TARGET ${LIBRARY_PROJECT_NAME} POST_BUILD
+      COMMAND "${CMAKE_COMMAND}" -E copy "${Steamworks_RUNTIME_DLL}" "$<TARGET_FILE_DIR:${LIBRARY_PROJECT_NAME}>")
+    add_custom_command(TARGET ${LIBRARY_PROJECT_NAME} POST_BUILD
+      COMMAND "${CMAKE_COMMAND}" -E echo "480" > "$<TARGET_FILE_DIR:${LIBRARY_PROJECT_NAME}>/steam_appid.txt"
       COMMENT "Generating steam_appid.txt"
     )
   endif()
 
-  add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-    COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Data" "$<TARGET_FILE_DIR:${TARGET_NAME}>/Data"
+  add_custom_command(TARGET ${LIBRARY_PROJECT_NAME} POST_BUILD
+    COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Data" "$<TARGET_FILE_DIR:${LIBRARY_PROJECT_NAME}>/Data"
   )
 elseif(APPLE)
-  set_target_properties(${TARGET_NAME} PROPERTIES
+  set_target_properties(${LIBRARY_PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE TRUE
     INSTALL_RPATH "@executable_path/../Frameworks"
     BUILD_WITH_INSTALL_RPATH TRUE
   )
-  add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-    COMMAND "${CMAKE_COMMAND}" -E make_directory "$<TARGET_BUNDLE_DIR:${TARGET_NAME}>/Contents/Frameworks"
-    COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:SDL3::SDL3-shared>" "$<TARGET_BUNDLE_DIR:${TARGET_NAME}>/Contents/Frameworks/"
-    COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:SDL3_ttf::SDL3_ttf-shared>" "$<TARGET_BUNDLE_DIR:${TARGET_NAME}>/Contents/Frameworks/"
-    COMMAND install_name_tool -change "@rpath/libSDL3_ttf.0.dylib" "@executable_path/../Frameworks/libSDL3_ttf.0.2.2.dylib" "$<TARGET_FILE:${TARGET_NAME}>"
-    COMMAND install_name_tool -change "@rpath/libSDL3.0.dylib" "@executable_path/../Frameworks/libSDL3.0.dylib" "$<TARGET_FILE:${TARGET_NAME}>"
+  add_custom_command(TARGET ${LIBRARY_PROJECT_NAME} POST_BUILD
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "$<TARGET_BUNDLE_DIR:${LIBRARY_PROJECT_NAME}>/Contents/Frameworks"
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:SDL3::SDL3-shared>" "$<TARGET_BUNDLE_DIR:${LIBRARY_PROJECT_NAME}>/Contents/Frameworks/"
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:SDL3_ttf::SDL3_ttf-shared>" "$<TARGET_BUNDLE_DIR:${LIBRARY_PROJECT_NAME}>/Contents/Frameworks/"
+    COMMAND install_name_tool -change "@rpath/libSDL3_ttf.0.dylib" "@executable_path/../Frameworks/libSDL3_ttf.0.2.2.dylib" "$<TARGET_FILE:${LIBRARY_PROJECT_NAME}>"
+    COMMAND install_name_tool -change "@rpath/libSDL3.0.dylib" "@executable_path/../Frameworks/libSDL3.0.dylib" "$<TARGET_FILE:${LIBRARY_PROJECT_NAME}>"
   )
 
   if(Steamworks_FOUND)
-    target_link_libraries("${TARGET_NAME}" PUBLIC Steamworks::Steamworks)
-    target_compile_definitions(${TARGET_NAME} PRIVATE USE_STEAMWORKS)
-    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-      COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${Steamworks_LIBRARIES}" "$<TARGET_BUNDLE_DIR:${TARGET_NAME}>/Contents/Frameworks/"
+    target_link_libraries("${LIBRARY_PROJECT_NAME}" PUBLIC Steamworks::Steamworks)
+    target_compile_definitions(${LIBRARY_PROJECT_NAME} PRIVATE USE_STEAMWORKS)
+    add_custom_command(TARGET ${LIBRARY_PROJECT_NAME} POST_BUILD
+      COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${Steamworks_LIBRARIES}" "$<TARGET_BUNDLE_DIR:${LIBRARY_PROJECT_NAME}>/Contents/Frameworks/"
     )
-    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-      COMMAND "${CMAKE_COMMAND}" -E echo "480" > "$<TARGET_FILE_DIR:${TARGET_NAME}>/steam_appid.txt"
+    add_custom_command(TARGET ${LIBRARY_PROJECT_NAME} POST_BUILD
+      COMMAND "${CMAKE_COMMAND}" -E echo "480" > "$<TARGET_FILE_DIR:${LIBRARY_PROJECT_NAME}>/steam_appid.txt"
       COMMENT "Generating steam_appid.txt"
     )
   endif()
 
   # Copy Data folder to output directory after build
-  add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-    COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Data" "$<TARGET_FILE_DIR:${TARGET_NAME}>/Data"
+  add_custom_command(TARGET ${LIBRARY_PROJECT_NAME} POST_BUILD
+    COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Data" "$<TARGET_FILE_DIR:${LIBRARY_PROJECT_NAME}>/Data"
   )
 else()
  if(Steamworks_FOUND)
-    target_link_libraries("${TARGET_NAME}" PUBLIC Steamworks::Steamworks)
-    target_compile_definitions(${TARGET_NAME} PRIVATE USE_STEAMWORKS)
-    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-      COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${Steamworks_LIBRARIES}" "$<TARGET_FILE_DIR:${TARGET_NAME}>"
+    target_link_libraries("${LIBRARY_PROJECT_NAME}" PUBLIC Steamworks::Steamworks)
+    target_compile_definitions(${LIBRARY_PROJECT_NAME} PRIVATE USE_STEAMWORKS)
+    add_custom_command(TARGET ${LIBRARY_PROJECT_NAME} POST_BUILD
+      COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${Steamworks_LIBRARIES}" "$<TARGET_FILE_DIR:${LIBRARY_PROJECT_NAME}>"
     )
-    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-      COMMAND "${CMAKE_COMMAND}" -E echo "480" > "$<TARGET_FILE_DIR:${TARGET_NAME}>/steam_appid.txt"
+    add_custom_command(TARGET ${LIBRARY_PROJECT_NAME} POST_BUILD
+      COMMAND "${CMAKE_COMMAND}" -E echo "480" > "$<TARGET_FILE_DIR:${LIBRARY_PROJECT_NAME}>/steam_appid.txt"
       COMMENT "Generating steam_appid.txt"
     )
   endif()
 
   # Copy Data folder to output directory after build
-  add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-    COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Data" "$<TARGET_FILE_DIR:${TARGET_NAME}>/Data"
+  add_custom_command(TARGET ${LIBRARY_PROJECT_NAME} POST_BUILD
+    COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Data" "$<TARGET_FILE_DIR:${LIBRARY_PROJECT_NAME}>/Data"
   )
 endif()

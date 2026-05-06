@@ -4,6 +4,8 @@
 #include "Renderer.h"
 #include <stdexcept>
 
+//#include <gl/gl.h>
+
 dae::Texture2D::~Texture2D()
 {
 	SDL_DestroyTexture(m_texture);
@@ -27,7 +29,14 @@ dae::Texture2D::Texture2D(const std::string &fullPath)
     SDL_Surface* surface = SDL_LoadPNG(fullPath.c_str());
     if (!surface)
     {
-        surface = SDL_LoadBMP(fullPath.c_str());
+        SDL_Surface* tmp = SDL_LoadBMP(fullPath.c_str());
+
+        //GLenum mode = GL_RGBA;
+        SDL_PixelFormat target = SDL_PIXELFORMAT_RGBA32;
+        surface = SDL_ConvertSurface(tmp, target);
+        SDL_DestroySurface(tmp);
+        //SDL_FreeFormat(target);
+
     }
     if (!surface)
     {

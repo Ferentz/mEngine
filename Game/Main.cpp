@@ -71,8 +71,13 @@ static void load()
 	// ============ players!
 	auto player1 = std::make_unique<dae::GameObject>();
 	player1->SetPosition(70, 0);
-	auto imgComp = player1->AddNGetComponent<dae::TextureComponent>();
-	imgComp->SetTexture("SPOSA1.png");
+	//auto imgComp1 = player1->AddNGetComponent<dae::TextureComponent>();
+	//imgComp1->SetTexture("SPOSA1.png");
+	auto imgComp2 = player1->AddNGetComponent<dae::TextureComponent>();
+	imgComp2->SetTexture("CDBIG3X.BMP");
+
+	//imgComp->SetTexture("digger/CDBIG3X.png");
+
 	auto healthComponent = player1->AddNGetComponent<dae::IntTracker>(3,3,0);
 	auto pointsComponent = 
 		player1->AddNGetComponent<dae::IntTracker>(0, 500, 0);
