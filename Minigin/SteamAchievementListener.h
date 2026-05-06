@@ -9,5 +9,5 @@ public:
 	virtual ~SteamEventListener() override = default;
 	void WinnerAchievement();
 	//dae::Listener m_listener{};
-	virtual void TuneIn(dae::EventId message, dae::GameObject* subject);
+	virtual void TuneIn(dae::EventId message, dae::GameObject* subject) override;
 };
