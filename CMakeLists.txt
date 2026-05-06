@@ -54,11 +54,12 @@ list(APPEND SOURCES Minigin/mSteam.cpp)
 endif()
 
 if(WIN32)
-  message("Using SDL input")
-  list(APPEND SOURCES Minigin/inputsystems/sdlInput.cpp)
-else()
   message("Using XInput")
   list(APPEND SOURCES Minigin/inputsystems/xInput.cpp)
+  
+else()
+  message("Using SDL input")
+  list(APPEND SOURCES Minigin/inputsystems/sdlInput.cpp)
 endif()
 
 ADD_LIBRARY( ${LIBRARY_PROJECT_NAME} STATIC

@@ -1,6 +1,6 @@
 
-#if __EMSCRIPTEN__
-#else
+//#if __EMSCRIPTEN__
+//#else
 #include "InputManager.h"
 
 #if WIN32
@@ -17,8 +17,6 @@
 
 namespace dae
 {
-	
-
 	class ControllerInput::ControllerImpl
 	{
 	public:
