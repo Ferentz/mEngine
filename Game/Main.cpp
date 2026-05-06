@@ -14,10 +14,12 @@
 
 #include <filesystem>
 
-#include <inputsystems/InputManager.h>
+
 #include <Comand.h>
 #include <SteamAchievementListener.h>
 #include <eventSystem/EventHash.h>
+
+#include <inputsystems/InputManager.h>
 
 #include <serviceLocator.h>
 #include <sound/sound.h>
