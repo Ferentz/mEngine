@@ -29,7 +29,6 @@ namespace  dae
         std::condition_variable loadVar;
         std::condition_variable playVar;
         std::condition_variable gotLoadedVar;
-        bool ready{ false };
 
         std::queue<int> m_audioLoadQueue;
         std::queue<int> m_audioPlayQueue;
