@@ -297,6 +297,7 @@ target_include_directories("${GAME_PROJ_NAME}" PUBLIC
 if(MSVC)
   # compile at warning level 4 + treat warnings as errors
   target_compile_options(${LIBRARY_PROJECT_NAME} PRIVATE /W4 /WX)
+  target_compile_options(${GAME_PROJ_NAME} PRIVATE /W4 /WX)
 else()
   target_compile_options(${LIBRARY_PROJECT_NAME} PRIVATE -Wall -Wextra -Werror)
 endif()

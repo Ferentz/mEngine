@@ -33,10 +33,10 @@ namespace dae
 		return true;
 	}
 
-	InputMethod* InputManager::GetInputMethod(int const idx)
+	InputMethod* InputManager::GetInputMethod(InputType const idx)
 	{
-		if (size_t(idx) >= m_inputs.size()) return nullptr;
-		return m_inputs[idx].get();
+		//if (size_t(idx) >= m_inputs.size()) return nullptr;
+		return m_inputs[size_t(idx)].get();
 	}
 
 	KeyBoardInput::KeyBoardInput()

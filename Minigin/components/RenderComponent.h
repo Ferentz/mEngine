@@ -8,8 +8,7 @@ namespace dae
 	public:
 		virtual ~RenderComponent() = default;
 		explicit RenderComponent(GameObject& parent)
-			:GameComponent{ parent },
-			m_transform{this}
+			:GameComponent{ parent }
 		{
 		}
 
@@ -20,15 +19,11 @@ namespace dae
 
 		virtual void Render() = 0;
 		virtual void Update(float) override;
-		void MakeDirty();
 
-		void SetPosition(float x, float y);
-		Transform const* GetLocalTransform() const;
-		Transform const* QueryWorldTransform();
-		Transform const* GetWorldTransform() const;
+		Transform m_offset{};
 
 	private:
-		SmartTransform m_transform;
+		
 
 	};
 

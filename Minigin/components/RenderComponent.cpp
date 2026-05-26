@@ -17,32 +17,6 @@ namespace dae
 	{
 	}
 
-	void RenderComponent::MakeDirty()
-	{
-		m_transform.MakeDirty();
-
-	}
-
-	void RenderComponent::SetPosition(float x, float y)
-	{
-		MakeDirty();
-		m_transform.SetLocalPosition(x, y, 0.0f);
-	}
-
-	Transform const* RenderComponent::GetLocalTransform() const
-	{
-		return m_transform.GetLocalTransform();
-	}
-
-	Transform const* RenderComponent::GetWorldTransform() const
-	{
-		return m_transform.GetWorldTransform();
-	}
-
-	Transform const* RenderComponent::QueryWorldTransform()
-	{
-		return m_transform.QueryWorldTransform(GetParent()->QueryWorldTransform());
-	}
 
 
 
@@ -56,7 +30,7 @@ namespace dae
 	{
 		if (m_texture != nullptr)
 		{
-			const auto& pos = QueryWorldTransform()->GetPosition();
+			const auto& pos = GetParent()->GetWorldTransform()->GetPosition()+ m_offset.GetPosition();
 			Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
 		}
 	}

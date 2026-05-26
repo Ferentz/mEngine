@@ -1,3 +1,4 @@
+#include "GameObject.h"
 #include <string>
 
 #include "ResourceManager.h"
@@ -53,46 +54,37 @@ namespace dae
 		}
 	}
 
+	GameObject* const GameObject::GetParent()
+	{
+		return m_pParent;
+	}
 
-	void GameObject::SetParent(GameObject& parent, bool keepWorldPos)
+	void GameObject::SetParent(GameObject *newParent, bool keepWorldPos)
 	{
 		// if the new parent is already the parent of the object
-		if (&parent == this->m_pParent) return;
+		if (newParent == this->m_pParent) return;
 
-		// if the new parent is a child of the object
-		if (this->IsChild(&parent)) return;
-
-		//if the object is in the child list of the parent
+		// if the new parent is a child of the object, works for nullptr
+		if (this->IsChild(newParent)) return;
 		
 		//rebase transforms
 		if (keepWorldPos)
 		{
-			m_transform.Rebase(parent.QueryWorldTransform());
-			//this->MakeDirty();
+			m_transform.ReconstructLocal(newParent);
 		}
 		this->MakeDirty();
 
 
-		// - should always return true atm. failsafe in function should be posible to remove
-		if (!parent.AddChild(this)) return;
-
 		//remove from old parent
 		if (m_pParent) m_pParent->RemoveChild(this);
-		
-		// officialy set new parent;
-		this->m_pParent = &parent;
-		
+		// set new parent;
+		this->m_pParent = newParent;
+		if (m_pParent) m_pParent->AddChild(this);
 	}
 
-	bool GameObject::AddChild(GameObject* newChild)
+	void GameObject::AddChild(GameObject* newChild)
 	{
-		if (std::find(m_children.begin(), m_children.end(), newChild) != m_children.end())
-		{
-			return false;
-		}
-
 		m_children.push_back(newChild);
-		return true;
 	}
 
 	void GameObject::RemoveChild(GameObject* toRemove)
@@ -103,6 +95,7 @@ namespace dae
 
 	bool GameObject::IsChild(GameObject* object)
 	{
+		if (object == nullptr) return false;
 		for (GameObject* child : m_children)
 		{
 			if ( object == child ) return true;
@@ -114,11 +107,6 @@ namespace dae
 	void GameObject::SetPosition(float x, float y)
 	{
 		m_transform.SetLocalPosition(x, y);
-		for (RenderComponent * component : m_renderComponents)
-		{
-			component->MakeDirty();
-		}
-		//m_transform->SetPosition(x, y, 0.0f);
 	}
 
 	SmartTransform * GameObject::GetTransform()
@@ -131,28 +119,13 @@ namespace dae
 		return m_transform.GetLocalTransform();
 	}
 
-	Transform const* GameObject::GetWorldTransform() const
+	Transform const* GameObject::GetWorldTransform()
 	{
 		return m_transform.GetWorldTransform();
 	}
 
-	Transform const * GameObject::QueryWorldTransform()
-	{
-		Transform const * temp{ nullptr };
-		if (m_pParent != nullptr)
-		{
-			temp = m_pParent->QueryWorldTransform();
-		}
-		return m_transform.QueryWorldTransform(temp);
-	}
-
 	void GameObject::MakeDirty()
 	{
-		
-		for (RenderComponent* pComponent : m_renderComponents)
-		{
-			pComponent->MakeDirty();
-		}
 		for (GameObject* pChild : m_children)
 		{
 			pChild->MakeDirty();
@@ -170,7 +143,7 @@ namespace dae
 		{
 			for (GameObject* child : m_children)
 			{
-				child->SetParent(*m_pParent);
+				child->SetParent(m_pParent);
 			}
 			// set children parent to curent parent
 		}

@@ -1,5 +1,7 @@
+#pragma once
 #include <State.h>
 #include <components/GameComponent.h>
+#include <eventSystem/Listener.h>
 
 namespace dae
 {
@@ -8,7 +10,7 @@ namespace dae
 
 namespace digger
 {
-	class GoldBag : public dae::GameComponent
+	class GoldBag : public dae::GameComponent , public dae::Listener
 	{
 		GoldBag(const GoldBag& other) = delete;
 		GoldBag(GoldBag&& other) = delete;
@@ -22,10 +24,10 @@ namespace digger
 				:State(bag)
 			{}
 			virtual ~BagState() = default;
-			virtual void OnEnter() override {};
-			virtual void OnExit() override {};
+			virtual void OnEnter() override  = 0;
+			virtual void OnExit() override  = 0;
 
-			virtual BagState* ProcessState() override { return nullptr; }
+			virtual BagState* ProcessState() override = 0;// { return nullptr; }
 		};
 		class StaticState : public BagState
 		{
@@ -44,7 +46,7 @@ namespace digger
 			virtual BagState* ProcessState() override;
 		};
 
-		std::unique_ptr<BagState> m_pState{};
+		std::unique_ptr<BagState> m_pState;
 		dae::TextureComponent* m_rTexture;
 
 	public:
@@ -52,5 +54,7 @@ namespace digger
 		virtual ~GoldBag() override = default;
 
 		virtual void Update(float) override;
+
+		virtual void TuneIn(dae::EventId message, dae::GameObject* subject) override;
 	};
 }

@@ -1,6 +1,8 @@
 #include <GoldBag.h>
 
 #include <GameObject.h>
+#include <eventSystem/EventHash.h>
+#include <eventSystem/EventStack.h>
 
 namespace digger
 {
@@ -8,7 +10,8 @@ namespace digger
 		:dae::GameComponent(parent)
 		, m_rTexture{&texture}
 	{
-		m_pState = std::make_unique<GoldBag::BagState>(*this);
+		m_pState = std::make_unique<GoldBag::StaticState>(*this);
+		dae::EventStack::GetEventStack().Register(*this, dae::make_sdbm_hash("dug ground"));
 	}
 	void GoldBag::Update(float)
 	{
@@ -17,6 +20,12 @@ namespace digger
 		{
 			m_pState.reset(newState);
 		}
+	}
+
+	void GoldBag::TuneIn(dae::EventId, dae::GameObject* )
+	{
+		//is only registered with ground was dug, we know that's what hapened.
+		// we can chack if it was the ground below the bag
 	}
 
 #pragma region static_state

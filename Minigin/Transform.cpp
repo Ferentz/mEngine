@@ -1,4 +1,9 @@
 #include "Transform.h"
+#include "Transform.h"
+#include "Transform.h"
+#include "Transform.h"
+#include "Transform.h"
+#include "Transform.h"
 
 #include "GameObject.h"
 #include "components/RenderComponent.h"
@@ -15,13 +20,24 @@ void dae::Transform::SetPosition(const glm::vec3& position)
 	m_position = position; 
 }
 
+void dae::Transform::Translate(float x, float y)
+{
+	m_position.x += x;
+	m_position.y += y;
+}
+
 void dae::Transform::SetRotation(float x)
 {
 	m_rotation_radians = x;
 }
 
+void dae::Transform::Rotate(float degrees)
+{
+	m_rotation_radians += glm::radians(degrees);
+}
 
-dae::SmartTransform::SmartTransform(std::variant<GameObject*, RenderComponent*> owner)
+
+dae::SmartTransform::SmartTransform(GameObject* owner)
 	: m_parent{owner}
 {
 }
@@ -44,50 +60,50 @@ void dae::SmartTransform::SetLocalRotation(float x)
 	m_local.SetRotation(x);
 }
 
+void dae::SmartTransform::SetGlobalTransform(Transform& )
+{
+}
+
+void dae::SmartTransform::SetGlobalPosition(float , float , float )
+{
+}
+
+void dae::SmartTransform::SetGlobalRotation(float )
+{
+}
+
 
 dae::Transform const * dae::SmartTransform::GetLocalTransform() const
 {
 	return &m_local;
 }
 
-dae::Transform const* dae::SmartTransform::QueryWorldTransform(Transform const * const parentWorldTransform)
+dae::Transform const* dae::SmartTransform::GetWorldTransform()
 {
 	
 
 	//Transform const * world{ GetWorldTransform() };
 	if (m_dirty)
 	{
-		if (parentWorldTransform == nullptr)
+		if (m_parent->GetParent() == nullptr)
 		{
 			m_global = m_local;
 		}
 		else
 		{
-			m_global = m_local + *parentWorldTransform;
+			m_global = *m_parent->GetParent()->GetWorldTransform() + m_local; 
 		}
 		m_dirty = false;
 	}
 	return &m_global;
 }
 
-dae::Transform const * dae::SmartTransform::GetWorldTransform() const
+void dae::SmartTransform::ReconstructLocal(GameObject * newBase)
 {
-	//if (m_dirty) return nullptr;
-	return &m_global;
-}
-
-void dae::SmartTransform::Rebase(Transform const * newBase)
-{
-	float rotation = m_local.GetRotation();
-	m_local = m_global - *newBase;
-	m_local.SetRotation(rotation);
+	m_local = (newBase == nullptr)? m_global : m_global.MissingLinkWith( *newBase->GetWorldTransform());
 }
 
 void dae::SmartTransform::MakeDirty()
 {
 	m_dirty = true;
-	if (std::holds_alternative<GameObject*>(m_parent))
-	{
-		std::get<GameObject*>(m_parent)->MakeDirty();
-	}
 }

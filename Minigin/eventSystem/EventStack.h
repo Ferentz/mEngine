@@ -1,7 +1,8 @@
 #pragma once
 #include "eventSystem/EventTypes.h"
 #include <vector>
-#include <map>
+//#include <map>
+#include<unordered_map>
 
 namespace dae
 {
@@ -13,6 +14,7 @@ namespace dae
 		static EventStack& GetEventStack();
 		void PushEvent(Event event);
 		void Register(Listener& listener);
+		void Register(Listener& listener, EventId event);
 		//void Unregister(EventId events, Listener*);
 		void Unregister(Listener* listener);
 		void BroadCastEvents();
@@ -24,7 +26,8 @@ namespace dae
 		size_t m_fillIndex{0};
 		std::vector<Event> m_stack;
 		//std::vector<EventId> m_registeredEvents;
-		std::vector<Listener*> m_registeredListeners;
+		std::unordered_map<EventId, std::vector<Listener*>> m_specificListenerMap{};
+		std::vector<Listener*> m_persistentListeners;
 
 		//think on how to best make it so a listener can pick up an event that allows the broadcasting to happen threaded.
 		/*bool m_eventGotPickedUp{ false };

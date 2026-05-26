@@ -22,7 +22,9 @@ namespace dae
 		void Update(float deltaTime);
 		void Render();
 
-		void SetParent(GameObject& newParent, bool keepWorldPos = false);
+		GameObject* const GetParent();
+
+		void SetParent(GameObject *newParent, bool keepWorldPos = false);
 		
 		bool IsChild(GameObject* object);
 		void SetPosition(float x, float y);
@@ -30,8 +32,7 @@ namespace dae
 
 
 		Transform const* GetLocalTransform() const;
-		Transform const * QueryWorldTransform();
-		Transform const* GetWorldTransform() const;
+		Transform const * GetWorldTransform();
 
 		void MakeDirty();
 		void MarkForDelete(bool excludeChildren = false);
@@ -86,10 +87,9 @@ namespace dae
 			return GetLatestComponent<T>();
 		}
 
-	protected:
-		SmartTransform m_transform;
 
 	private:
+		SmartTransform m_transform;
 		bool m_toDelete{};
 		GameObject* m_pParent{};
 		std::vector<std::unique_ptr<GameComponent>> m_components{};
@@ -97,7 +97,7 @@ namespace dae
 		std::vector<GameObject*> m_children{};
 
 	private:
-		bool AddChild(GameObject* newChild);
+		void AddChild(GameObject* newChild);
 		void RemoveChild(GameObject* toRemove);
 	};
 }

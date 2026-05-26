@@ -19,6 +19,12 @@ namespace dae
 		up
 	};
 
+	enum class InputType
+	{
+		keyboard,
+		gamepad
+	};
+
 	class BaseAction final
 	{
 	public:
@@ -110,7 +116,7 @@ namespace dae
 		
 		std::vector<std::unique_ptr<InputMethod>> m_inputs{};
 
-		InputMethod* GetInputMethod(int const idx);
+		InputMethod* GetInputMethod(InputType const idx);
 
 	private:
 		
