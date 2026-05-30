@@ -92,7 +92,7 @@ namespace dae
 		// checks whole vector. remove " m_children.end()" as an erase argument and it will only remove 1 instance.
 		m_children.erase(std::remove(m_children.begin(), m_children.end(), toRemove), m_children.end());
 	}
-
+	
 	bool GameObject::IsChild(GameObject* object)
 	{
 		if (object == nullptr) return false;

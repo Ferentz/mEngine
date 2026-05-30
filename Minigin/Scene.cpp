@@ -1,3 +1,5 @@
+#include "Scene.h"
+#include "Scene.h"
 #include <algorithm>
 #include <vector>
 #include "Scene.h"
@@ -22,9 +24,19 @@ void Scene::Remove(const GameObject& object)
 	);
 }
 
-void Scene::RemoveAll()
+void Scene::RemoveAllObjects()
 {
 	m_objects.clear();
+}
+
+void dae::Scene::Add(Collider& object)
+{
+	m_colliders.emplace_back(&object);
+}
+
+void dae::Scene::Remove(Collider* object)
+{
+	std::erase(m_colliders, object);
 }
 
 void Scene::Update(float deltatime)

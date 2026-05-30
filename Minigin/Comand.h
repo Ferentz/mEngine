@@ -2,10 +2,11 @@
 //#include "components/CommandComponent.h"
 
 
+
 namespace dae
 {
 	class GameObject;
-
+	class GridMove;
 
 	class Command
 	{
@@ -14,18 +15,19 @@ namespace dae
 		virtual void Execute() = 0;
 	};
 
-	
-
-	class GameObjectCommand : public Command
+	template<class T>
+	class GameCommand : public Command
 	{
-		GameObject* m_component;
+		T* m_subject;
 	protected:
-		GameObject* GetObject() const { return m_component; }
+		T* GetSubject() const { return m_subject; }
 	public:
-		GameObjectCommand(GameObject* object) :m_component{ object } {};
-		virtual ~GameObjectCommand() override = default;
+		GameCommand(T* object)
+			:m_subject{ object }
+		{
+		};
+		virtual ~GameCommand() override = default;
 	};
-
 
 	enum class Direction
 	{
@@ -35,11 +37,11 @@ namespace dae
 		right
 	};
 
-	class MoveCommand : public GameObjectCommand
+	class MoveCommand : public GameCommand<GameObject>
 	{
 	public:
 		MoveCommand(GameObject* object, Direction direction)
-			:GameObjectCommand(object),
+			:GameCommand<GameObject>(object),
 			m_moveDirection{ direction }
 		{
 		}
@@ -50,15 +52,29 @@ namespace dae
 		Direction m_moveDirection;
 	};
 
+	class GridMoveCommand : public GameCommand<GridMove>
+	{
+	public:
+		GridMoveCommand(GridMove* object, Direction direction)
+			:GameCommand<GridMove>(object),
+			m_moveDirection{ direction }
+		{
+		}
+		virtual ~GridMoveCommand() override = default;
+
+		virtual void Execute() override;
+	private:
+		Direction m_moveDirection;
+	};
+
 
 	class IntTracker;
 
-	class HurtCommand : public GameObjectCommand
+	class HurtCommand : public GameCommand<IntTracker>
 	{
 	public:
-		HurtCommand(GameObject* object, IntTracker* health, bool subtract = true)
-			:GameObjectCommand(object),
-			m_healthComponent{ health },
+		HurtCommand(IntTracker* health, bool subtract = true)
+			:GameCommand<IntTracker>(health),
 			m_doesSubtract{subtract}
 		{
 		}
@@ -66,7 +82,6 @@ namespace dae
 
 		virtual void Execute() override;
 	private:
-		IntTracker* m_healthComponent;
 		bool m_doesSubtract;
 	};
 

@@ -12,6 +12,7 @@ namespace dae
 	{
 	public:
 		Scene& CreateScene();
+		Scene* GetActiveScene();
 
 		void Update(float deltaTime);
 		void FixedUpdate(float deltaTime);
@@ -19,6 +20,7 @@ namespace dae
 	private:
 		friend class Singleton<SceneManager>;
 		SceneManager() = default;
+		int activeScene{};
 		std::vector<std::unique_ptr<Scene>> m_scenes{};
 	};
 }

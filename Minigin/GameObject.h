@@ -74,6 +74,20 @@ namespace dae
 
 		template<class T>
 			requires std::is_base_of_v<GameComponent, T>
+		T* GetComponent()
+		{
+			for (auto& component : m_components)
+			{
+				if (auto ptr = dynamic_cast<T*>(component.get())) // get retrives the pointer fro the unique pointer
+				{
+					return ptr;
+				}
+			}
+			return nullptr;
+		}
+
+		template<class T>
+			requires std::is_base_of_v<GameComponent, T>
 		T* GetLatestComponent()
 		{
 				return dynamic_cast<T*>(m_components.back().get());
@@ -87,9 +101,10 @@ namespace dae
 			return GetLatestComponent<T>();
 		}
 
+		SmartTransform m_transform;
 
 	private:
-		SmartTransform m_transform;
+		
 		bool m_toDelete{};
 		GameObject* m_pParent{};
 		std::vector<std::unique_ptr<GameComponent>> m_components{};

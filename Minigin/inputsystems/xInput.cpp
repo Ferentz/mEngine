@@ -22,13 +22,19 @@ namespace dae
 	{
 	public:
 		static std::map<int, short> inputMap;
-		
+		static DWORD controllerCount;
 
 		XINPUT_STATE m_currentState{};
 		XINPUT_STATE m_previousState{};
 		DWORD m_controllerIndex{};
 		int m_buttonsPressedThisFrame{};
 		int m_buttonsReleasedThisFrame{};
+
+		ControllerImpl()
+			:m_controllerIndex{ controllerCount }
+		{
+			controllerCount++;
+		}
 		
 	
 		bool ProcessInput(std::vector<std::unique_ptr<BaseAction>>& actions);
@@ -57,6 +63,8 @@ namespace dae
 	{SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, XINPUT_GAMEPAD_RIGHT_SHOULDER},
 	{SDL_GAMEPAD_BUTTON_LEFT_SHOULDER, XINPUT_GAMEPAD_LEFT_SHOULDER}
 	};
+
+	DWORD ControllerInput::ControllerImpl::controllerCount{};
 
 	bool  ControllerInput::ControllerImpl::ProcessInput(std::vector<std::unique_ptr<BaseAction>>& actions)
 	{

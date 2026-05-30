@@ -68,6 +68,8 @@ ADD_LIBRARY( ${LIBRARY_PROJECT_NAME} STATIC
 set(GAME_SOURCES
   Game/Main.cpp
   Game/GoldBag.cpp
+  Game/Player.cpp
+  Game/command/GameCommand.cpp
 )
 
 

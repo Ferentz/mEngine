@@ -26,14 +26,15 @@ namespace dae
 		void SetParent(GameObject& parent);
 		virtual void Update(float) {};
 
+		GameObject* GetGameObject();
 
 	protected:
 		explicit GameComponent(GameObject* parent)
-			:m_pParent{parent}
+			:m_pGameObject{parent}
 		{}
-		GameObject* GetParent() const;
+		
 	private:
-		GameObject* m_pParent;
+		GameObject* m_pGameObject;
 		
 		
 		GameComponent(const GameComponent& other) = delete;

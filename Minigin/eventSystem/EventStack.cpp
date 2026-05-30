@@ -1,4 +1,5 @@
 #include "EventStack.h"
+#include "EventStack.h"
 #include "eventSystem/EventStack.h"
 #include "eventSystem/Listener.h"
 
@@ -10,6 +11,12 @@ namespace dae
 	{
 		static EventStack inst{ 100 };
 		return inst;
+	}
+
+	EventStack::~EventStack()
+	{
+		m_persistentListeners.clear();
+		m_specificListenerMap.clear();
 	}
 
 
@@ -62,17 +69,25 @@ namespace dae
 	}*/
 	void EventStack::Unregister(Listener* listener)
 	{
-		m_persistentListeners.erase(
-			std::remove(m_persistentListeners.begin(), m_persistentListeners.end(), listener),
-			m_persistentListeners.end());
-
 		if (listener == nullptr) return;
-
-		std::erase(m_persistentListeners, listener);
-
-		for (auto it : m_specificListenerMap)
+		if (!m_persistentListeners.empty())
+		{
+			std::erase(m_persistentListeners, listener);
+		}
+		/*if (m_specificListenerMap.bucket_count() <= 0) return;
+		for (auto & it : m_specificListenerMap)
 		{
 			std::erase(it.second, listener);
+		}*/
+
+		if (m_specificListenerMap.empty())
+			return;
+
+		for (auto it = m_specificListenerMap.begin();
+			it != m_specificListenerMap.end();
+			++it)
+		{
+			std::erase(it->second, listener);
 		}
 	}
 	void EventStack::BroadCastEvents()

@@ -1,3 +1,4 @@
+#include "RenderComponent.h"
 
 #include "RenderComponent.h"
 #include "GameObject.h"
@@ -17,9 +18,6 @@ namespace dae
 	{
 	}
 
-
-
-
 	TextureComponent::TextureComponent(GameObject& parent)
 		:RenderComponent{ parent },
 		m_texture(nullptr)
@@ -30,7 +28,7 @@ namespace dae
 	{
 		if (m_texture != nullptr)
 		{
-			const auto& pos = GetParent()->GetWorldTransform()->GetPosition()+ m_offset.GetPosition();
+			const auto& pos = GetGameObject()->GetWorldTransform()->GetPosition()+ m_offset.GetPosition();
 			Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
 		}
 	}
@@ -38,6 +36,11 @@ namespace dae
 	void TextureComponent::SetTexture(const std::string& filename)
 	{
 		m_texture = ResourceManager::GetInstance().LoadTexture(filename);
+	}
+
+	Texture2D const* TextureComponent::GetTexture()
+	{
+		return m_texture.get();
 	}
 
 

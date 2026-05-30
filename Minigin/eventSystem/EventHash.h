@@ -1,4 +1,4 @@
-
+#pragma once
 namespace dae
 {
 	template <int length>

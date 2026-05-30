@@ -102,6 +102,8 @@ dae::Minigin::Minigin(const std::filesystem::path& dataPath)
 dae::Minigin::~Minigin()
 {
 	Renderer::GetInstance().Destroy();
+	InputManager::GetInstance().ReleaseInputs();
+
 	SDL_DestroyWindow(g_window);
 	g_window = nullptr;
 	SDL_Quit();

@@ -108,10 +108,31 @@ namespace dae
 
 		bool ProcessInput();
 
-		InputManager()
+		InputManager() = default;
+		~InputManager() override = default;
+
+		InputMethod* AddInputMethod(InputType input)
 		{
-			m_inputs.emplace_back(std::make_unique<KeyBoardInput>());
-			m_inputs.emplace_back(std::make_unique<ControllerInput>());
+			switch (input)
+			{
+			case dae::InputType::keyboard:
+				m_inputs.emplace_back(std::make_unique<KeyBoardInput>());
+				break;
+			case dae::InputType::gamepad:
+				m_inputs.emplace_back(std::make_unique<ControllerInput>());
+				break;
+			default:
+				break;
+			}
+			return m_inputs.back().get();
+		}
+
+		void ReleaseInputs()
+		{
+			for (auto & input : m_inputs)
+			{
+				input.reset();
+			}
 		}
 		
 		std::vector<std::unique_ptr<InputMethod>> m_inputs{};

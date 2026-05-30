@@ -1,3 +1,5 @@
+#include <memory>
+
 template <typename T, class Derived>
 class State
 {
@@ -16,5 +18,5 @@ public:
     /// <returns>
     /// the new state or null if state didnt switch
     /// </returns>
-    virtual Derived* ProcessState() = 0;
+    virtual std::unique_ptr <Derived> ProcessState() = 0;
 };

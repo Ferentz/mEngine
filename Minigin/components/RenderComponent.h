@@ -42,7 +42,7 @@ namespace dae
 		virtual void Render() override;
 		//virtual void Render()const override {}
 		void SetTexture(const std::string& filename);
-
+		Texture2D const* GetTexture();
 	protected:
 		std::shared_ptr<Texture2D> m_texture{};
 	private:

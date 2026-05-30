@@ -19,8 +19,8 @@ namespace dae
 			return m_value;
 		}
 		//explicit Event(EventId _id, GameComponent const * _subject)
-		EventStack::GetEventStack().PushEvent(Event{ make_sdbm_hash("health changed"), this->GetParent()});
-		m_signal.BroadCast(make_sdbm_hash("health changed"), GetParent());
+		EventStack::GetEventStack().PushEvent(Event{ make_sdbm_hash("health changed"), this->GetGameObject()});
+		m_signal.BroadCast(make_sdbm_hash("health changed"), GetGameObject());
 		return m_value;
 	}
 
@@ -29,11 +29,11 @@ namespace dae
 		m_value += val;
 		if (m_value >= m_maxValue)
 		{
-			m_signal.BroadCast(make_sdbm_hash("won"), GetParent());
+			m_signal.BroadCast(make_sdbm_hash("won"), GetGameObject());
 		}
 		else
 		{
-			m_signal.BroadCast(make_sdbm_hash("health changed"), GetParent());
+			m_signal.BroadCast(make_sdbm_hash("health changed"), GetGameObject());
 		}
 		return m_value;
 	}

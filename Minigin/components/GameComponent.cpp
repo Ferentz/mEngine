@@ -11,19 +11,19 @@ namespace dae
 {
 	
 	GameComponent::GameComponent(GameObject& parent)
-		:m_pParent{&parent}
+		:m_pGameObject{&parent}
 	{
 	}
 
 	void GameComponent::SetParent(GameObject& parent)
 	{
-		m_pParent = &parent;
+		m_pGameObject = &parent;
 	}
 	
 
-	GameObject* GameComponent::GetParent() const
+	GameObject* GameComponent::GetGameObject()
 	{
-		return m_pParent;
+		return m_pGameObject;
 	}
 
 	derivedComponent::derivedComponent(GameObject& parent, float val)
@@ -39,10 +39,10 @@ namespace dae
 
 	void RotatorComponent::Update(float deltaTime)
 	{
-		SmartTransform* transform{ GetParent()->GetTransform() };
+		SmartTransform* transform{ GetGameObject()->GetTransform() };
 		transform->SetLocalRotation(transform->GetRotation() + m_rotatingSpeed * deltaTime);
 		//transform->MakeDirty();
-		GetParent()->MakeDirty();
+		GetGameObject()->MakeDirty();
 	}
 
 	void RotatorComponent::SetRotationSpeed(float speed)

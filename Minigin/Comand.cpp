@@ -3,6 +3,7 @@
 #include "Minigin.h"
 
 #include "components/EventComponent.h"
+#include "tileGrid/GridMove.h"
 
 void dae::MoveCommand::Execute()
 {
@@ -24,8 +25,8 @@ void dae::MoveCommand::Execute()
 		break;
 	}
 
-	auto transform{ GetObject()->GetTransform() };
-	glm::vec3 const& r_pos{ transform->GetLocalTransform()->GetPosition() };
+	auto transform{ GetSubject()->GetTransform() };
+	glm::vec2 const& r_pos{ transform->GetLocalTransform()->GetPosition() };
 	float m_speed{20.f};
 	transform->SetLocalPosition(
 		r_pos.x + m_moveVec.x * m_speed * dae::Minigin::GetDeltaTime(),
@@ -39,10 +40,35 @@ void dae::HurtCommand::Execute()
 {
 	if (m_doesSubtract)
 	{
-		m_healthComponent->SubtractValue(1);
+		GetSubject()->SubtractValue(1);
 	}
 	else
 	{
-		m_healthComponent->AddValue(1);
+		GetSubject()->AddValue(1);
 	}
+}
+
+void dae::GridMoveCommand::Execute()
+{
+	auto gridMove{ GetSubject()};
+	glm::ivec2 m_moveVec{};
+	//GetComponent())->Move(m_moveDirection);
+	switch (m_moveDirection)
+	{
+	case dae::Direction::up:
+		m_moveVec.y = -1;
+		break;
+	case dae::Direction::down:
+		m_moveVec.y = 1;
+		break;
+	case dae::Direction::left:
+		m_moveVec.x = -1;
+		break;
+	case dae::Direction::right:
+		m_moveVec.x = 1;
+		break;
+	}
+
+	gridMove->MoveTo(m_moveVec);
+
 }

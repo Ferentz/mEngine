@@ -12,6 +12,7 @@ namespace dae
 	{
 	public:
 		static EventStack& GetEventStack();
+		~EventStack();
 		void PushEvent(Event event);
 		void Register(Listener& listener);
 		void Register(Listener& listener, EventId event);
