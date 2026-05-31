@@ -6,39 +6,54 @@
 
 void digger::DiggerMoveCommnad::Execute()
 {
-	auto gridMove{ GetSubject() };
-	glm::ivec2 m_moveVec{};
+	bool horizontal{ false };
+	int direction{ 1 };
 
 	switch (m_moveDirection)
 	{
 	case dae::Direction::up:
-		m_moveVec.y = -1;
+		horizontal = false;
+		direction = -1;
 		break;
 	case dae::Direction::down:
-		m_moveVec.y = 1;
+		horizontal = false;
+		direction = 1;
 		break;
 	case dae::Direction::left:
-		m_moveVec.x = -1;
+		horizontal = true;
+		direction = -1;
 		break;
 	case dae::Direction::right:
-		m_moveVec.x = 1;
+		horizontal = true;
+		direction = 1;
 		break;
+	}
+
+	auto gridMove = GetSubject();
+
+	if (gridMove->Move(horizontal, direction))
+	{
+		auto tile = gridMove->GetGrid()->GetTile(gridMove->GetClosestPoint())->GetComponent<GameTile>();
+		if (tile)
+		{
+			tile->SetTraversed();
+		}
 	}
 
 	//gridMove->MoveTo(m_moveVec);
 
-	if (!gridMove->IsAtPoint()) return;
+	//if (!gridMove->IsAtPoint()) return;
 
-	auto newPoint = gridMove->GetPoint() + m_moveVec;
-	if (!gridMove->GetGrid()->IsPointValid(newPoint)) return;
-	auto tile = gridMove->GetGrid()->GetTile(newPoint)->GetComponent<GameTile>();
-	if ( (m_moveDirection == dae::Direction::left || m_moveDirection == dae::Direction::right) || tile->CanMoveToTile())
-	{
-		//release poit
-		gridMove->GetGrid()->GetTile(gridMove->GetPoint())->GetComponent<GameTile>()->ReleaseOccupancy(gridMove->GetGameObject());
-		gridMove->SetTarget(newPoint);
-		//aquire point
-		tile->TakeOccupancy(gridMove->GetGameObject());
-	}
+	//auto newPoint = gridMove->GetClosestPoint() + m_moveVec;
+	//if (!gridMove->GetGrid()->IsPointValid(newPoint)) return;
+	//auto tile = gridMove->GetGrid()->GetTile(newPoint)->GetComponent<GameTile>();
+	//if ( (m_moveDirection == dae::Direction::left || m_moveDirection == dae::Direction::right) || tile->CanMoveToTile())
+	//{
+	//	//release poit
+	//	gridMove->GetGrid()->GetTile(gridMove->GetClosestPoint())->GetComponent<GameTile>()->ReleaseOccupancy(gridMove->GetGameObject());
+	//	gridMove->SetTarget(newPoint);
+	//	//aquire point
+	//	tile->TakeOccupancy(gridMove->GetGameObject());
+
 
 }

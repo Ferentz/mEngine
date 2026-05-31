@@ -33,7 +33,8 @@ namespace digger
 			virtual void OnEnter() override {};
 			virtual void OnExit() override {};
 
-			virtual std::unique_ptr<BagState> ProcessState() override = 0;// { return nullptr; }
+			virtual std::unique_ptr<BagState> ProcessState() override { return nullptr; }
+			virtual std::unique_ptr<BagState> ProcessState(float) = 0;
 			virtual std::unique_ptr<BagState> OnPush(dae::Collider* subject) = 0;
 			dae::GridMove* m_gridMove;
 		};
@@ -45,27 +46,17 @@ namespace digger
 			virtual ~StaticState() = default;
 			virtual void OnEnter() override{}
 			virtual void OnExit() override {}
-			virtual std::unique_ptr<BagState> ProcessState() override;
+			virtual std::unique_ptr<BagState> ProcessState(float) override;
 			virtual std::unique_ptr<BagState> OnPush(dae::Collider* subject) override;
-		};
-
-		class PushState : public BagState
-		{
-		public:
-			PushState(GoldBag& bag, dae::GridMove* gridmove);
-			virtual ~PushState() = default;
-			virtual void OnEnter() override {}
-			virtual void OnExit() override {}
-			virtual std::unique_ptr<BagState> ProcessState() override;
-			virtual std::unique_ptr<BagState> OnPush(dae::Collider*) override { return nullptr; }
 		};
 
 		class FallState : public BagState
 		{
+			float fallTIme;
 		public:
 			FallState(GoldBag& bag, dae::GridMove* gridmove);
 			virtual ~FallState() = default;
-			virtual std::unique_ptr<BagState> ProcessState() override;
+			virtual std::unique_ptr<BagState> ProcessState(float) override;
 			virtual std::unique_ptr<BagState> OnPush(dae::Collider* subject) override;
 		};
 

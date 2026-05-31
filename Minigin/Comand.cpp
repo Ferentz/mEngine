@@ -50,25 +50,30 @@ void dae::HurtCommand::Execute()
 
 void dae::GridMoveCommand::Execute()
 {
-	auto gridMove{ GetSubject()};
-	glm::ivec2 m_moveVec{};
-	//GetComponent())->Move(m_moveDirection);
+
+	bool horizontal{ false };
+	int direction{1};
+
 	switch (m_moveDirection)
 	{
 	case dae::Direction::up:
-		m_moveVec.y = -1;
+		horizontal = false;
+		direction = -1;
 		break;
 	case dae::Direction::down:
-		m_moveVec.y = 1;
+		horizontal = false;
+		direction = 1;
 		break;
 	case dae::Direction::left:
-		m_moveVec.x = -1;
+		horizontal = true;
+		direction = -1;
 		break;
 	case dae::Direction::right:
-		m_moveVec.x = 1;
+		horizontal = true;
+		direction = 1;
 		break;
 	}
 
-	gridMove->MoveTo(m_moveVec);
+	GetSubject()->Move(horizontal, direction);
 
 }

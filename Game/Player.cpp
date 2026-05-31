@@ -14,9 +14,9 @@ namespace digger
 		:dae::GameComponent(obj)
 		, gridMove{ &movement }
 	{
-		auto tile = movement.GetGrid()->GetTile(movement.GetPoint())->GetComponent<GameTile>();
+		auto tile = movement.GetGrid()->GetTile(movement.GetClosestPoint())->GetComponent<GameTile>();
 		tile->TakeOccupancy(GetGameObject());
-		movement.m_signal.Register(*this);
+		//movement.m_signal.Register(*this);
 		collider.m_signal.Register(*this);
 	}
 
@@ -26,7 +26,7 @@ namespace digger
 		{
 		case dae::make_sdbm_hash("arrived"):
 
-			if (auto tileObj = gridMove->GetGrid()->GetTile(gridMove->GetPoint()))
+			if (auto tileObj = gridMove->GetGrid()->GetTile(gridMove->GetClosestPoint()))
 			{
 				if (auto tile = tileObj->GetComponent<GameTile>())
 				{

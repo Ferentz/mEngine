@@ -108,12 +108,22 @@ namespace dae
 			return glm::vec2(point.x * (tileScale), point.y * tileScale);
 		}
 
+		virtual glm::ivec2 GetPointOfGridLocation(glm::vec2 location) const
+		{
+			return glm::round(glm::vec2(location.x / (tileScale), location.y / tileScale));
+		}
+
 		bool IsPointValid(glm::ivec2 point)
 		{
 			if (point.x >= 0 && point.x < width
 				&& point.y >= 0 && point.y < height)
 				return true;
 			return false;
+		}
+
+		float GetTileScale() const
+		{
+			return tileScale;
 		}
 	
 	protected:

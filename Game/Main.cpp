@@ -59,11 +59,13 @@ static std::unique_ptr<dae::GameObject> MakePlayer(std::string image,
 
 	auto imgComp2 = player->AddNGetComponent<dae::TextureComponent>();
 	imgComp2->SetTexture(image);
-	auto gridmove = 
-		player->AddNGetComponent<dae::GridMove>(in_grid, glm::ivec2(2,2), 1.f);
-
+	
 	auto col = 
 		player->AddNGetComponent<dae::Collider>();
+
+	auto gridmove =
+		player->AddNGetComponent<dae::GridMove>(in_grid, *col, glm::ivec2(2, 2), 1.f);
+	gridmove->SetInfluence(false, false);
 	//auto playerComp =
 		player->AddNGetComponent<digger::Player>(*gridmove, *col);
 
@@ -166,10 +168,12 @@ static void load()
 		std::make_unique<dae::GameObject>();
 	auto imgComp = goldBag->AddNGetComponent<dae::TextureComponent>();
 	imgComp->SetTexture("gold_bag.png");
-	auto gridmove =
-		goldBag->AddNGetComponent<dae::GridMove>(*gridComp, glm::ivec2(5, 5), 1.f);
+	
 	auto col =
 		goldBag->AddNGetComponent<dae::Collider>();
+	auto gridmove =
+		goldBag->AddNGetComponent<dae::GridMove>(*gridComp,*col, glm::ivec2(5, 5), 1.f);
+	gridmove->SetInfluence(true, false);
 	//dae::TextureComponent& texture, dae::GridMove& gridmove, dae::Collider& collisionBox
 	//auto goldComp =
 		goldBag->AddNGetComponent<digger::GoldBag>(*imgComp, *gridmove, *col);

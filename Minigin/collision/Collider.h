@@ -47,21 +47,27 @@ namespace dae
 				if (this == collider) continue;
 				if (Overlap(*collider))
 				{
-					collisions.push_back(collider->GetGameObject());
+					collisions.push_back(collider);
 				}
 			}
 			if (!collisions.empty()) m_signal.BroadCast(make_sdbm_hash("collide"), GetGameObject());
 		}
-		std::vector<GameObject*> const& GetCollisions()
+		std::vector<Collider*> const& GetCollisions()
 		{
 			return collisions;
 		}
 
+		void ResolveCollisions()
+		{
+
+		}
+
+		glm::vec2 size{ 5 };
 		BroadCaster m_signal;
 
 	private:
-		glm::vec2 size{5};
-		std::vector<GameObject*> collisions{};
+		
+		std::vector<Collider*> collisions{};
 
 		dae::Scene* m_scene{};
 		

@@ -16,7 +16,7 @@ namespace digger
 		, m_rTexture{&texture}
 		, m_pState{ std::make_unique<StaticState>(*this, &gridmove) }
 	{
-		auto tile = gridmove.GetGrid()->GetTile(gridmove.GetPoint())->GetComponent<GameTile>();
+		auto tile = gridmove.GetGrid()->GetTile(gridmove.GetClosestPoint())->GetComponent<GameTile>();
 		tile->TakeOccupancy(GetGameObject());
 		dae::EventStack::GetEventStack().Register(*this, dae::make_sdbm_hash("ground dug"));
 		collisionBox.m_signal.Register(*this);
@@ -27,9 +27,9 @@ namespace digger
 		dae::EventStack::GetEventStack().Unregister(this);
 	}
 
-	void GoldBag::Update(float)
+	void GoldBag::Update(float delta)
 	{
-		if (auto newState = m_pState->ProcessState();
+		if (auto newState = m_pState->ProcessState(delta);
 			newState.get() != nullptr)
 		{
 			m_pState.swap(newState);
@@ -51,7 +51,7 @@ namespace digger
 			auto collider = subject->GetComponent<dae::Collider>();
 			if (isTreasure)
 			{
-				dae::EventStack::GetEventStack().PushEvent(dae::Event(dae::make_sdbm_hash("gold_collected"), collider->GetCollisions()[0]));
+				dae::EventStack::GetEventStack().PushEvent(dae::Event(dae::make_sdbm_hash("gold_collected"), collider->GetCollisions()[0]->GetGameObject()));
 				GetGameObject()->MarkForDelete();
 				// if player collect coins
 			}
@@ -72,7 +72,7 @@ namespace digger
 	
 	bool GoldBag::BagState::CanFall()
 	{
-		if (auto tileObj = m_gridMove->GetGrid()->GetTile(m_gridMove->GetPoint() - glm::ivec2(0, -1)))
+		if (auto tileObj = m_gridMove->GetGrid()->GetTile(m_gridMove->GetClosestPoint() - glm::ivec2(0, -1)))
 		{
 			if (auto tile = tileObj->GetComponent<GameTile>())
 			{
@@ -89,83 +89,46 @@ namespace digger
 		:BagState(bag, gridmove)
 	{
 	}
-	std::unique_ptr<GoldBag::BagState> GoldBag::StaticState::ProcessState()
+	std::unique_ptr<GoldBag::BagState> GoldBag::StaticState::ProcessState(float)
 	{
 		return nullptr;
 	}
-	std::unique_ptr<GoldBag::BagState> GoldBag::StaticState::OnPush(dae::Collider* other)
+	std::unique_ptr<GoldBag::BagState> GoldBag::StaticState::OnPush(dae::Collider*)
 	{
-		// the goldbag can only be pushed from side to side;
-		
-		float direction_x = m_subject->GetGameObject()->m_transform.GetLocalTransform()->GetPosition().x - other->GetCollisions()[0]->m_transform.GetLocalTransform()->GetPosition().x;
-		if (direction_x != 0)
+
+		if (CanFall() && m_gridMove->Move(false, 1))
 		{
-			direction_x /= fabs(direction_x);
+			return std::make_unique<FallState>(*m_subject, m_gridMove);
 		}
-		glm::ivec2 direction{ direction_x , 0 };
+		return nullptr;
 
-		m_gridMove->MoveTo(direction);
-
-		// the gold bags can always push eachother
-
-		//auto newPoint = m_gridMove->GetPoint() + direction;
-		//if (!m_gridMove->GetGrid()->IsPointValid(newPoint)) return;
-		//auto tile = m_gridMove->GetGrid()->GetTile(newPoint)->GetComponent<GameTile>();
-		//if ((m_moveDirection == dae::Direction::left || m_moveDirection == dae::Direction::right) || tile->CanMoveToTile())
-		//{
-		//	//release poit
-		//	m_gridMove->GetGrid()->GetTile(m_gridMove->GetPoint())->GetComponent<GameTile>()->ReleaseOccupancy(m_gridMove->GetGameObject());
-		//	m_gridMove->SetTarget(newPoint);
-		//	//aquire point
-		//	tile->TakeOccupancy(GetGameObject());
-		//}
-
-
-		return std::make_unique<PushState>(*m_subject, m_gridMove);
 	}
 
 #pragma endregion static_state
-#pragma region push_state
-	GoldBag::PushState::PushState(GoldBag& bag, dae::GridMove* gridmove)
-		:BagState(bag, gridmove)
-	{
-		
-	}
 
-	std::unique_ptr<GoldBag::BagState> GoldBag::PushState::ProcessState()
-	{
-		if (m_gridMove->IsAtPoint())
-			return nullptr;
-		else
-		{
-			if (CanFall())
-				return std::make_unique<FallState>(*m_subject, m_gridMove);
-		} 
-		return std::make_unique<StaticState>(*m_subject, m_gridMove);
-	}
-#pragma endregion push_state
 #pragma region fall_state
 	GoldBag::FallState::FallState(GoldBag& bag, dae::GridMove* gridmove)
 		:BagState(bag, gridmove)
 	{
 	}
-	std::unique_ptr<GoldBag::BagState> GoldBag::FallState::ProcessState()
+	std::unique_ptr<GoldBag::BagState> GoldBag::FallState::ProcessState(float delta)
 	{
-		if (!m_gridMove->IsAtPoint()) return nullptr;
-		if (CanFall())
+		if(CanFall() && 
+			m_gridMove->Move(false, 1))
 		{
-			m_gridMove->MoveTo(glm::ivec2(0, 1));
-
+			fallTIme += delta;
 			return nullptr;
 		}
-
-		m_subject->isTreasure = true;
+		else if(fallTIme > 1.f)
+			m_subject->isTreasure = true;
 		return std::make_unique<StaticState>(*m_subject, m_gridMove);
 	}
 	std::unique_ptr<GoldBag::BagState> GoldBag::FallState::OnPush(dae::Collider*)
 	{
+		if (fallTIme <= 1.f)
+			return nullptr;
 		// kill colided thing and self.
-		return std::unique_ptr<GoldBag::BagState>();
+		return std::unique_ptr<GoldBag::StaticState>();
 	}
 #pragma endregion fall_state
 
