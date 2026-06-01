@@ -53,20 +53,21 @@ namespace dae
 
 		if (!grid->IsPointValid(newPoint)) return false;
 
-		useSpeed = useSpeed * dae::Minigin::GetDeltaTime();
-
-		if (collider != nullptr && !CheckCollisions(moveVec, horizontal, direction, influenced))
+		float deltaSpeed = useSpeed * dae::Minigin::GetDeltaTime();
+		if (collider != nullptr && !CheckCollisions(moveVec, horizontal, direction,useSpeed, influenced))
 		{
 			if (!influenced)
 			{
-				glm::vec2 dir = glm::vec2(moveVec) * -useSpeed;
+				glm::vec2 dir = glm::vec2(moveVec) * -deltaSpeed;
 				GetGameObject()->m_transform.Translate(dir.x, dir.y);
 			}
 			
 			return false;
 		}
 
-		glm::vec2 dir = glm::vec2(moveVec) * useSpeed;
+
+
+		glm::vec2 dir = glm::vec2(moveVec) * deltaSpeed;
 		GetGameObject()->m_transform.Translate(dir.x, dir.y);
 
 		CheckPosition();
@@ -105,7 +106,7 @@ namespace dae
 		return false;
 	}
 
-	bool GridMove::CheckCollisions(glm::vec2 moveVec, bool horizontal, int direction, bool influenced)
+	bool GridMove::CheckCollisions(glm::vec2 moveVec, bool horizontal, int direction, float useSpeed, bool influenced)
 	{
 		if (influenced)
 		{
@@ -122,7 +123,7 @@ namespace dae
 			{
 				if (auto otherMove = other->GetGameObject()->GetComponent<GridMove>())
 				{
-					if (!otherMove->Move(horizontal, direction, true, speed))
+					if (!otherMove->Move(horizontal, direction, true, useSpeed))
 					{
 						return false; // if the other thing can't move, neither can we
 					}

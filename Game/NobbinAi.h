@@ -1,6 +1,8 @@
 #pragma once
 
 #include <components/GameComponent.h>
+#include <eventSystem/Listener.h>
+
 #include "command/NobbinMoveCommand.h"
 namespace dae
 {
@@ -12,7 +14,7 @@ namespace digger
 {
 	//class Digger;
 
-	class NobbinAI : public dae::GameComponent
+	class NobbinAI : public dae::GameComponent, public dae::Listener
 	{
 
 		// so, our little obbin noggin needs to get the player, and commands
@@ -25,9 +27,11 @@ namespace digger
 
 		void SetTarget(dae::GameObject* targ) { playerone = targ; }
 
+		void TuneIn(dae::EventId id, dae::GameObject* subject) override;
+
 	private:
 		float timer{};
-		float interval{2.f};
+		float interval{5.f};
 		
 		int node{};
 

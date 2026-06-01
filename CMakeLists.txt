@@ -77,6 +77,8 @@ set(GAME_SOURCES
   Game/command/NobbinMoveCommand.cpp
   Game/GameTile.cpp
   Game/Gem.cpp
+  Game/Spawner.cpp
+  Game/LevelCreator.cpp
 )
 
 

@@ -35,6 +35,7 @@ namespace digger
 				timer = 0;
 				canDig = false;
 				texture->SetTexture("nobbin.png");
+				signal.BroadCast({}, GetGameObject()); // curently only one person listeneing
 			}
 		}
 		else
@@ -44,6 +45,7 @@ namespace digger
 				timer = 0;
 				canDig = true;
 				texture->SetTexture("hobbin.png");
+				signal.BroadCast({}, GetGameObject());
 			}
 		}
 	}

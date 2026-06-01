@@ -2,6 +2,7 @@
 //#include <components/GameComponent.h>
 #include "Entity.h"
 #include <eventSystem/Listener.h>
+#include <eventSystem/BroadCaster.h>
 
 //#include "Entity.h"
 
@@ -32,12 +33,13 @@ namespace digger
 
 		bool removeOnDie{ true };
 
+		dae::BroadCaster signal{};
 	private:
 		bool isAllive{ true };
 		bool canDig{ false };
 		float timer{};
-		float const digTime{ 5.f };
-		float noDigTime{5.f};
+		float const digTime{ 3.f };
+		float noDigTime{10.f};
 		dae::GridMove* gridMove;
 		dae::TextureComponent* texture;
 	};

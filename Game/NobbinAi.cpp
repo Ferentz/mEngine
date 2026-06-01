@@ -18,11 +18,12 @@ namespace digger
 		, left{ &mov, dae::Direction::left, nob }
 		, right{ &mov, dae::Direction::right, nob }
 	{
-
+		nob.signal.Register(*this);
 	}
 	void NobbinAI::Update(float delta)
 	{
 		timer += delta;
+
 		if (timer >= interval)
 		{
 			timer = 0;
@@ -78,5 +79,9 @@ namespace digger
 		{
 			node++;
 		}
+	}
+	void NobbinAI::TuneIn(dae::EventId , dae::GameObject* )
+	{
+		timer = interval; // trigger recalibration
 	}
 }

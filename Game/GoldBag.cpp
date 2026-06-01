@@ -186,9 +186,17 @@ namespace digger
 		return nullptr;
 	}
 
-	std::unique_ptr<GoldBag::BagState> GoldBag::GoingToFallState::OnPush(dae::Collider* )
+	std::unique_ptr<GoldBag::BagState> GoldBag::GoingToFallState::OnPush(dae::Collider* collider)
 	{
-		timer = 0;
+		auto & collisions{ collider->GetCollisions() };
+		for (auto collision : collisions)
+		{
+			if (collision->GetGameObject()->GetComponent<digger::Entity>())
+			{
+				timer = 0;
+				return nullptr;
+			}
+		}
 		return nullptr;
 	}
 

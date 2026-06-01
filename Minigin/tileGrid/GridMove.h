@@ -48,7 +48,7 @@ namespace dae
 
 		bool CheckPosition();
 
-		bool CheckCollisions(glm::vec2 moveVec, bool horizontal, int direction, bool influenced = false);
+		bool CheckCollisions(glm::vec2 moveVec, bool horizontal, int direction, float useSpeed, bool influenced = false);
 
 	};
 }
