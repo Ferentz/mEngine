@@ -27,9 +27,11 @@
 
 #include <GameObject.h>
 #include <Components.h>
+#include <Texture2D.h>
 #include <TileGrid/Tilegrid.h>
 #include <TileGrid/GridMove.h>
 #include <collision/Collider.h>
+#include <Transform.h>
 #include "GameTile.h"
 
 #include <vector>
@@ -37,8 +39,11 @@
 #include <memory>
 #include <utility>
 
-#include "Player.h"
+#include "Digger.h"
+#include "Nobbin.h"
+#include "NobbinAi.h"
 #include "GoldBag.h"
+#include "Gem.h"
 
 //using sdlInput = SDL_Scancode;
 //using sdlInput = SDL_GamepadButton;
@@ -60,14 +65,16 @@ static std::unique_ptr<dae::GameObject> MakePlayer(std::string image,
 	auto imgComp2 = player->AddNGetComponent<dae::TextureComponent>();
 	imgComp2->SetTexture(image);
 	
+	imgComp2->renderScale = in_grid.GetTile(glm::ivec2(0, 0))->GetComponent<dae::TextureComponent>()->renderScale;
+
 	auto col = 
 		player->AddNGetComponent<dae::Collider>();
 
 	auto gridmove =
-		player->AddNGetComponent<dae::GridMove>(in_grid, *col, glm::ivec2(2, 2), 1.f);
+		player->AddNGetComponent<dae::GridMove>(in_grid, *col, glm::ivec2(2, 2), 60.f);
 	gridmove->SetInfluence(false, false);
 	//auto playerComp =
-		player->AddNGetComponent<digger::Player>(*gridmove, *col);
+		player->AddNGetComponent<digger::Digger>(*gridmove, *col);
 
 
 	auto healthComponent = 
@@ -108,6 +115,24 @@ static std::unique_ptr<dae::GameObject> MakePlayer(std::string image,
 	return player;
 }
 
+static std::unique_ptr<dae::GameObject> MakeNobbin(dae::Tilegrid& in_grid)
+{
+	auto nob = std::make_unique<dae::GameObject>();
+
+	auto imgComp = nob->AddNGetComponent<dae::TextureComponent>();
+	imgComp->renderScale = in_grid.GetTile(glm::ivec2(0, 0))->GetComponent<dae::TextureComponent>()->renderScale;
+	auto col = nob->AddNGetComponent<dae::Collider>();
+
+	auto gridmove =
+		nob->AddNGetComponent<dae::GridMove>(in_grid, *col, glm::ivec2(8, 8), 20.f);
+	gridmove->SetInfluence(false, false);
+	//auto playerComp =
+	auto nobbin = nob->AddNGetComponent<digger::Nobbin>(*gridmove, *col, *imgComp);
+	nob->AddNGetComponent<digger::NobbinAI>(*gridmove, *nobbin);
+
+	return nob;
+}
+
 static void load()
 {
 	std::vector<std::string> paths{"sci_fi_door-6451.mp3"};
@@ -120,15 +145,15 @@ static void load()
 	auto go = std::make_unique<dae::GameObject>();
 	//go->AddComponent<dae::derivedComponent>(7.f);
 	go->AddComponent<dae::TextureComponent>();
-	go->GetComponents<dae::TextureComponent>()[0]->SetTexture("background.png");
+	go->GetComponents<dae::TextureComponent>()[0]->SetTexture("digger_play_bg.png");
 	//go->SetTexture("background.png");
 	scene.Add(std::move(go));
 
-	go = std::make_unique<dae::GameObject>();
+	/*go = std::make_unique<dae::GameObject>();
 	auto component = go->AddNGetComponent<dae::TextureComponent>();
 	component->SetTexture("logo.png");
 	component->m_offset.SetPosition(358, 180);
-	scene.Add(std::move(go));
+	scene.Add(std::move(go));*/
 
 	auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
 
@@ -139,44 +164,63 @@ static void load()
 	textComponent->SetColor({ 255, 255, 0, 255 });
 	scene.Add(std::move(go2));
 
-	go = std::make_unique<dae::GameObject>();
+	/*go = std::make_unique<dae::GameObject>();
 	go->AddComponent<dae::FPSComponent>("FPS", font);
-	scene.Add(std::move(go));
+	scene.Add(std::move(go));*/
 
 	auto grid =
 		std::make_unique<dae::GameObject>();
 	auto gridComp =
-		grid->AddNGetComponent<dae::Tilegrid>(10, 10, 10.f);
-	gridComp->MakeGrid<GameTile>(true, "ground.png", "ground_dug.png");
-	grid->SetPosition(100, 100);
+		grid->AddNGetComponent<dae::Tilegrid>(15, 10, 10.f);
+	gridComp->MakeGrid<digger::GameTile>(true, "ground.png", "ground_dug.png");
+	grid->SetPosition(150, 80);
 	
+
+	// GEM
+
+	auto gem = std::make_unique<dae::GameObject>();
+	auto gemCol = gem->AddNGetComponent<dae::Collider>();
+	gemCol->isTrigger = true;
+	gem->AddComponent<digger::Gem>(*gemCol);
+	auto gemTex = gem->AddNGetComponent<dae::TextureComponent>();
+	gemTex->SetTexture("gem.png");
+	gem->SetParent(grid.get());
+	auto gemPos = gridComp->GetGridLocationOfPoint(glm::ivec2(2, 3));
+	gem->m_transform.SetLocalPosition(gemPos.x, gemPos.y);
+
+	scene.Add(std::move(gem));
+
 	// ============ players!
 	SDL_Scancode input1 [6] { SDL_SCANCODE_W , SDL_SCANCODE_A ,SDL_SCANCODE_S, SDL_SCANCODE_D ,SDL_SCANCODE_E, SDL_SCANCODE_Q };
 	SDL_GamepadButton input2[6]{ SDL_GAMEPAD_BUTTON_DPAD_UP , SDL_GAMEPAD_BUTTON_DPAD_LEFT ,SDL_GAMEPAD_BUTTON_DPAD_DOWN, SDL_GAMEPAD_BUTTON_DPAD_RIGHT ,SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, SDL_GAMEPAD_BUTTON_LEFT_SHOULDER };
 
-	auto player1 = MakePlayer("CDBIG3X.BMP", dae::InputType::keyboard, input1, *gridComp);
+	auto player1 = MakePlayer("digger.png", dae::InputType::keyboard, input1, *gridComp);
 
 	//----------player 2
-	auto player2 = MakePlayer("SPOSA1.png", dae::InputType::gamepad, input2, *gridComp);
+	/*auto player2 = MakePlayer("SPOSA1.png", dae::InputType::gamepad, input2, *gridComp);*/
+	auto nobbin = MakeNobbin(*gridComp);
+
+	nobbin->GetComponent<digger::NobbinAI>()->SetTarget(player1.get());
 
 
 	scene.Add(std::move(grid));
 	scene.Add(std::move(player1));
-	scene.Add(std::move(player2));
+	//scene.Add(std::move(player2));
+	scene.Add(std::move(nobbin));
 
 	auto goldBag =
 		std::make_unique<dae::GameObject>();
 	auto imgComp = goldBag->AddNGetComponent<dae::TextureComponent>();
 	imgComp->SetTexture("gold_bag.png");
-	
+	imgComp->renderScale = gridComp->GetTile(glm::ivec2(0, 0))->GetComponent<dae::TextureComponent>()->renderScale;
 	auto col =
 		goldBag->AddNGetComponent<dae::Collider>();
 	auto gridmove =
-		goldBag->AddNGetComponent<dae::GridMove>(*gridComp,*col, glm::ivec2(5, 5), 1.f);
+		goldBag->AddNGetComponent<dae::GridMove>(*gridComp,*col, glm::ivec2(5, 5), 40.f);
 	gridmove->SetInfluence(true, false);
 	//dae::TextureComponent& texture, dae::GridMove& gridmove, dae::Collider& collisionBox
 	//auto goldComp =
-		goldBag->AddNGetComponent<digger::GoldBag>(*imgComp, *gridmove, *col);
+		goldBag->AddNGetComponent<digger::GoldBag>(*imgComp, *gridmove, *col, "gold.png");
 
 	scene.Add(std::move(goldBag));
 	//================ ui/event stuff

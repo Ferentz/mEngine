@@ -37,6 +37,7 @@ namespace dae
 		
 		void Update(float) override
 		{
+			if (!canCollide) return;
 			collisions.clear();
 			auto scene = SceneManager::GetInstance().GetActiveScene();
 			if (scene == nullptr) return;
@@ -63,6 +64,8 @@ namespace dae
 		}
 
 		glm::vec2 size{ 5 };
+		bool canCollide{ true };
+		bool isTrigger{ false };
 		BroadCaster m_signal;
 
 	private:
@@ -74,6 +77,9 @@ namespace dae
 
 		bool Overlap(Collider& other)
 		{
+			if (!other.canCollide) return false;
+
+			if (other.isTrigger) return false;
 			auto const & mypos = GetGameObject()->m_transform.GetWorldTransform()->GetPosition();
 			auto const& otherPos = other.GetGameObject()->m_transform.GetWorldTransform()->GetPosition();
 			

@@ -102,9 +102,14 @@ void dae::Renderer::RenderTexture(const Texture2D& texture, const float x, const
 	SDL_FRect dst{};
 	dst.x = x;
 	dst.y = y;
+	
+	//SDL_SetRenderScale(GetSDLRenderer(), 0.5f, 1.f);
+
 	SDL_GetTextureSize(texture.GetSDLTexture(), &dst.w, &dst.h);
-	//dst.w *= 0.1f;
-	//dst.h *= 0.1f;
+
+	
+	/*dst.w *= 0.5f;
+	dst.h *= 0.5f;*/
 	SDL_RenderTexture(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst);
 }
 

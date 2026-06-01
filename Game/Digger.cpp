@@ -1,4 +1,4 @@
-#include "Player.h"
+#include "Digger.h"
 
 #include <eventSystem/EventHash.h>
 
@@ -10,19 +10,19 @@
 #include "GameTile.h"
 namespace digger
 {
-	Player::Player(dae::GameObject& obj, dae::GridMove& movement, dae::Collider& collider)
-		:dae::GameComponent(obj)
+	Digger::Digger(dae::GameObject& obj, dae::GridMove& movement, dae::Collider& collider)
+		:Entity(obj)
 		, gridMove{ &movement }
 	{
 		auto tile = movement.GetGrid()->GetTile(movement.GetClosestPoint())->GetComponent<GameTile>();
-		tile->TakeOccupancy(GetGameObject());
+		tile->SetTraversed();
 		//movement.m_signal.Register(*this);
 		collider.m_signal.Register(*this);
 	}
 
-	void Player::TuneIn(dae::EventId id, dae::GameObject*)
+	void Digger::TuneIn(dae::EventId , dae::GameObject*)
 	{
-		switch (id)
+		/*switch (id)
 		{
 		case dae::make_sdbm_hash("arrived"):
 
@@ -38,6 +38,19 @@ namespace digger
 			break;
 		default:
 			break;
+		}*/
+	}
+
+	void Digger::Die()
+	{
+		if (auto texture = GetGameObject()->GetComponent<dae::TextureComponent>())
+		{
+			texture->SetTexture("digger_dead.png");
 		}
+		if (auto collider = GetGameObject()->GetComponent<dae::Collider>())
+		{
+			collider->canCollide = false;
+		}
+		gridMove->canMove = false;
 	}
 }

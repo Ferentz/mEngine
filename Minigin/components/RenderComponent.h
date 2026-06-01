@@ -42,7 +42,11 @@ namespace dae
 		virtual void Render() override;
 		//virtual void Render()const override {}
 		void SetTexture(const std::string& filename);
-		Texture2D const* GetTexture();
+		Texture2D const* GetTexture() const;
+		glm::vec2 GetRenderSize() const;
+
+		float renderScale{1.f};
+
 	protected:
 		std::shared_ptr<Texture2D> m_texture{};
 	private:

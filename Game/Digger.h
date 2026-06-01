@@ -1,5 +1,5 @@
 #pragma once
-#include <components/GameComponent.h>
+#include "Entity.h"
 #include <eventSystem/Listener.h>
 
 namespace dae
@@ -9,12 +9,14 @@ namespace dae
 }
 namespace digger
 {
-	class Player : public dae::GameComponent, public dae::Listener
+	class Digger : public Entity, public dae::Listener
 	{
 	public :
-		Player(dae::GameObject& obj, dae::GridMove& movement, dae::Collider& collider);
+		Digger(dae::GameObject& obj, dae::GridMove& movement, dae::Collider& collider);
 
 		void TuneIn(dae::EventId id, dae::GameObject* subject) override;
+	
+		void Die();
 	private:
 		dae::GridMove* gridMove;
 	};

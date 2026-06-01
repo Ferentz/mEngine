@@ -1,4 +1,5 @@
 #include "RenderComponent.h"
+#include "RenderComponent.h"
 
 #include "RenderComponent.h"
 #include "GameObject.h"
@@ -29,7 +30,8 @@ namespace dae
 		if (m_texture != nullptr)
 		{
 			const auto& pos = GetGameObject()->GetWorldTransform()->GetPosition()+ m_offset.GetPosition();
-			Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
+			auto size = GetRenderSize();
+			Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y, size.x, size.y);
 		}
 	}
 
@@ -38,9 +40,14 @@ namespace dae
 		m_texture = ResourceManager::GetInstance().LoadTexture(filename);
 	}
 
-	Texture2D const* TextureComponent::GetTexture()
+	Texture2D const* TextureComponent::GetTexture() const
 	{
 		return m_texture.get();
+	}
+
+	glm::vec2 TextureComponent::GetRenderSize() const
+	{
+		return GetTexture()->GetSize() * renderScale;
 	}
 
 

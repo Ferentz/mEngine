@@ -1,10 +1,11 @@
-#include "GameCommand.h"
+#include "NobbinMoveCommand.h"
 #include "GameTile.h"
+#include "Nobbin.h"
 
 #include <glm/glm.hpp>
 #include <tileGrid/GridMove.h>
 
-void digger::DiggerMoveCommnad::Execute()
+void digger::NobbinMoveCommnad::Execute()
 {
 	bool horizontal{ false };
 	int direction{ 1 };
@@ -28,16 +29,20 @@ void digger::DiggerMoveCommnad::Execute()
 		direction = 1;
 		break;
 	}
-
+	
 	auto gridMove = GetSubject();
 
 	if (gridMove->Move(horizontal, direction))
 	{
-		auto tile = gridMove->GetGrid()->GetTile(gridMove->GetClosestPoint())->GetComponent<GameTile>();
-		if (tile)
+		if (nobbin->CanDig())
 		{
-			tile->SetTraversed();
+			auto tile = gridMove->GetGrid()->GetTile(gridMove->GetClosestPoint())->GetComponent<GameTile>();
+			if (tile)
+			{
+				tile->SetTraversed();
+			}
 		}
+		
 	}
 
 
