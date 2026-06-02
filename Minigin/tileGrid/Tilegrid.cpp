@@ -15,6 +15,8 @@ namespace dae
 	GameObject* Tilegrid::GetTile(glm::ivec2 point)
 	{
 		if (point.x < 0 || point.x >= width || point.y < 0 || point.y >= height) return nullptr;
+
+
 		return tiles[point.x + width * point.y];
 	}
 
@@ -35,7 +37,13 @@ namespace dae
 
 	glm::ivec2 Tilegrid::GetPointOfGridLocation(glm::vec2 location) const
 	{
-		return glm::round(glm::vec2(location.x / (tileScale), location.y / tileScale));
+		glm::ivec2 point{ glm::round(glm::vec2(location.x / (tileScale), location.y / tileScale)) };
+
+		if (point.x < 0) point.x = 0;
+		if (point.x >= width) point.x = width-1;
+		if (point.y < 0) point.y = 0;
+		if (point.y >= height) point.y = height - 1;
+		return std::move(point);
 	}
 
 	bool Tilegrid::IsPointValid(glm::ivec2 point)

@@ -45,7 +45,11 @@ namespace digger
 		std::vector<levelType> tiles{};
 	};
 
-
+	struct HighScore
+	{
+		std::string name{};
+		int score;
+	};
 	
 	class LevelDataContainer
 	{
@@ -53,9 +57,15 @@ namespace digger
 	public:
 		void LoadData(std::string file);
 
-		void BuildStartScreen();
+		void BuildStartScreen(dae::Scene& scene);
+
+		std::vector<HighScore> loadHighScores(std::string filename);
+
+		bool SaveHighScores(std::string& filename, std::vector<HighScore> const& scores);
+
 		
 		std::vector<LevelData> const& GetLeveles() { return levels; }
+		
 		
 		void BuildScene(int level, dae::Scene& scene, gameMode mode, dae::InputMethod* player1, dae::InputMethod* player2);
 

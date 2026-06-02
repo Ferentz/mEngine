@@ -29,7 +29,7 @@ namespace dae
 	{
 		if (m_texture != nullptr)
 		{
-			const auto& pos = GetGameObject()->GetWorldTransform()->GetPosition()+ m_offset.GetPosition();
+			const auto& pos = GetGameObject()->GetWorldTransform()->GetPosition() + m_offset.GetPosition();
 			auto size = GetRenderSize();
 			Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y, size.x, size.y);
 		}

@@ -64,17 +64,17 @@ static void load()
 	levels.LoadData("levels.txt");
 
 
-	auto& inputManager =
+	/*auto& inputManager =
 		dae::InputManager::GetInstance();
 	auto input1 =
 		inputManager.AddInputMethod(dae::InputType::keyboard);
 	auto input2 =
-		inputManager.AddInputMethod(dae::InputType::gamepad);
+		inputManager.AddInputMethod(dae::InputType::gamepad);*/
 
 
-	levels.BuildScene(0, scene, digger::gameMode::normal, input1, input2);
+	//levels.BuildScene(0, scene, digger::gameMode::normal, input1, input2);
 
-
+	levels.BuildStartScreen(scene);
 
 
 		//================ ui/event stuff

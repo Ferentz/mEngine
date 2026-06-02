@@ -6,6 +6,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <string> 
 
 
 #include <Components.h>
@@ -70,8 +71,110 @@ namespace digger
 
 	void LevelDataContainer::BuildStartScreen(dae::Scene& scene)
 	{
+		auto go = std::make_unique<dae::GameObject>();
+		go->AddComponent<dae::TextureComponent>();
+		go->GetComponents<dae::TextureComponent>()[0]->SetTexture("digger_score_bg.png");
+		scene.Add(std::move(go));
 
+
+		auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
+
+		auto higScores{ loadHighScores("highScores.csv")};
+
+		float xBaseOffset{ 120.f };
+		float xOffset{ 200.f };
+		float yOffset{ 170.f };
+		for (auto& score : higScores)
+		{
+			go = std::make_unique<dae::GameObject>();
+			//go2->SetParent(*go.get());
+			auto textComponent = go->AddNGetComponent<dae::TextComponent>(score.name, font);
+			textComponent->SetColor({ 255, 220, 0, 255 });
+			textComponent->m_offset.SetPosition(glm::vec2(xBaseOffset, yOffset));
+
+			auto textComponent2 = go->AddNGetComponent<dae::TextComponent>(std::to_string(score.score), font);
+			textComponent2->SetColor({ 255, 220, 0, 255 });
+			textComponent2->m_offset.SetPosition( glm::vec2(xBaseOffset + xOffset, yOffset));
+
+			scene.Add(std::move(go));
+			yOffset += 50;
+		}
+		
 	}
+
+	std::vector<HighScore> LevelDataContainer::loadHighScores(std::string filename)
+	{
+		std::vector<HighScore> scores;
+
+		std::ifstream file(dae::ResourceManager::GetInstance().GetFullDataPath(filename));
+
+		if (!file.is_open())
+		{
+			return scores;
+		}
+
+		std::string line;
+
+		while (std::getline(file, line))
+		{
+			if (line.empty())
+			{
+				continue;
+			}
+
+			std::stringstream stream(line);
+
+			std::string name;
+			std::string scoreString;
+
+			if (!std::getline(stream, name, ','))
+			{
+				continue;
+			}
+
+			if (!std::getline(stream, scoreString))
+			{
+				continue;
+			}
+
+			try
+			{
+				HighScore score;
+				score.name = std::move(name);
+				score.score = std::stoi(scoreString);
+
+				scores.push_back(std::move(score));
+			}
+			catch (...)
+			{
+				// Skip malformed entries
+				continue;
+			}
+		}
+
+		return scores;
+	}
+
+	bool LevelDataContainer::SaveHighScores( std::string & filename, std::vector<HighScore> const &scores)
+	{
+		std::ofstream file(dae::ResourceManager::GetInstance().GetFullDataPath(filename));
+
+		if (!file.is_open())
+		{
+			return false;
+		}
+
+		for (const auto& score : scores)
+		{
+			file << score.name
+				<< ','
+				<< score.score
+				<< '\n';
+		}
+
+		return true;
+	}
+
 
 	void LevelDataContainer::BuildScene(int level, dae::Scene& scene, gameMode mode, dae::InputMethod* player1, dae::InputMethod* player2)
 	{
@@ -84,7 +187,7 @@ namespace digger
 
 		auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
 
-		auto go = std::make_unique<dae::GameObject>();
+		go = std::make_unique<dae::GameObject>();
 		//go2->SetParent(*go.get());
 		auto textComponent = go->AddNGetComponent<dae::TextComponent>("Programming 4 Assignment", font);
 		textComponent->m_offset.SetPosition(292, 20);
