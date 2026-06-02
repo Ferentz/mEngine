@@ -47,17 +47,21 @@ namespace dae
 	class InputMethod
 	{
 	public:
+
+		static std::vector<InputType> GetAvailableInputs();
+
 		InputMethod() = default;
 		virtual ~InputMethod() = default;
 
 		virtual bool ProcessInput() = 0;
 
-		/*virtual bool IsPressedThisFrame(unsigned int button) const = 0;
-		virtual bool IsReleasedThisFrame(unsigned int button) const = 0;
-		virtual bool IsDown(unsigned int button) const = 0;*/
+		virtual bool IsButtonPressedThisFrame(unsigned int button)const = 0;
+		virtual bool IsButtonReleasedThisFrame(unsigned int button)const = 0;
+		virtual bool IsButtonDown(unsigned int button)const = 0;
 
 		//template<class T, typename ...Args>
 		virtual void AddAction(std::unique_ptr<Command> command, unsigned int keybind, KeyState triggerState) = 0;
+		virtual void ClearActions() { m_actions.clear(); };
 
 	protected:
 
@@ -73,29 +77,39 @@ namespace dae
 	public:
 		ControllerInput();
 		virtual ~ControllerInput() override;
+
+		static int GetConnectedGamePadCount();
+
 		virtual bool ProcessInput() override;
 
-		/*virtual bool IsPressedThisFrame(unsigned int button) const override;
-		virtual bool IsReleasedThisFrame(unsigned int button) const override;
-		virtual bool IsDown(unsigned int button) const override;*/
+		virtual bool IsButtonPressedThisFrame(unsigned int button)const override;
+		virtual bool IsButtonReleasedThisFrame(unsigned int button)const override;
+		virtual bool IsButtonDown(unsigned int button)const override;
 
 		virtual void AddAction(std::unique_ptr<Command> command, unsigned int keybind, KeyState triggerState) override;
 	};
 
 	class KeyBoardInput final : public InputMethod
 	{
-		const bool* m_currentState{ nullptr };
+		const bool* m_currentStatePtr{ nullptr };
 		std::vector<bool> m_previousState{};
+		std::vector<bool> m_currentState{};
 		int m_numKeys{};
+
+
 	public:
 		KeyBoardInput();
 		virtual ~KeyBoardInput() override = default;
 
+		static bool HasKeyboard();
+
 		 bool ProcessInput() override;
 
-		 bool IsPressedThisFrame(unsigned int button) const ;
-		 bool IsReleasedThisFrame(unsigned int button) const ;
-		 bool IsDown(unsigned int button) const ;
+		 virtual bool IsButtonPressedThisFrame(unsigned int button) const override;
+		 virtual bool IsButtonReleasedThisFrame(unsigned int button)const override;
+		 virtual bool IsButtonDown(unsigned int button)const override;
+
+		
 		 void AddAction(std::unique_ptr<Command> command, unsigned int keybind, KeyState triggerState) override;
 	};
 

@@ -48,6 +48,11 @@ void Scene::Update(float deltatime)
 	for(auto& object : m_objects)
 	{
 		object->Update(deltatime);
+		if (breakFromScene)
+		{
+			breakFromScene = false;
+			return;
+		}
 	}
 }
 

@@ -5,6 +5,7 @@
 
 
 #include <GameObject.h>
+#include <Singleton.h>
 
 
 
@@ -48,12 +49,15 @@ namespace digger
 	struct HighScore
 	{
 		std::string name{};
-		int score;
+		int score{};
 	};
 	
-	class LevelDataContainer
+	class LevelDataContainer final: public  dae::Singleton<LevelDataContainer>
 	{
 		std::vector<LevelData> levels;
+
+		friend class Singleton<LevelDataContainer>;
+		LevelDataContainer() = default;
 	public:
 		void LoadData(std::string file);
 

@@ -18,6 +18,10 @@
 #include <inputsystems/InputManager.h>
 #include <SceneManager.h>
 #include <ResourceManager.h>
+#include <buttons/Selector.h>
+#include <buttons/Button.h>
+
+#include <inputsystems/InputManager.h>
 
 #include "command/NobbinMoveCommand.h"
 #include "command/GameCommand.h"
@@ -29,9 +33,21 @@
 #include "Gem.h"
 #include "Spawner.h"
 
+#include <iostream>
+
 
 namespace digger
 {
+	void function()
+	{
+		auto& scene = dae::SceneManager::GetInstance().CreateScene();
+		auto & player1 = dae::InputManager::GetInstance().m_inputs[0];
+		auto& player2 = dae::InputManager::GetInstance().m_inputs[0];
+		dae::SceneManager::GetInstance().SetActiveScene(1);
+		LevelDataContainer::GetInstance().BuildScene(0, scene, gameMode::normal, player1.get(), player2.get());
+		
+	}
+
 	void LevelDataContainer::LoadData(std::string file)
 	{
 		std::ifstream reader{};
@@ -99,6 +115,63 @@ namespace digger
 			scene.Add(std::move(go));
 			yOffset += 50;
 		}
+
+		auto inputTypes{ dae::InputMethod::GetAvailableInputs() };
+
+		
+		for (auto & inputType : inputTypes)
+		{
+			dae::InputManager::GetInstance().AddInputMethod(inputType);
+		}
+
+
+
+		//const int gamepadCount = dae::ControllerInput::GetConnectedGamePadCount();
+		//bool const hasKeyBoard = dae::KeyBoardInput::HasKeyboard();
+
+		//if (gamepadCount < 1)
+		//{
+		//	// only 1 player option
+		//}
+
+		//if (gamepadCount >= 2)
+		//{
+		//	//use gamepad for player 2
+		//}
+
+		go = std::make_unique<dae::GameObject>();
+
+		//go2->SetParent(*go.get());
+		auto selector = go->AddNGetComponent<dae::ButtonSelector>();
+
+		auto but = std::make_unique<dae::GameObject>();
+		auto button = but->AddNGetComponent<dae::Button>("play", font, SDL_Color{ 255, 210, 0, 255 }, SDL_Color{ 255, 0,0,255 }, & function);
+
+		selector->AddButton(*button);
+		selector->SetSelected(0);
+
+		but->SetParent(go.get());
+		but->m_transform.SetLocalPosition(500, 200);
+
+
+		scene.Add(std::move(but));
+
+		but = std::make_unique<dae::GameObject>();
+		button = but->AddNGetComponent<dae::Button>("vs", font, SDL_Color{ 255, 210, 0, 255 }, SDL_Color{ 255, 0,0,255 }, &function);
+
+		selector->AddButton(*button);
+		selector->SetSelected(0);
+
+		but->SetParent(go.get());
+		but->m_transform.SetLocalPosition(500, 300);
+
+
+		scene.Add(std::move(but));
+		/*auto button = go->AddNGetComponent<dae::TextComponent>(std::to_string(score.score), font);
+		textComponent2->SetColor({ 255, 220, 0, 255 });
+		textComponent2->m_offset.SetPosition(glm::vec2(xBaseOffset + xOffset, yOffset));*/
+
+		scene.Add(std::move(go));
 		
 	}
 

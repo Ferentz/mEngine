@@ -31,7 +31,10 @@ namespace dae
 		Scene& operator=(const Scene& other) = delete;
 		Scene& operator=(Scene&& other) = delete;
 
+		void BreakFromScene() { breakFromScene = true; }
+
 	private:
+		bool breakFromScene{};
 		friend class SceneManager;
 		explicit Scene() = default;
 

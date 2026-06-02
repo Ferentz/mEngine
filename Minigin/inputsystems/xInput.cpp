@@ -38,6 +38,7 @@ namespace dae
 		
 	
 		bool ProcessInput(std::vector<std::unique_ptr<BaseAction>>& actions);
+
 		bool  IsPressedThisFrame(unsigned int button) const
 		{
 			return m_buttonsPressedThisFrame & button;
@@ -53,6 +54,24 @@ namespace dae
 			return m_currentState.Gamepad.wButtons & button;
 		}
 
+		static int GetConnectedGamePadCount()
+		{
+			int count{};
+
+			for (DWORD i{}; i < XUSER_MAX_COUNT; ++i)
+			{
+				XINPUT_STATE state{};
+
+				const DWORD result = XInputGetState(i, &state);
+
+				if (result == ERROR_SUCCESS)
+				{
+					++count;
+				}
+			}
+
+			return count;
+		}
 	};
 
 	std::map<int, short> ControllerInput::ControllerImpl::inputMap{
@@ -61,7 +80,11 @@ namespace dae
 	{SDL_GAMEPAD_BUTTON_DPAD_DOWN, XINPUT_GAMEPAD_DPAD_DOWN},
 	{SDL_GAMEPAD_BUTTON_DPAD_UP, XINPUT_GAMEPAD_DPAD_UP},
 	{SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, XINPUT_GAMEPAD_RIGHT_SHOULDER},
-	{SDL_GAMEPAD_BUTTON_LEFT_SHOULDER, XINPUT_GAMEPAD_LEFT_SHOULDER}
+	{SDL_GAMEPAD_BUTTON_LEFT_SHOULDER, XINPUT_GAMEPAD_LEFT_SHOULDER},
+	{SDL_GAMEPAD_BUTTON_SOUTH, XINPUT_GAMEPAD_A},
+	{SDL_GAMEPAD_BUTTON_EAST, XINPUT_GAMEPAD_B},
+	{SDL_GAMEPAD_BUTTON_WEST, XINPUT_GAMEPAD_X},
+	{SDL_GAMEPAD_BUTTON_NORTH, XINPUT_GAMEPAD_Y}
 	};
 
 	DWORD ControllerInput::ControllerImpl::controllerCount{};
@@ -99,6 +122,11 @@ namespace dae
 		return true;
 	}
 
+	int ControllerInput::GetConnectedGamePadCount()
+	{
+		return ControllerInput::ControllerImpl::GetConnectedGamePadCount();
+	}
+
 	bool ControllerInput::ProcessInput()
 	{
 		return m_impl->ProcessInput(m_actions);
@@ -118,6 +146,19 @@ namespace dae
 	{
 		return m_impl->m_currentState.Gamepad.wButtons & button;
 	}*/
+
+	bool ControllerInput::IsButtonPressedThisFrame(unsigned int button)const
+	{
+		return m_impl->IsPressedThisFrame(unsigned int(ControllerImpl::inputMap[button]));
+	}
+	bool ControllerInput::IsButtonReleasedThisFrame(unsigned int button)const
+	{
+		return m_impl->IsReleasedThisFrame(unsigned int(ControllerImpl::inputMap[button]));
+	}
+	bool ControllerInput::IsButtonDown(unsigned int button)const
+	{
+		return m_impl->IsDown(unsigned int(ControllerImpl::inputMap[button]));
+	}
 
 	void  ControllerInput::AddAction(std::unique_ptr<Command> command, unsigned int keybind, KeyState triggerState)
 	{

@@ -60,8 +60,7 @@ static void load()
 
 	auto& scene = dae::SceneManager::GetInstance().CreateScene();
 
-	digger::LevelDataContainer levels{};
-	levels.LoadData("levels.txt");
+	digger::LevelDataContainer::GetInstance().LoadData("levels.txt");
 
 
 	/*auto& inputManager =
@@ -74,15 +73,17 @@ static void load()
 
 	//levels.BuildScene(0, scene, digger::gameMode::normal, input1, input2);
 
-	levels.BuildStartScreen(scene);
+	digger::LevelDataContainer::GetInstance().BuildStartScreen(scene);
 
+	auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
 
 		//================ ui/event stuff
 		auto smallFont = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 20);
 	auto player1_HealthDisplay = std::make_unique<dae::GameObject>();
+	player1_HealthDisplay->AddComponent<dae::FPSComponent>("fps" , font);
 	player1_HealthDisplay->SetPosition(50, 300);
 	//auto explenation1 =
-	player1_HealthDisplay->AddNGetComponent<dae::TextComponent>("wasd to move. e to take damage. q to collect points", smallFont);
+	//player1_HealthDisplay->AddNGetComponent<dae::TextComponent>("wasd to move. e to take damage. q to collect points", smallFont);
 	/*auto healthDisplayComponent =
 		player1_HealthDisplay->AddNGetComponent<dae::HealthDisplay>("health", font, *healthComponent);
 	healthDisplayComponent->SetPosition(100, 25);

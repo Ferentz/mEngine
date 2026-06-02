@@ -41,6 +41,8 @@ set(SOURCES
   Minigin/ServiceLocator.cpp
   Minigin/tileGrid/TileGrid.cpp
   Minigin/tileGrid/GridMove.cpp
+  Minigin/buttons/Button.cpp
+  Minigin/buttons/Selector.cpp
   
   Minigin/SteamAchievementListener.cpp
 )
