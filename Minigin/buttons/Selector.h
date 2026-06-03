@@ -22,6 +22,6 @@ namespace dae
 
 		void AddButton(Button& button);
 
-		void SetSelected(int idx);
+		void SetSelected(size_t idx);
 	};
 }

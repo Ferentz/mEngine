@@ -1,6 +1,6 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-#include <SDL3/SDL_gamepad.h>
+#include <SDL3/SDL_main_impl.h>
 
 #if _DEBUG && __has_include(<vld.h>)
 #include <vld.h>
@@ -10,7 +10,7 @@
 #include "SceneManager.h"
 #include "ResourceManager.h"
 //#include "TextObject.h"
-#include "Scene.h"
+#include <Scene.h>
 
 #include <filesystem>
 
@@ -29,17 +29,13 @@
 
 #include <GameObject.h>
 #include <Components.h>
-#include <Texture2D.h>
-#include <TileGrid/Tilegrid.h>
-#include <TileGrid/GridMove.h>
-#include <collision/Collider.h>
-#include <Transform.h>
 #include "GameTile.h"
 
 #include <vector>
 #include <string>
 #include <memory>
 #include <utility>
+#include <iostream>
 
 
 //using sdlInput = SDL_Scancode;
@@ -47,12 +43,12 @@
 
 namespace fs = std::filesystem;
 
-#include <type_traits>
 
 
 
 static void load()
 {
+	std::cout << "hifrommain";
 	std::vector<std::string> paths{ "sci_fi_door-6451.mp3" };
 	dae::servicelocator soundService{};
 

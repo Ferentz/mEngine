@@ -1,4 +1,8 @@
 #pragma once
+#include <string>
+
+#include <glm/glm.hpp>
+
 #include <State.h>
 #include <components/GameComponent.h>
 #include <eventSystem/Listener.h>

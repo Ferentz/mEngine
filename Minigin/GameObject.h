@@ -1,9 +1,13 @@
 #pragma once
-#include <string>
+
 #include <memory>
 #include "Transform.h"
 #include "Components.h"
 #include <variant>
+#include <vector>
+#include <utility>
+#include <type_traits>
+#include <concepts>
 
 namespace dae
 {

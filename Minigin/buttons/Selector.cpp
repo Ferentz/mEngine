@@ -5,6 +5,7 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_gamepad.h>
+#include <SDL3/SDL_scancode.h>
 
 #include <memory>
 
@@ -80,7 +81,7 @@ namespace dae
 	{
 		buttons.push_back(&button);
 	}
-	void ButtonSelector::SetSelected(int idx)
+	void ButtonSelector::SetSelected(size_t idx)
 	{
 		if (idx < 0 || idx >= buttons.size()) return;
 		buttons[selectedButtonIDX]->Unselect();

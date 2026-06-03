@@ -1,13 +1,5 @@
 #pragma once
-#include <string>
-#include <memory>
 
-//#include "GameObject.h"
-
-
-#include <SDL3/SDL_pixels.h>
-#include <glm/glm.hpp>
-#include <chrono>
 
 namespace dae
 {

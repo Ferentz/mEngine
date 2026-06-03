@@ -1,6 +1,9 @@
 #pragma once
+#include <SDL3/SDL.h>
 #include "GameComponent.h"
 #include "Transform.h"
+#include <string>
+#include <memory>
 namespace dae
 {
 	class RenderComponent : public GameComponent

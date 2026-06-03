@@ -2,21 +2,26 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_gamepad.h>
+#include <SDL3/SDL_scancode.h>
+#include <SDL3/SDL_pixels.h>
+#include <glm/fwd.hpp>
 
 #include <vector>
 #include <fstream>
 #include <sstream>
 #include <string> 
+#include <memory>
+#include <utility>
 
-
+#include <GameObject.h>
 #include <Components.h>
-#include <Texture2D.h>
 #include <TileGrid/Tilegrid.h>
 #include <TileGrid/GridMove.h>
 #include <collision/Collider.h>
 #include <Transform.h>
 #include <inputsystems/InputManager.h>
 #include <SceneManager.h>
+#include <Scene.h>
 #include <ResourceManager.h>
 #include <buttons/Selector.h>
 #include <buttons/Button.h>
@@ -38,7 +43,7 @@
 
 namespace digger
 {
-	void function()
+	static void function()
 	{
 		auto& scene = dae::SceneManager::GetInstance().CreateScene();
 		auto & player1 = dae::InputManager::GetInstance().m_inputs[0];

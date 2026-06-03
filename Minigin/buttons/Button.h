@@ -4,6 +4,7 @@
 
 #include <functional>
 #include <string>
+#include <memory>
 
 #include <SDL3/SDL_pixels.h>
 

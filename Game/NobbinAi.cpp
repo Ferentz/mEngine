@@ -5,8 +5,10 @@
 #include "Nobbin.h"
 #include "Digger.h"
 
+#include <GameObject.h>
 #include <tileGrid/GridStar.h>
 #include <tileGrid/GridMove.h>
+#include <eventSystem/EventTypes.h>
 
 namespace digger
 {

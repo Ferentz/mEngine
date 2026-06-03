@@ -1,19 +1,18 @@
 #include "GameObject.h"
-#include "GameObject.h"
-#include "GameObject.h"
-#include <string>
+
+
+#include <iostream>
+#include <memory>
+#include <vector>
+#include <variant>
 
 #include "ResourceManager.h"
 #include "SceneManager.h"
 #include "Scene.h"
 #include "Renderer.h"
 
-#include <stdexcept>
-#include <SDL3_ttf/SDL_ttf.h>
-#include "Font.h"
-#include "Texture2D.h"
 
-#include <iostream>
+
 
 //#include "components/GameComponent.h"
 //#include "components/RenderComponent.h"
