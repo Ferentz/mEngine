@@ -17,7 +17,7 @@ namespace dae
 	{
 		
 	public:
-		static unsigned int numConnected{};
+		static unsigned int numConnected;
 		unsigned int gamePadIDX{};
 
 		std::map<unsigned int, KeyState> m_buttonStates{
@@ -38,11 +38,14 @@ namespace dae
 		static int GetConnectedGamePadCount()
 		{
 			int count{ 0 };
-			SDL_JoystickID* ids = SDL_GetGamepads(&count);
+			SDL_GetGamepads(&count);
 
 			return count;
 		}
 	};
+
+	ControllerInput::ControllerImpl::numConnected{};
+
 
 	bool  ControllerInput::ControllerImpl::ProcessInput(std::vector<std::unique_ptr<BaseAction>>& actions)
 	{
@@ -51,7 +54,6 @@ namespace dae
 		SDL_JoystickID* ids = SDL_GetGamepads(&count);
 		SDL_Gamepad* gamepad = SDL_OpenGamepad(ids[gamePadIDX]);
 
-		int i{};
 		for (auto& binding : actions)
 		{
 			unsigned int buttonKey{ binding->m_button };
@@ -109,15 +111,15 @@ namespace dae
 
 	bool ControllerInput::IsButtonPressedThisFrame(unsigned int button)const
 	{
-		return m_buttonStates[button] == KeyState::presed;
+		return m_impl->m_buttonStates[button] == KeyState::presed;
 	}
 	bool ControllerInput::IsButtonReleasedThisFrame(unsigned int button)const
 	{
-		return m_buttonStates[button] == KeyState::released;
+		return m_impl->m_buttonStates[button] == KeyState::released;
 	}
 	bool ControllerInput::IsButtonDown(unsigned int button)const
 	{
-		return m_buttonStates[button] == KeyState::down;
+		return m_impl->m_buttonStates[button] == KeyState::down;
 	}
 
 
