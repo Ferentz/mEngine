@@ -50,9 +50,9 @@ dae::Scene* dae::SceneManager::GetActiveScene()
 	// TODO: insert return statement here
 }
 
-void dae::SceneManager::SetActiveScene(int i)
+void dae::SceneManager::SetActiveScene(size_t i)
 {
-	if (i >= m_scenes.size() && i < 0) return;
+	if (i	>= m_scenes.size() && i < 0) return;
 	switchScene = true;
 	nextScene = i;
 	if (m_scenes.size() <= 0) return;

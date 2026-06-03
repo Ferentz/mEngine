@@ -13,7 +13,7 @@ namespace dae
 	public:
 		Scene& CreateScene();
 		Scene* GetActiveScene();
-		void SetActiveScene(int i);
+		void SetActiveScene(size_t i);
 
 		void CheckForSwitch();
 		void Update(float deltaTime);
@@ -24,8 +24,8 @@ namespace dae
 		bool switchScene{};
 		friend class Singleton<SceneManager>;
 		SceneManager() = default;
-		int activeScene{};
-		int nextScene{};
+		size_t activeScene{};
+		size_t nextScene{};
 		std::vector<std::unique_ptr<Scene>> m_scenes{};
 	};
 }
