@@ -39,7 +39,7 @@ set(SOURCES
   Minigin/sound/soundImpl.cpp
   Minigin/components/ServiceComponent.cpp
   Minigin/ServiceLocator.cpp
-  Minigin/tileGrid/TileGrid.cpp
+  Minigin/tileGrid/Tilegrid.cpp
   Minigin/tileGrid/GridMove.cpp
   Minigin/buttons/Button.cpp
   Minigin/buttons/Selector.cpp
