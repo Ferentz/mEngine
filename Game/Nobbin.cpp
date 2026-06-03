@@ -2,7 +2,7 @@
 
 
 #include <components/RenderComponent.h>
-#include <tileGrid/GridMove.h>
+#include <tileGrid/Gridmove.h>
 #include <collision/Collider.h>
 
 

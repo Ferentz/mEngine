@@ -16,7 +16,7 @@
 #include <GameObject.h>
 #include <Components.h>
 #include <TileGrid/Tilegrid.h>
-#include <TileGrid/GridMove.h>
+#include <TileGrid/Gridmove.h>
 #include <collision/Collider.h>
 #include <Transform.h>
 #include <inputsystems/InputManager.h>
@@ -46,8 +46,9 @@ namespace digger
 	static void function()
 	{
 		auto& scene = dae::SceneManager::GetInstance().CreateScene();
-		auto & player1 = dae::InputManager::GetInstance().m_inputs[0];
-		auto& player2 = dae::InputManager::GetInstance().m_inputs[1];
+		auto& inputs = dae::InputManager::GetInstance().m_inputs;
+		auto & player1 = inputs[0];
+		auto& player2 = inputs.size() > 1 ? inputs[1] : inputs[0];
 		dae::SceneManager::GetInstance().SetActiveScene(1);
 		LevelDataContainer::GetInstance().BuildScene(0, scene, gameMode::normal, player1.get(), player2.get());
 		

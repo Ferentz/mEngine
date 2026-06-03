@@ -3,7 +3,7 @@
 #include "Minigin.h"
 
 #include "components/EventComponent.h"
-#include "tileGrid/GridMove.h"
+#include "tileGrid/Gridmove.h"
 
 void dae::MoveCommand::Execute()
 {

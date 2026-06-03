@@ -7,7 +7,7 @@
 
 #include <GameObject.h>
 #include <tileGrid/GridStar.h>
-#include <tileGrid/GridMove.h>
+#include <tileGrid/Gridmove.h>
 #include <eventSystem/EventTypes.h>
 
 namespace digger

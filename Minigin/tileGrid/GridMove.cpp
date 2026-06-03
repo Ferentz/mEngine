@@ -1,4 +1,4 @@
-#include <tileGrid/GridMove.h>
+#include <tileGrid/Gridmove.h>
 #include "Minigin.h"
 
 namespace dae
