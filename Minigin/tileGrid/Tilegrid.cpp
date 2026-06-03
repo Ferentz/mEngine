@@ -43,7 +43,7 @@ namespace dae
 		if (point.x >= width) point.x = width-1;
 		if (point.y < 0) point.y = 0;
 		if (point.y >= height) point.y = height - 1;
-		return std::move(point);
+		return point;
 	}
 
 	bool Tilegrid::IsPointValid(glm::ivec2 point)
