@@ -16,7 +16,7 @@
 #include <GameObject.h>
 #include <Components.h>
 #include <TileGrid/Tilegrid.h>
-#include <TileGrid/Gridmove.h>
+#include <TileGrid/GridMove.h>
 #include <collision/Collider.h>
 #include <Transform.h>
 #include <inputsystems/InputManager.h>

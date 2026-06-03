@@ -2,7 +2,7 @@
 
 #include <eventSystem/EventHash.h>
 
-#include <tileGrid/Gridmove.h>
+#include <tileGrid/GridMove.h>
 #include <collision/Collider.h>
 #include <tileGrid/Tilegrid.h>
 #include <GameObject.h>

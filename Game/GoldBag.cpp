@@ -2,7 +2,7 @@
 #include "GameTile.h"
 //#include "Digger.h"
 #include "Entity.h"
-#include <tilegrid/Gridmove.h>
+#include <tileGrid/GridMove.h>
 
 #include <GameObject.h>
 #include <eventSystem/EventHash.h>

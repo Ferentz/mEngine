@@ -3,7 +3,7 @@
 #include "Nobbin.h"
 
 #include <glm/glm.hpp>
-#include <tileGrid/Gridmove.h>
+#include <tileGrid/GridMove.h>
 
 void digger::NobbinMoveCommnad::Execute()
 {
