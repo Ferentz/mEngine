@@ -47,7 +47,7 @@ namespace digger
 	{
 		auto& scene = dae::SceneManager::GetInstance().CreateScene();
 		auto & player1 = dae::InputManager::GetInstance().m_inputs[0];
-		auto& player2 = dae::InputManager::GetInstance().m_inputs[0];
+		auto& player2 = dae::InputManager::GetInstance().m_inputs[1];
 		dae::SceneManager::GetInstance().SetActiveScene(1);
 		LevelDataContainer::GetInstance().BuildScene(0, scene, gameMode::normal, player1.get(), player2.get());
 		

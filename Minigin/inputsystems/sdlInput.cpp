@@ -37,14 +37,16 @@ namespace dae
 
 		static int GetConnectedGamePadCount()
 		{
+			SDL_Init(SDL_INIT_GAMEPAD);
 			int count{ 0 };
-			SDL_GetGamepads(&count);
+			SDL_JoystickID* ids = SDL_GetGamepads(&count);
+			SDL_OpenGamepad(ids[0]);
 
 			return count;
 		}
 	};
 
-	ControllerInput::ControllerImpl::numConnected{};
+	unsigned int ControllerInput::ControllerImpl::numConnected{};
 
 
 	bool  ControllerInput::ControllerImpl::ProcessInput(std::vector<std::unique_ptr<BaseAction>>& actions)
@@ -54,44 +56,39 @@ namespace dae
 		SDL_JoystickID* ids = SDL_GetGamepads(&count);
 		SDL_Gamepad* gamepad = SDL_OpenGamepad(ids[gamePadIDX]);
 
-		for (auto& binding : actions)
+		for (auto& buttonState : m_buttonStates)
 		{
-			unsigned int buttonKey{ binding->m_button };
-
-			bool isPressed{
-				SDL_GetGamepadButton(gamepad, static_cast<SDL_GamepadButton>(buttonKey)) };
-
+			bool isPressed = SDL_GetGamepadButton(gamepad, static_cast<SDL_GamepadButton>(buttonState.first));
 			if (!isPressed)
 			{
-				if (m_buttonStates[buttonKey] != KeyState::released)
+				if (buttonState.second == KeyState::down || buttonState.second == KeyState::presed)
 				{
-					if (binding->m_state == KeyState::released)
-					{
-						binding->m_commands->Execute();
-					}
-					m_buttonStates[buttonKey] = KeyState::released;
+					buttonState.second = KeyState::released;
+				}
+				else
+				{
+					buttonState.second = KeyState::up;
 				}
 			}
 			else
 			{
-				if (m_buttonStates[buttonKey] == KeyState::presed || m_buttonStates[buttonKey] == KeyState::down)
+				if (buttonState.second == KeyState::presed || buttonState.second == KeyState::down)
 				{
-					if (binding->m_state == KeyState::down)
-					{
-						binding->m_commands->Execute();
-					}
-					m_buttonStates[buttonKey] = KeyState::down;
+					buttonState.second = KeyState::down;
 				}
-				else if (m_buttonStates[buttonKey] == KeyState::released)
+				else
 				{
-					if (binding->m_state == KeyState::presed)
-					{
-						binding->m_commands->Execute();
-					}
-					m_buttonStates[buttonKey] = KeyState::presed;
+					buttonState.second = KeyState::presed;
 				}
 			}
-			i++;
+		}
+
+		for (auto& binding : actions)
+		{
+			unsigned int buttonKey{ binding->m_button };
+
+			if(m_buttonStates[buttonKey] == binding->m_state)
+				binding->m_commands->Execute();
 		}
 		SDL_free(ids);
 		return true;
@@ -133,9 +130,9 @@ namespace dae
 	ControllerInput::ControllerInput()
 		:m_impl{ std::make_unique<ControllerInput::ControllerImpl>() }
 	{
-		SDL_Init(SDL_INIT_GAMEPAD);
+		
 
-		m_impl->gamePadIDX = numConnected;
+		m_impl->gamePadIDX = m_impl->numConnected;
 		m_impl->numConnected++;
 	}
 	ControllerInput::~ControllerInput() = default;
