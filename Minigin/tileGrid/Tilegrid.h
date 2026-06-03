@@ -57,7 +57,7 @@ namespace dae
 		
 		template<class T, typename ...Args>
 			requires std::is_base_of_v<dae::Tile, T>
-		dae::GameObject* MakeTile(int x, int y, Args&& ...args)
+		dae::GameObject* MakeTile(unsigned int x, unsigned int y, Args&& ...args)
 		{
 			if(x + width * y < tiles.size() && tiles[x + width * y] != nullptr)
 			tiles[x + width * y]->MarkForDelete();
