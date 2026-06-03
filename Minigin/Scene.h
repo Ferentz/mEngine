@@ -15,9 +15,15 @@ namespace dae
 		void Add(std::unique_ptr<GameObject> object);
 		void Remove(const GameObject& object);
 		void RemoveAllObjects();
+		void Release(GameObject* object);
+		bool HoldsObject(GameObject* object);
 
 		void Add(Collider& object);
 		void Remove(Collider* object);
+
+		void CleanUp();
+
+		void Start() const;
 
 		void Update(float deltaTime);
 		void Render() const;

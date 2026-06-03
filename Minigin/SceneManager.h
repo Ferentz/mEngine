@@ -15,9 +15,11 @@ namespace dae
 		Scene* GetActiveScene();
 		void SetActiveScene(int i);
 
+		void CheckForSwitch();
 		void Update(float deltaTime);
 		void FixedUpdate(float deltaTime);
 		void Render();
+
 	private:
 		bool switchScene{};
 		friend class Singleton<SceneManager>;

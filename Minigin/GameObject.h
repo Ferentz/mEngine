@@ -3,12 +3,16 @@
 #include <memory>
 #include "Transform.h"
 #include "Components.h"
+#include <variant>
+
 namespace dae
 {
 	//class GameComponent;
 	class TransformComponent;
 	class Font;
 	class Texture2D;
+	class Scene;
+
 	class GameObject final
 	{
 	public:
@@ -19,13 +23,20 @@ namespace dae
 		GameObject& operator=(const GameObject& other) = delete;
 		GameObject& operator=(GameObject&& other) = delete;
 
+		void Start();
 		void Update(float deltaTime);
 		void Render();
 
-		GameObject* const GetParent();
+		Scene* GetScene();
+
+		GameObject* const GetParentAsObject();
+		Scene* GetParentAsScene();
 
 		void SetParent(GameObject *newParent, bool keepWorldPos = false);
-		
+		void SetParent(Scene& newParent, bool keepWorldPos = false);
+		void Add(std::unique_ptr<GameObject> && object, bool keepWorldPos = false);
+
+
 		bool IsChild(GameObject* object);
 		void SetPosition(float x, float y);
 		auto GetTransform() -> SmartTransform*;
@@ -37,6 +48,7 @@ namespace dae
 		void MakeDirty();
 		void MarkForDelete(bool excludeChildren = false);
 		bool WillBeDeleted() const { return m_toDelete; }
+		bool Cleanup();
 
 		// COMPONENT FUNCTIONS
 		void RemoveComponent(size_t index);
@@ -88,6 +100,24 @@ namespace dae
 
 		template<class T>
 			requires std::is_base_of_v<GameComponent, T>
+		T* GetComponent_ChildrenInclusive()
+		{
+			for (auto& component : m_components)
+			{
+				if (auto ptr = dynamic_cast<T*>(component.get())) // get retrives the pointer fro the unique pointer
+				{
+					return ptr;
+				}
+			}
+			for (auto& child : m_children)
+			{
+				if (T* component = child->GetComponent_ChildrenInclusive<T>()) return component;
+			}
+			return nullptr;
+		}
+
+		template<class T>
+			requires std::is_base_of_v<GameComponent, T>
 		T* GetLatestComponent()
 		{
 				return dynamic_cast<T*>(m_components.back().get());
@@ -106,13 +136,14 @@ namespace dae
 	private:
 		
 		bool m_toDelete{};
-		GameObject* m_pParent{};
+		std::variant<GameObject*, Scene*> m_pParent{};
 		std::vector<std::unique_ptr<GameComponent>> m_components{};
 		std::vector<RenderComponent*> m_renderComponents{};
-		std::vector<GameObject*> m_children{};
+		std::vector<std::unique_ptr<GameObject>> m_children{};
 
 	private:
 		void AddChild(GameObject* newChild);
 		void RemoveChild(GameObject* toRemove);
+		
 	};
 }

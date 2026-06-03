@@ -43,6 +43,7 @@ namespace digger
 
 	void Digger::Die()
 	{
+		isAllive = false;
 		if (auto texture = GetGameObject()->GetComponent<dae::TextureComponent>())
 		{
 			texture->SetTexture("digger_dead.png");

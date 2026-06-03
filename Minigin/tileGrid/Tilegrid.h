@@ -81,14 +81,15 @@ namespace dae
 			auto tile = std::make_unique<dae::GameObject>();
 
 			tile->AddNGetComponent<T>(x, y, std::forward<Args>(args)...);
-			tile->SetParent(GetGameObject());
 			auto pos = GetGridLocationOfPoint(glm::ivec2(x, y));
 			tile->SetPosition(pos.x, pos.y);
 
 			tiles[x + width * y] = tile.get();
 
-			if(auto scene = dae::SceneManager::GetInstance().GetActiveScene())
-				scene->Add(std::move(tile));
+			GetGameObject()->Add(std::move(tile));
+
+			/*if(auto scene = GetGameObject()->GetScene())
+				scene->Add(std::move(tile));*/
 			return tiles[x + width * y];
 		}
 	};

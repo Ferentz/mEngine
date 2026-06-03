@@ -17,7 +17,10 @@ namespace digger
 		void TuneIn(dae::EventId id, dae::GameObject* subject) override;
 	
 		void Die();
+
+		bool IsAllive() { return isAllive; }
 	private:
+		bool isAllive{true};
 		dae::GridMove* gridMove;
 	};
 }

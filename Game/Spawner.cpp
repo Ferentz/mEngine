@@ -23,7 +23,10 @@ namespace digger
 			timer = 0;
 			if (numToSpawn > 0) numToSpawn--;
 			auto nob = LevelDataContainer::MakeNobbin_ai(*grid, spawnPos.x, spawnPos.y);
-			dae::SceneManager::GetInstance().GetActiveScene()->Add(std::move(nob));
+
+			// could do a set parent and making this nob release. but this is safe even if working in the non-active scene.
+			if(auto parent = GetGameObject()->GetParentAsObject()) parent->Add(std::move(nob));
+			else GetGameObject()->GetParentAsScene()->Add(std::move(nob));
 			// spawn nobbin
 		}
 	}

@@ -24,6 +24,7 @@ namespace dae
 		explicit GameComponent(GameObject& parent);
 
 		void SetParent(GameObject& parent);
+		virtual void Start() {};
 		virtual void Update(float) {};
 
 		GameObject* GetGameObject();

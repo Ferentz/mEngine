@@ -14,7 +14,7 @@ namespace dae
 {
 	struct Node
 	{
-		glm::ivec2 point;
+		glm::ivec2 point{};
 		float gCost{};
 		float hCost{};
 		glm::ivec2 parent{ -1, -1 };

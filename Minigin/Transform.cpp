@@ -91,13 +91,13 @@ dae::Transform const* dae::SmartTransform::GetWorldTransform()
 	//Transform const * world{ GetWorldTransform() };
 	if (m_dirty)
 	{
-		if (m_pGameObject->GetParent() == nullptr)
+		if (m_pGameObject->GetParentAsObject() == nullptr)
 		{
 			m_global = m_local;
 		}
 		else
 		{
-			m_global = *m_pGameObject->GetParent()->GetWorldTransform() + m_local; 
+			m_global = *m_pGameObject->GetParentAsObject()->GetWorldTransform() + m_local; 
 		}
 		m_dirty = false;
 	}

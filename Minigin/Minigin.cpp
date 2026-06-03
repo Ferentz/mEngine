@@ -174,6 +174,7 @@ void dae::Minigin::RunOneFrame()
 
 	m_quit = !InputManager::GetInstance().ProcessInput();
 
+	SceneManager::GetInstance().CheckForSwitch();
 	while (m_lag >= m_fixed_time_step)
 	{
 		SceneManager::GetInstance().FixedUpdate(m_fixed_time_step);

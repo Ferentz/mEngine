@@ -15,16 +15,11 @@ namespace dae
 		Collider(GameObject& object)
 			:GameComponent(object)
 		{
-			auto scene{ SceneManager::GetInstance().GetActiveScene() };
-			if (scene == nullptr) return;
-
-			m_scene = scene;
-			scene->Add(*this);
 		}
 
 		~Collider() override
 		{
-			auto scene{ SceneManager::GetInstance().GetActiveScene() };
+			auto scene{ GetGameObject()->GetScene() };
 			if (scene == nullptr) return;
 
 			if (m_scene == scene)
@@ -32,6 +27,14 @@ namespace dae
 				scene->Remove(this);
 			}
 			
+		}
+		void Start() override
+		{
+			auto scene{ GetGameObject()->GetScene() };
+			if (scene == nullptr) return;
+
+			m_scene = scene;
+			scene->Add(*this);
 		}
 		
 		

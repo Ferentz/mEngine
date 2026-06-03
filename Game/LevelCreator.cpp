@@ -150,11 +150,8 @@ namespace digger
 		selector->AddButton(*button);
 		selector->SetSelected(0);
 
-		but->SetParent(go.get());
 		but->m_transform.SetLocalPosition(500, 200);
-
-
-		scene.Add(std::move(but));
+		go->Add(std::move(but));
 
 		but = std::make_unique<dae::GameObject>();
 		button = but->AddNGetComponent<dae::Button>("vs", font, SDL_Color{ 255, 210, 0, 255 }, SDL_Color{ 255, 0,0,255 }, &function);
@@ -162,11 +159,9 @@ namespace digger
 		selector->AddButton(*button);
 		selector->SetSelected(0);
 
-		but->SetParent(go.get());
 		but->m_transform.SetLocalPosition(500, 300);
+		go->Add(std::move(but));
 
-
-		scene.Add(std::move(but));
 		/*auto button = go->AddNGetComponent<dae::TextComponent>(std::to_string(score.score), font);
 		textComponent2->SetColor({ 255, 220, 0, 255 });
 		textComponent2->m_offset.SetPosition(glm::vec2(xBaseOffset + xOffset, yOffset));*/
@@ -329,7 +324,7 @@ namespace digger
 
 
 				if (obj.get() == nullptr) continue; // no object to add on tile;
-				scene.Add(std::move(obj));
+				grid->Add(std::move(obj));
 			}
 		}
 
@@ -440,17 +435,9 @@ namespace digger
 		auto nobbin = nob->GetComponent<digger::Nobbin>();
 		auto gridmove = nob->GetComponent<dae::GridMove>();
 
-		auto ai = nob->AddNGetComponent<digger::NobbinAI>(*gridmove, *nobbin);
+		 nob->AddNGetComponent<digger::NobbinAI>(*gridmove, *nobbin);
 
-		auto const & objects{ dae::SceneManager::GetInstance().GetActiveScene()->GetObjects() };
-
-		for (auto& object : objects)
-		{
-			if (auto player = object->GetComponent<digger::Digger>())
-			{
-				ai->SetTarget(player->GetGameObject());
-			}
-		}
+		
 
 		return nob;
 	}
@@ -539,7 +526,7 @@ namespace digger
 		auto gemTex = gem->AddNGetComponent<dae::TextureComponent>();
 		gemTex->SetTexture("gem.png");
 
-		gem->SetParent(in_grid.GetGameObject());
+		
 
 		auto gemPos = in_grid.GetGridLocationOfPoint(glm::ivec2(x, y));
 		gem->m_transform.SetLocalPosition(gemPos.x, gemPos.y);
@@ -569,7 +556,7 @@ namespace digger
 	{
 		auto spawn = std::make_unique<dae::GameObject>();
 
-		spawn->SetParent(in_grid.GetGameObject());
+		
 
 		spawn->AddNGetComponent<digger::Spawner>(in_grid, x, y, amount);
 

@@ -3,6 +3,7 @@
 //#include "Digger.h"
 #include "GameTile.h"
 #include "Nobbin.h"
+#include "Digger.h"
 
 #include <tileGrid/GridStar.h>
 #include <tileGrid/GridMove.h>
@@ -22,10 +23,37 @@ namespace digger
 	}
 	void NobbinAI::Update(float delta)
 	{
+		if (playerone == nullptr)
+		{
+			auto player = movement->GetGrid()->GetGameObject()->GetComponent_ChildrenInclusive<digger::Digger>();
+			if (player == nullptr) return; // no player
+			playerone = player->GetGameObject();
+		}
+
+		if (auto digger = playerone->GetComponent<digger::Digger>())
+		{
+			if (!digger->IsAllive()) return; // no allive player
+		}
+
+
 		timer += delta;
 
 		if (timer >= interval)
 		{
+			/*auto player = movement->GetGrid()->GetGameObject()->GetComponent_ChildrenInclusive<digger::Digger>();
+
+			if(player == nullptr)
+			auto const& objects{ dae::SceneManager::GetInstance().GetActiveScene()->GetObjects() };*/
+
+			/*for (auto& object : objects)
+			{
+				if (auto player = object->GetComponent<digger::Digger>())
+				{
+					SetTarget(player->GetGameObject());
+					break;
+				}
+			}*/
+
 			timer = 0;
 			node = 0;
 			auto playerMov{ playerone->GetComponent<dae::GridMove>() };

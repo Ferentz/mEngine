@@ -13,7 +13,6 @@ namespace dae
 		collider.size.x = in_grid.GetTileScale() * 0.75f;
 		collider.size.y = in_grid.GetTileScale() * 0.75f;
 
-		GetGameObject()->SetParent(in_grid.GetGameObject(), false);
 		auto pos = grid->GetGridLocationOfPoint(closestPoint);
 		GetGameObject()->m_transform.SetLocalPosition(pos.x, pos.y);
 	}

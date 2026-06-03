@@ -1,7 +1,11 @@
 #include "GameObject.h"
+#include "GameObject.h"
+#include "GameObject.h"
 #include <string>
 
 #include "ResourceManager.h"
+#include "SceneManager.h"
+#include "Scene.h"
 #include "Renderer.h"
 
 #include <stdexcept>
@@ -10,8 +14,6 @@
 #include "Texture2D.h"
 
 #include <iostream>
-
-#include "GameObject.h"
 
 //#include "components/GameComponent.h"
 //#include "components/RenderComponent.h"
@@ -24,7 +26,21 @@ namespace dae
 	{
 
 	}
+
 	GameObject::~GameObject() = default;
+
+	void GameObject::Start()
+	{
+		for (std::unique_ptr<GameComponent>& pComponent : m_components)
+		{
+			pComponent->Start();
+		}
+
+		for (auto& child : m_children)
+		{
+			child->Start();
+		}
+	}
 
 	void GameObject::Update(float deltaTime)
 	{
@@ -32,6 +48,11 @@ namespace dae
 		for (std::unique_ptr<GameComponent>& pComponent : m_components)
 		{
 			pComponent->Update(deltaTime);
+		}
+
+		for (auto& child : m_children)
+		{
+			child->Update(deltaTime);
 		}
 		//if (m_Dirty)
 		//{
@@ -52,17 +73,51 @@ namespace dae
 			if (pRenderComponent != nullptr)
 				pRenderComponent->Render();
 		}
+
+		for (auto& child : m_children)
+		{
+			child->Render();
+		}
 	}
 
-	GameObject* const GameObject::GetParent()
+	Scene* GameObject::GetScene()
 	{
-		return m_pParent;
+		if (auto scene = GetParentAsScene())
+		{
+			return scene;
+		}
+		else if (auto object = GetParentAsObject())
+		{
+			return object->GetScene();
+		}
+		return nullptr;
+	}
+
+	GameObject* const GameObject::GetParentAsObject()
+	{
+		if (std::holds_alternative<GameObject*>(m_pParent))
+		{
+			return std::get<GameObject*>(m_pParent);
+		}
+		return nullptr;
+	}
+
+	Scene* GameObject::GetParentAsScene()
+	{
+		if (std::holds_alternative<Scene*>(m_pParent))
+		{
+			return std::get<Scene*>(m_pParent);
+		}
+		return nullptr;
 	}
 
 	void GameObject::SetParent(GameObject *newParent, bool keepWorldPos)
 	{
+		if (!GetScene()) std::cerr << "object has not been added to a scene yet.\n";
+
 		// if the new parent is already the parent of the object
-		if (newParent == this->m_pParent) return;
+		auto parentAsObject = GetParentAsObject();
+		if ( newParent == parentAsObject) return;
 
 		// if the new parent is a child of the object, works for nullptr
 		if (this->IsChild(newParent)) return;
@@ -76,29 +131,78 @@ namespace dae
 
 
 		//remove from old parent
-		if (m_pParent) m_pParent->RemoveChild(this);
+		if (parentAsObject) parentAsObject->RemoveChild(this);
+		else if(auto sceneParent = GetParentAsScene()) sceneParent->Release(this);
+
 		// set new parent;
-		this->m_pParent = newParent;
-		if (m_pParent) m_pParent->AddChild(this);
+		if (newParent) this->m_pParent = newParent;
+		else this->m_pParent = dae::SceneManager::GetInstance().GetActiveScene();
+
+		if (auto parent = GetParentAsObject()) parent->AddChild(this);
+		else dae::SceneManager::GetInstance().GetActiveScene()->Add(std::unique_ptr<GameObject>(this));
+	}
+
+	void GameObject::SetParent(Scene& newParent, bool keepWorldPos)
+	{
+		// if the new parent is already the parent of the object
+		auto parentAsScene = GetParentAsScene();
+		if (&newParent == parentAsScene) return;
+
+		//rebase transforms
+		if (keepWorldPos)
+		{
+			m_transform.ReconstructLocal(nullptr);
+		}
+		this->MakeDirty();
+
+
+		//remove from old parent
+		if (auto parent = GetParentAsObject()) parent->RemoveChild(this);
+		else if (parentAsScene) parentAsScene->Release(this);
+
+		// set new parent;
+		this->m_pParent = &newParent;
+
+		if (auto parentObject = GetParentAsObject()) parentObject->AddChild(this);
+		else if (auto sceneParent = GetParentAsScene())
+		{
+			if(!sceneParent->HoldsObject(this))
+				sceneParent->Add(std::unique_ptr<GameObject>(this));
+		}
+	}
+
+	void GameObject::Add(std::unique_ptr<GameObject> && object, bool keepWorldPos)
+	{
+		auto child = object.release();
+		if (child) child->SetParent(this, keepWorldPos);
 	}
 
 	void GameObject::AddChild(GameObject* newChild)
 	{
-		m_children.push_back(newChild);
+		m_children.emplace_back(newChild);
 	}
 
 	void GameObject::RemoveChild(GameObject* toRemove)
 	{
-		// checks whole vector. remove " m_children.end()" as an erase argument and it will only remove 1 instance.
-		m_children.erase(std::remove(m_children.begin(), m_children.end(), toRemove), m_children.end());
+		auto it = std::find_if(m_children.begin(),m_children.end(),
+			[toRemove](const std::unique_ptr<GameObject>& ptr)
+			{
+				return ptr.get() == toRemove;
+			}
+		);
+
+		if (it == m_children.end()) return;
+
+		it->release();
+		m_children.erase(it);
 	}
 	
 	bool GameObject::IsChild(GameObject* object)
 	{
 		if (object == nullptr) return false;
-		for (GameObject* child : m_children)
+		for (auto& child : m_children)
 		{
-			if ( object == child ) return true;
+			if ( object == child.get() ) return true;
 			if ( child->IsChild(object) ) return true;
 		}
 		return false;
@@ -126,7 +230,7 @@ namespace dae
 
 	void GameObject::MakeDirty()
 	{
-		for (GameObject* pChild : m_children)
+		for (auto & pChild : m_children)
 		{
 			pChild->MakeDirty();
 		}
@@ -141,16 +245,24 @@ namespace dae
 		m_toDelete = true;
 		if (excludeChildren)
 		{
-			for (GameObject* child : m_children)
+			for (auto & child : m_children)
 			{
-				child->SetParent(m_pParent);
+				child->SetParent(GetParentAsObject());
 			}
 			// set children parent to curent parent
 		}
-		for (GameObject* child : m_children)
+		for (auto & child : m_children)
 		{
 			child->MarkForDelete();
 		}
+	}
+
+	bool GameObject::Cleanup()
+	{
+		std::erase_if(m_children, [](std::unique_ptr<GameObject> const& obj) {
+			return obj->Cleanup();
+			});
+		return m_toDelete;
 	}
 
 	void GameObject::RemoveComponent(size_t index)
