@@ -244,7 +244,7 @@ namespace digger
 	}
 
 
-	void LevelDataContainer::BuildScene(int level, dae::Scene& scene, gameMode mode, dae::InputMethod*, dae::InputMethod* player2)
+	void LevelDataContainer::BuildScene(int level, dae::Scene& scene, gameMode mode, dae::InputMethod* player1, dae::InputMethod* player2)
 	{
 
 		auto go = std::make_unique<dae::GameObject>();
@@ -287,7 +287,7 @@ namespace digger
 						tile->SetTraversed();
 						break;
 					case digger::levelType::digger:
-						//obj = MakeDigger(player1, *gridComp, x, y);
+						obj = MakeDigger(player1, *gridComp, x, y);
 						tile->SetTraversed();
 						break;
 					case digger::levelType::spawner:

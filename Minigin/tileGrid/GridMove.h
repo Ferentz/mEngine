@@ -40,7 +40,7 @@ namespace dae
 		bool v_collisionInfluence{ true };
 
 		glm::ivec2 closestPoint{};
-		glm::ivec2 goalPoint{};
+		//glm::ivec2 goalPoint{};
 		Tilegrid* grid{};
 		float speed{};
 
