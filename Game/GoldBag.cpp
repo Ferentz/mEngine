@@ -7,7 +7,7 @@
 #include <GameObject.h>
 #include <eventSystem/EventHash.h>
 #include <eventSystem/EventStack.h>
-#include <collision/collider.h>
+#include <collision/Collider.h>
 #include <components/RenderComponent.h>
 
 namespace digger
