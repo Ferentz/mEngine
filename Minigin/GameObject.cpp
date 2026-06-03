@@ -93,7 +93,7 @@ namespace dae
 		return nullptr;
 	}
 
-	GameObject* const GameObject::GetParentAsObject()
+	GameObject* GameObject::GetParentAsObject()
 	{
 		if (std::holds_alternative<GameObject*>(m_pParent))
 		{

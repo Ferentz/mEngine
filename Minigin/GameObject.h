@@ -29,7 +29,7 @@ namespace dae
 
 		Scene* GetScene();
 
-		GameObject* const GetParentAsObject();
+		GameObject* GetParentAsObject();
 		Scene* GetParentAsScene();
 
 		void SetParent(GameObject *newParent, bool keepWorldPos = false);
