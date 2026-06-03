@@ -23,7 +23,7 @@ namespace dae
 		SDL_Scancode input1[numInputs]{
 			SDL_SCANCODE_W ,
 			SDL_SCANCODE_S ,
-			SDL_SCANCODE_KP_ENTER};
+			SDL_SCANCODE_SPACE };
 
 		SDL_GamepadButton input2[numInputs]{
 			SDL_GAMEPAD_BUTTON_DPAD_UP ,

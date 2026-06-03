@@ -244,7 +244,7 @@ namespace digger
 	}
 
 
-	void LevelDataContainer::BuildScene(int level, dae::Scene& scene, gameMode mode, dae::InputMethod* player1, dae::InputMethod* player2)
+	void LevelDataContainer::BuildScene(int level, dae::Scene& scene, gameMode mode, dae::InputMethod*, dae::InputMethod* player2)
 	{
 
 		auto go = std::make_unique<dae::GameObject>();
@@ -287,7 +287,7 @@ namespace digger
 						tile->SetTraversed();
 						break;
 					case digger::levelType::digger:
-						obj = MakeDigger(player1, *gridComp, x, y);
+						//obj = MakeDigger(player1, *gridComp, x, y);
 						tile->SetTraversed();
 						break;
 					case digger::levelType::spawner:
@@ -520,6 +520,8 @@ namespace digger
 		auto gem = std::make_unique<dae::GameObject>();
 		auto gemCol = gem->AddNGetComponent<dae::Collider>();
 		gemCol->isTrigger = true;
+		gemCol->size.x = in_grid.GetTileScale() * 0.75f;
+		gemCol->size.y = in_grid.GetTileScale() * 0.75f;
 
 		gem->AddComponent<digger::Gem>(*gemCol);
 
