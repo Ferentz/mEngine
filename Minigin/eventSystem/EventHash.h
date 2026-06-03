@@ -1,4 +1,7 @@
 #pragma once
+
+#include <cstddef>
+
 namespace dae
 {
 	template <int length>

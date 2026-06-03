@@ -16,7 +16,7 @@ namespace digger
 
 		void TuneIn(dae::EventId id, dae::GameObject* subject) override;
 	
-		void Die();
+		void Die() override;
 
 		bool IsAllive() { return isAllive; }
 	private:

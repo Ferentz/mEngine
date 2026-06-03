@@ -1,11 +1,10 @@
 #include "Digger.h"
 
-#include <eventSystem/EventHash.h>
-
 #include <tileGrid/GridMove.h>
 #include <collision/Collider.h>
 #include <tileGrid/Tilegrid.h>
 #include <GameObject.h>
+#include <eventSystem/EventHash.h>
 
 #include "GameTile.h"
 namespace digger
