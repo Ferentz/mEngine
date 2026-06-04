@@ -43,6 +43,7 @@ set(SOURCES
   Minigin/tileGrid/GridMove.cpp
   Minigin/buttons/Button.cpp
   Minigin/buttons/Selector.cpp
+  Minigin/collision/Collider.cpp
   
   Minigin/SteamAchievementListener.cpp
 )
@@ -81,6 +82,8 @@ set(GAME_SOURCES
   Game/Gem.cpp
   Game/Spawner.cpp
   Game/LevelCreator.cpp
+  Game/GameManager.cpp
+  Game/PointsTracker.cpp
 )
 
 

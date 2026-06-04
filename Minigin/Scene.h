@@ -18,9 +18,6 @@ namespace dae
 		void Release(GameObject* object);
 		bool HoldsObject(GameObject* object);
 
-		void Add(Collider& object);
-		void Remove(Collider* object);
-
 		void CleanUp();
 
 		void Start() const;
@@ -29,7 +26,6 @@ namespace dae
 		void Render() const;
 
 		std::vector < std::unique_ptr<GameObject>> const& GetObjects(){ return m_objects; }
-		std::vector <Collider*> const& GetColliders() { return m_colliders; }
 
 		~Scene() = default;
 		Scene(const Scene& other) = delete;
@@ -44,7 +40,6 @@ namespace dae
 		friend class SceneManager;
 		explicit Scene() = default;
 
-		std::vector <Collider*> m_colliders{};
 		std::vector < std::unique_ptr<GameObject>> m_objects{};
 		
 	};

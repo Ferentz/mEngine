@@ -9,6 +9,9 @@
 
 #include <GameTile.h>
 #include <Digger.h>
+#include <GoldBag.h>
+
+#include <iostream>
 
 namespace digger
 {
@@ -57,6 +60,11 @@ namespace digger
 			auto collider = subject->GetComponent<dae::Collider>();
 			for (auto collision : collider->GetCollisions())
 			{
+				if (collision->GetGameObject()->GetComponent<GoldBag>())
+				{
+					std::cout << "hi";
+				}
+
 				if (auto digger = collision->GetGameObject()->GetComponent<Digger>())
 				{
 					digger->Die();

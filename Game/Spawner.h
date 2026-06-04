@@ -20,5 +20,6 @@ namespace digger
 		Spawner(dae::GameObject& object, dae::Tilegrid& grid, int x, int y, int load = -1);
 
 		void Update(float) override;
+		int NumToSpawn() { return numToSpawn; }
 	};
 }

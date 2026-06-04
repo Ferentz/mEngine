@@ -62,16 +62,6 @@ bool dae::Scene::HoldsObject(GameObject* object)
 	return true;
 }
 
-void dae::Scene::Add(Collider& object)
-{
-	m_colliders.emplace_back(&object);
-}
-
-void dae::Scene::Remove(Collider* object)
-{
-	std::erase(m_colliders, object);
-}
-
 void dae::Scene::CleanUp()
 {
 	std::erase_if(m_objects, [](std::unique_ptr<GameObject> const& obj) {

@@ -11,51 +11,20 @@ namespace dae
 
 	class Collider final: public GameComponent
 	{
+		static std::vector<Collider*> s_colliders;
+
 	public:
-		Collider(GameObject& object)
-			:GameComponent(object)
-		{
-		}
+		Collider(GameObject& object);
 
-		~Collider() override
-		{
-			auto scene{ GetGameObject()->GetScene() };
-			if (scene == nullptr) return;
-
-			if (m_scene == scene)
-			{
-				scene->Remove(this);
-			}
-			
-		}
+		~Collider() override;
 		void Start() override
 		{
-			auto scene{ GetGameObject()->GetScene() };
-			if (scene == nullptr) return;
 
-			m_scene = scene;
-			scene->Add(*this);
 		}
 		
 		
-		void Update(float) override
-		{
-			if (!canCollide) return;
-			collisions.clear();
-			auto scene = SceneManager::GetInstance().GetActiveScene();
-			if (scene == nullptr) return;
-			auto const & colliders = scene->GetColliders();
+		void Update(float) override;
 
-			for (auto collider : colliders)
-			{
-				if (this == collider) continue;
-				if (Overlap(*collider))
-				{
-					collisions.push_back(collider);
-				}
-			}
-			if (!collisions.empty()) m_signal.BroadCast(make_sdbm_hash("collide"), GetGameObject());
-		}
 		std::vector<Collider*> const& GetCollisions()
 		{
 			return collisions;
@@ -74,50 +43,11 @@ namespace dae
 	private:
 		
 		std::vector<Collider*> collisions{};
-
-		dae::Scene* m_scene{};
 		
 
-		bool Overlap(Collider& other)
-		{
-			if (!other.canCollide) return false;
-
-			if (other.isTrigger) return false;
-			auto const & mypos = GetGameObject()->m_transform.GetWorldTransform()->GetPosition();
-			auto const& otherPos = other.GetGameObject()->m_transform.GetWorldTransform()->GetPosition();
-			
-			if (
-				isPointInsideAABB(
-					glm::vec2(mypos.x, mypos.y), glm::vec2(otherPos.x, otherPos.y)
-				)
-				) return true;
-
-			if (
-				isPointInsideAABB(
-					glm::vec2(mypos.x, mypos.y), glm::vec2(otherPos.x + other.size.x, otherPos.y)
-				)
-				) return true;
-			if (
-				isPointInsideAABB(
-					glm::vec2(mypos.x, mypos.y), glm::vec2(otherPos.x , otherPos.y + other.size.y)
-				)
-				) return true;
-			if (
-				isPointInsideAABB(
-					glm::vec2(mypos.x, mypos.y), glm::vec2(otherPos.x + other.size.x, otherPos.y + other.size.y)
-				)
-				) return true;
-
-			return false;
-		}
-		bool isPointInsideAABB(glm::vec2 pos2d, glm::vec2 point) {
-			return 
-				point.x >= pos2d.x &&
-				point.x <= pos2d.x+ size.x &&
-				point.y >= pos2d.y &&
-				point.y <= pos2d.y + size.y
-				;
-		}
+		bool Overlap(Collider& other);
+		bool isPointInsideAABB(glm::vec2 pos2d, glm::vec2 point);
 
 	};
+
 }

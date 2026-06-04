@@ -304,7 +304,7 @@ namespace digger
 						obj = MakeBag(*gridComp, x, y);
 						break;
 					case digger::levelType::gem:
-						obj = MakeGem(*gridComp, x, y);
+						//obj = MakeGem(*gridComp, x, y);
 						break;
 
 
