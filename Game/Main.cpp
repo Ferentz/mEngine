@@ -43,7 +43,7 @@
 
 namespace fs = std::filesystem;
 
-
+#include <windows.h>
 
 
 static void load()
@@ -119,7 +119,12 @@ static void load()
 
 }
 
+FILE* stream;
+
 int main(int, char*[]) {
+
+	AllocConsole();
+	freopen_s(&stream, "CONOUT$", "w", stdout);
 #if __EMSCRIPTEN__
 	fs::path data_location = "";
 #else
@@ -129,5 +134,8 @@ int main(int, char*[]) {
 #endif
 	dae::Minigin engine(data_location);
 	engine.Run(load);
+
+	FreeConsole();
+
     return 0;
 }

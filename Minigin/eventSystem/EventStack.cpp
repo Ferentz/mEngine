@@ -27,7 +27,7 @@ namespace dae
 
 	void EventStack::PushEvent(Event event)
 	{
-		m_stack[m_fillIndex] = event; // copy int and adress
+		
 		size_t tempFIllIDX = m_fillIndex;
 		tempFIllIDX++;
 		if (tempFIllIDX >= m_stack.size())
@@ -36,6 +36,8 @@ namespace dae
 		}
 
 		if (tempFIllIDX == m_broadcastIndex) return; // no overfilling
+
+		m_stack[m_fillIndex] = event; // copy int and adress
 
 		m_fillIndex = tempFIllIDX;
 
@@ -92,11 +94,11 @@ namespace dae
 	}
 	void EventStack::BroadCastEvents()
 	{
-		size_t idx{ m_broadcastIndex };
+		//size_t idx{ m_broadcastIndex };
 		size_t nbrTraversedElements{}; // infinity loop prevemtion
-		while ((idx != m_fillIndex) && (nbrTraversedElements <= m_stack.size()))
+		while ((m_broadcastIndex != m_fillIndex) && (nbrTraversedElements <= m_stack.size()))
 		{
-			Event& event = m_stack[idx];
+			Event& event = m_stack[m_broadcastIndex];
 			for (Listener* listener : m_persistentListeners)
 			{
 				listener->TuneIn(event.id, event.subject);
@@ -111,8 +113,13 @@ namespace dae
 			event.id = 0;
 			event.subject = nullptr;
 
-			++idx;
+			++m_broadcastIndex;
 			++nbrTraversedElements;
+
+			if (m_broadcastIndex >= m_stack.size())
+			{
+				m_broadcastIndex = 0;
+			}
 		}
 	}
 }

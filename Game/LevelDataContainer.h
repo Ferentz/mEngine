@@ -20,12 +20,7 @@ namespace dae
 
 namespace digger
 {
-	enum class gameMode
-	{
-		normal,
-		coop,
-		vs
-	};
+	enum class gameMode;
 
 	enum class levelType
 	{
@@ -55,23 +50,28 @@ namespace digger
 	class LevelDataContainer final: public  dae::Singleton<LevelDataContainer>
 	{
 		std::vector<LevelData> levels;
+		std::vector<HighScore> highscores{};
 
 		friend class Singleton<LevelDataContainer>;
 		LevelDataContainer() = default;
 	public:
+
+		std::vector<HighScore> & GetHighScores() { return highscores;  }
 		void LoadData(std::string file);
 
 		void BuildStartScreen(dae::Scene& scene);
 
+		void BuildEndScreen(dae::GameObject& scene);
+
 		std::vector<HighScore> loadHighScores(std::string filename);
 
-		bool SaveHighScores(std::string& filename, std::vector<HighScore> const& scores);
+		bool SaveHighScores(std::string filename, std::vector<HighScore> const& scores);
 
 		
 		std::vector<LevelData> const& GetLeveles() { return levels; }
 		
 		
-		void BuildScene(int level, dae::Scene& scene, gameMode mode, dae::InputMethod* player1, dae::InputMethod* player2);
+		void BuildLevel(int level, dae::GameObject& scene, gameMode mode, dae::InputMethod* player1, dae::InputMethod* player2);
 
 		static std::unique_ptr<dae::GameObject> MakeDigger(dae::InputMethod* input, dae::Tilegrid& in_grid, int x, int y);
 
@@ -86,6 +86,8 @@ namespace digger
 		static std::unique_ptr<dae::GameObject> MakeBag(dae::Tilegrid& in_grid, int x, int y);
 
 		static std::unique_ptr<dae::GameObject> MakeSpawner(dae::Tilegrid& in_grid, int x, int y, int amount = -1);
+
+		std::unique_ptr<dae::GameObject> MakeGameEssentials(dae::GameObject* root);
 	};
 
 	

@@ -4,6 +4,8 @@
 #include <components/RenderComponent.h>
 #include <tileGrid/GridMove.h>
 #include <collision/Collider.h>
+#include <eventSystem/EventHash.h>
+#include <eventSystem/EventStack.h>
 
 
 
@@ -60,10 +62,10 @@ namespace digger
 			auto collider = subject->GetComponent<dae::Collider>();
 			for (auto collision : collider->GetCollisions())
 			{
-				if (collision->GetGameObject()->GetComponent<GoldBag>())
+				/*if (collision->GetGameObject()->GetComponent<GoldBag>())
 				{
 					std::cout << "hi";
-				}
+				}*/
 
 				if (auto digger = collision->GetGameObject()->GetComponent<Digger>())
 				{
@@ -79,6 +81,7 @@ namespace digger
 	{
 		if (removeOnDie) GetGameObject()->MarkForDelete();
 
+		dae::EventStack::GetEventStack().PushEvent(dae::Event{ dae::make_sdbm_hash("death enemy"),GetGameObject() });
 		auto collider = GetGameObject()->GetComponent<dae::Collider>();
 		collider->canCollide = false;
 		isAllive = false;

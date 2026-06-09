@@ -5,6 +5,8 @@
 #include <eventSystem/EventStack.h>
 #include <eventSystem/EventHash.h>
 
+#include <iostream>
+
 
 namespace digger
 {
@@ -28,6 +30,7 @@ namespace digger
 	{
 		if (!isTraversed)
 		{
+			std::cout << "tile dug--------\n";
 			dae::EventStack::GetEventStack().PushEvent(dae::Event{ dae::make_sdbm_hash("ground dug"), this->GetGameObject() });
 			isTraversed = true;
 			m_textureComp->SetTexture(m_traversedTextureName);

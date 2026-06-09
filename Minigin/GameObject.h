@@ -35,6 +35,7 @@ namespace dae
 
 		GameObject* GetParentAsObject();
 		Scene* GetParentAsScene();
+		std::vector<std::unique_ptr<GameObject>> const& GetChildren() { return m_children; }
 
 		void SetParent(GameObject *newParent, bool keepWorldPos = false);
 		void SetParent(Scene& newParent, bool keepWorldPos = false);
@@ -118,6 +119,31 @@ namespace dae
 				if (T* component = child->GetComponent_ChildrenInclusive<T>()) return component;
 			}
 			return nullptr;
+		}
+
+		template<class T>
+			requires std::is_base_of_v<GameComponent, T>
+		int CountComponents_childrenInclusive()
+		{
+			int result{};
+
+			for (auto& component : m_components)
+			{
+				if (auto ptr = dynamic_cast<T*>(component.get()))
+				{
+					result++;
+				}
+			}
+
+			for (auto& child : m_children)
+			{
+				if (int components = child->CountComponents_childrenInclusive<T>())
+				{
+					result += components;
+				}
+			}
+
+			return result;
 		}
 
 		template<class T>

@@ -1,12 +1,20 @@
 #include "PointsTracker.h"
 
 #include <eventSystem/EventHash.h>
+#include <eventSystem/EventStack.h>
 
 namespace digger
 {
-	PointsTracker::PointsTracker(dae::GameObject& parent)
-		:GameComponent{parent}
+	PointsTracker::PointsTracker(dae::GameObject& parent, dae::TextComponent& textcomp)
+		:GameComponent{parent},
+		text{ &textcomp }
 	{
+		text->SetText("00000");
+		dae::EventStack::GetEventStack().Register(*this);
+	}
+	PointsTracker::~PointsTracker()
+	{
+		dae::EventStack::GetEventStack().Unregister(this);
 	}
 	void PointsTracker::TuneIn(dae::EventId message, dae::GameObject* )
 	{
@@ -34,6 +42,12 @@ namespace digger
 			numTreshHolds++;
 			signal.BroadCast(dae::make_sdbm_hash("treshhold collected"), GetGameObject());
 		}
+		auto pointsText{ std::to_string(points) };
+		while (pointsText.length() < 5)
+		{
+			pointsText.insert(0, "0");
+		}
+		text->SetText(pointsText);
 	}
 	int PointsTracker::GetPoints() const
 	{

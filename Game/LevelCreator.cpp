@@ -37,6 +37,9 @@
 #include "GoldBag.h"
 #include "Gem.h"
 #include "Spawner.h"
+#include "PointsTracker.h"
+#include "HighScoreHandler.h"
+#include "GameManager.h"
 
 #include <iostream>
 
@@ -50,8 +53,14 @@ namespace digger
 		auto & player1 = inputs[0];
 		auto& player2 = inputs.size() > 1 ? inputs[1] : inputs[0];
 		dae::SceneManager::GetInstance().SetActiveScene(1);
-		LevelDataContainer::GetInstance().BuildScene(0, scene, gameMode::normal, player1.get(), player2.get());
-		
+
+		auto go = std::make_unique<dae::GameObject>();
+		auto rootptr{ go.get() };
+		scene.Add(std::move(go));
+		LevelDataContainer::GetInstance().BuildLevel(0, *rootptr, gameMode::normal, player1.get(), player2.get());
+	
+		scene.Add(LevelDataContainer::GetInstance().MakeGameEssentials(rootptr));
+
 	}
 
 	void LevelDataContainer::LoadData(std::string file)
@@ -101,12 +110,12 @@ namespace digger
 
 		auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
 
-		auto higScores{ loadHighScores("highScores.csv")};
+		highscores = loadHighScores("highScores.csv");
 
 		float xBaseOffset{ 120.f };
 		float xOffset{ 200.f };
 		float yOffset{ 170.f };
-		for (auto& score : higScores)
+		for (auto& score : highscores)
 		{
 			go = std::make_unique<dae::GameObject>();
 			//go2->SetParent(*go.get());
@@ -176,81 +185,20 @@ namespace digger
 		
 	}
 
-	std::vector<HighScore> LevelDataContainer::loadHighScores(std::string filename)
+	void LevelDataContainer::BuildEndScreen(dae::GameObject& scene)
 	{
-		std::vector<HighScore> scores;
+		auto go = std::make_unique<dae::GameObject>();
+		go->AddNGetComponent<dae::TextureComponent>()->SetTexture("digger_newScore_bg.png");
+		scene.Add(std::move(go));
+		
+		go = std::make_unique<dae::GameObject>();
+		go->AddNGetComponent<digger::HighScoreHandler>();
+		scene.Add(std::move(go));
+		// we want him to be able to typ ein numbers. so he needs something that detects input
 
-		std::ifstream file(dae::ResourceManager::GetInstance().GetFullDataPath(filename));
-
-		if (!file.is_open())
-		{
-			return scores;
-		}
-
-		std::string line;
-
-		while (std::getline(file, line))
-		{
-			if (line.empty())
-			{
-				continue;
-			}
-
-			std::stringstream stream(line);
-
-			std::string name;
-			std::string scoreString;
-
-			if (!std::getline(stream, name, ','))
-			{
-				continue;
-			}
-
-			if (!std::getline(stream, scoreString))
-			{
-				continue;
-			}
-
-			try
-			{
-				HighScore score;
-				score.name = std::move(name);
-				score.score = std::stoi(scoreString);
-
-				scores.push_back(std::move(score));
-			}
-			catch (...)
-			{
-				// Skip malformed entries
-				continue;
-			}
-		}
-
-		return scores;
 	}
 
-	bool LevelDataContainer::SaveHighScores( std::string & filename, std::vector<HighScore> const &scores)
-	{
-		std::ofstream file(dae::ResourceManager::GetInstance().GetFullDataPath(filename));
-
-		if (!file.is_open())
-		{
-			return false;
-		}
-
-		for (const auto& score : scores)
-		{
-			file << score.name
-				<< ','
-				<< score.score
-				<< '\n';
-		}
-
-		return true;
-	}
-
-
-	void LevelDataContainer::BuildScene(int level, dae::Scene& scene, gameMode mode, dae::InputMethod* player1, dae::InputMethod* player2)
+	void LevelDataContainer::BuildLevel(int level, dae::GameObject& scene, gameMode mode, dae::InputMethod* player1, dae::InputMethod* player2)
 	{
 
 		auto go = std::make_unique<dae::GameObject>();
@@ -304,7 +252,7 @@ namespace digger
 						obj = MakeBag(*gridComp, x, y);
 						break;
 					case digger::levelType::gem:
-						//obj = MakeGem(*gridComp, x, y);
+						obj = MakeGem(*gridComp, x, y);
 						break;
 
 
@@ -336,6 +284,98 @@ namespace digger
 
 		scene.Add(std::move(grid));
 	}
+
+
+
+	std::vector<HighScore> LevelDataContainer::loadHighScores(std::string filename)
+	{
+		std::vector<HighScore> scores;
+
+		std::ifstream file(dae::ResourceManager::GetInstance().GetFullDataPath(filename));
+
+		if (!file.is_open())
+		{
+			return scores;
+		}
+
+		std::string line;
+
+		while (std::getline(file, line))
+		{
+			if (line.empty())
+			{
+				continue;
+			}
+
+			std::stringstream stream(line);
+
+			std::string name;
+			std::string scoreString;
+
+			if (!std::getline(stream, name, ','))
+			{
+				continue;
+			}
+
+			if (!std::getline(stream, scoreString))
+			{
+				continue;
+			}
+
+			try
+			{
+				HighScore score;
+				score.name = std::move(name);
+				score.score = std::stoi(scoreString);
+
+				scores.push_back(std::move(score));
+			}
+			catch (...)
+			{
+				// Skip malformed entries
+				continue;
+			}
+		}
+
+		return scores;
+	}
+
+	bool LevelDataContainer::SaveHighScores( std::string filename, std::vector<HighScore> const &scores)
+	{
+		std::ofstream file(dae::ResourceManager::GetInstance().GetFullDataPath(filename));
+
+		if (!file.is_open())
+		{
+			return false;
+		}
+
+		for (const auto& score : scores)
+		{
+			file << score.name
+				<< ','
+				<< score.score
+				<< '\n';
+		}
+
+		return true;
+	}
+
+	
+
+	std::unique_ptr<dae::GameObject> LevelDataContainer::MakeGameEssentials(dae::GameObject* root)
+	{
+		auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
+		auto points = std::make_unique<dae::GameObject>();
+
+		auto render = points->AddNGetComponent<dae::TextComponent>("points", font, SDL_Color{ 255,255,0,255 });
+		auto p = points->AddNGetComponent<digger::PointsTracker>(*render);
+		points->m_transform.SetLocalPosition(0, 10);
+		points->AddNGetComponent<GameManager>(*p, *root, gameMode::normal);
+
+		return std::move(points);
+	}
+
+
 
 	std::unique_ptr<dae::GameObject> LevelDataContainer::MakeDigger(dae::InputMethod* input, dae::Tilegrid& in_grid, int x, int y)
 	{
@@ -570,4 +610,6 @@ namespace digger
 
 		return std::move(spawn);
 	}
+
+	
 }

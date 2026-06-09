@@ -5,6 +5,7 @@
 #include <tileGrid/Tilegrid.h>
 #include <GameObject.h>
 #include <eventSystem/EventHash.h>
+#include <eventSystem/EventStack.h>
 
 #include "GameTile.h"
 namespace digger
@@ -45,12 +46,14 @@ namespace digger
 		isAllive = false;
 		if (auto texture = GetGameObject()->GetComponent<dae::TextureComponent>())
 		{
+			
 			texture->SetTexture("digger_dead.png");
 		}
 		if (auto collider = GetGameObject()->GetComponent<dae::Collider>())
 		{
 			collider->canCollide = false;
 		}
+		dae::EventStack::GetEventStack().PushEvent(dae::Event{ dae::make_sdbm_hash("died player"), nullptr });
 		gridMove->canMove = false;
 	}
 }

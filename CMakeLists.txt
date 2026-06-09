@@ -84,6 +84,7 @@ set(GAME_SOURCES
   Game/LevelCreator.cpp
   Game/GameManager.cpp
   Game/PointsTracker.cpp
+  Game/HighScoreHandler.cpp
 )
 
 

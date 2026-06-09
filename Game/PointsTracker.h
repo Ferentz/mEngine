@@ -1,4 +1,5 @@
 #include <components/GameComponent.h>
+#include <components/RenderComponent.h>
 #include <eventSystem/Listener.h>
 #include <eventSystem/BroadCaster.h>
 
@@ -14,8 +15,11 @@ namespace digger
 
 		dae::BroadCaster signal;
 
+		dae::TextComponent* text;
+
 	public:
-		PointsTracker(dae::GameObject& parent);
+		PointsTracker(dae::GameObject& parent, dae::TextComponent& textcomp);
+		~PointsTracker() override;
 		void TuneIn(dae::EventId message, dae::GameObject* subject) override;
 
 		int GetPoints() const;

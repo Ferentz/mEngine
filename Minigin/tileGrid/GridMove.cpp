@@ -1,6 +1,8 @@
 #include <tileGrid/GridMove.h>
 #include "Minigin.h"
 
+#include <iostream>
+
 namespace dae
 {
 	GridMove::GridMove(GameObject& parent, Tilegrid& in_grid, Collider& collider, glm::ivec2 startPoint, float speed)
@@ -40,8 +42,6 @@ namespace dae
 		{
 			// -> move to closest point
 			moveVec = DirectionToClosest();
-
-
 		}
 		auto closestPos = grid->GetGridLocationOfPoint(closestPoint);
 		glm::vec2 vecToOher{ closestPos - GetGameObject()->GetLocalTransform()->GetPosition() };
@@ -49,6 +49,8 @@ namespace dae
 		float dot = glm::dot(vecToOher, glm::vec2(moveVec));
 
 		auto newPoint = dot > 0 ? closestPoint : closestPoint + moveVec;
+
+		/*std::cout << newPoint.x << "," << newPoint.y << "\n";*/
 
 		if (!grid->IsPointValid(newPoint)) return false;
 

@@ -1,6 +1,6 @@
 #include "GoldBag.h"
 #include "GameTile.h"
-//#include "Digger.h"
+#include "Digger.h"
 #include "Entity.h"
 #include <tileGrid/GridMove.h>
 
@@ -9,6 +9,8 @@
 #include <eventSystem/EventStack.h>
 #include <collision/Collider.h>
 #include <components/RenderComponent.h>
+
+#include <iostream>
 
 namespace digger
 {
@@ -44,6 +46,8 @@ namespace digger
 
 		if (id == dae::make_sdbm_hash("ground dug"))
 		{
+			std::cout << "heard dig\n";
+			std::cout << " at tile " << m_pState->m_gridMove->GetClosestPoint().x << "," << m_pState->m_gridMove->GetClosestPoint().y << "\n";
 			if (auto newState = m_pState->OnDug();
 				newState.get() != nullptr)
 			{
@@ -56,7 +60,16 @@ namespace digger
 			auto collider = subject->GetComponent<dae::Collider>();
 			if (isTreasure)
 			{
-				dae::EventStack::GetEventStack().PushEvent(dae::Event(dae::make_sdbm_hash("gold_collected"), collider->GetCollisions()[0]->GetGameObject()));
+				auto& collisions = collider->GetCollisions();
+				for (auto collision : collisions)
+				{
+					if (collision->GetGameObject()->GetComponent<Digger>())
+					{
+						dae::EventStack::GetEventStack().PushEvent(dae::Event(dae::make_sdbm_hash("collect gold"), collision->GetGameObject()));
+						break;
+					}
+				}
+				//dae::EventStack::GetEventStack().PushEvent(dae::Event(dae::make_sdbm_hash("collect gold"), collider->GetCollisions()[0]->GetGameObject()));
 				GetGameObject()->MarkForDelete();
 				// if player collect coins
 			}
@@ -174,6 +187,8 @@ namespace digger
 	GoldBag::GoingToFallState::GoingToFallState(GoldBag& bag, dae::GridMove* gridmove)
 		:BagState(bag, gridmove)
 	{
+		std::cout << "\n going to fall \n";
+		std::cout << " at tile " << m_gridMove->GetClosestPoint().x << "," << m_gridMove->GetClosestPoint().y << "\n";
 	}
 
 	std::unique_ptr<GoldBag::BagState> GoldBag::GoingToFallState::Update(float delta)
