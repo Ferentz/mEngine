@@ -10,6 +10,7 @@ namespace dae
 	{
 	public:
 		ServiceComponent(GameObject& parent);
+		~ServiceComponent();
 		servicelocator soundService{};
 		virtual void TuneIn(EventId event, GameObject* subject) override;
 	};

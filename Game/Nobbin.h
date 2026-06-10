@@ -16,22 +16,25 @@ namespace dae
 
 namespace digger
 {
+	class Spawner;
+
 	class Nobbin : public Entity , public dae::Listener
 	{
 	public:
-		Nobbin(dae::GameObject& parent, dae::GridMove& movement, dae::Collider& collider, dae::TextureComponent& texture);
+		Nobbin(dae::GameObject& parent, dae::GridMove& movement, dae::Collider& collider, glm::ivec2 base, Spawner * origin, dae::TextureComponent& texture);
 
 		void Update(float) override;
 
 		void TuneIn(dae::EventId id, dae::GameObject* subject) override;
 
 		void Die() override;
+		void Respawn() override;
 
 		bool CanDig() { return canDig; }
 
 		bool IsAllive() { return isAllive; }
 
-		bool removeOnDie{ true };
+		//bool removeOnDie{ true };
 
 		dae::BroadCaster signal{};
 	private:
@@ -41,6 +44,7 @@ namespace digger
 		float const digTime{ 3.f };
 		float noDigTime{10.f};
 		dae::GridMove* gridMove;
+		Spawner* home;
 		dae::TextureComponent* texture;
 	};
 }

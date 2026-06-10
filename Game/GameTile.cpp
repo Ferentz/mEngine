@@ -19,6 +19,8 @@ namespace digger
 		m_textureComp = GetGameObject()->AddNGetComponent<dae::TextureComponent>();
 		m_textureComp->SetTexture(isTraversed ? m_traversedTextureName : m_textureName);
 		m_textureComp->renderScale = 1.5f;
+
+		GetGameObject()->objectName = "tile";
 	}
 
 	float GameTile::GetTileSize() const
@@ -30,7 +32,7 @@ namespace digger
 	{
 		if (!isTraversed)
 		{
-			std::cout << "tile dug--------\n";
+			//std::cout << "tile dug--------\n";
 			dae::EventStack::GetEventStack().PushEvent(dae::Event{ dae::make_sdbm_hash("ground dug"), this->GetGameObject() });
 			isTraversed = true;
 			m_textureComp->SetTexture(m_traversedTextureName);

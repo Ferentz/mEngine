@@ -118,6 +118,7 @@ namespace dae
 	}
 	bool KeyBoardInput::IsButtonPressedThisFrame(unsigned int button) const
 	{
+		if (button > m_currentState.size()) return false;
 		bool buttonChange = m_currentState[button] ^ m_previousState[button];
 
 		return buttonChange && m_currentState[button];
@@ -125,6 +126,7 @@ namespace dae
 
 	bool KeyBoardInput::IsButtonReleasedThisFrame(unsigned int button)const
 	{
+		if (button > m_currentState.size()) return false;
 		bool buttonChange = m_currentState[button] ^ m_previousState[button];
 
 		return buttonChange && !m_currentState[button];
@@ -132,6 +134,7 @@ namespace dae
 
 	bool KeyBoardInput::IsButtonDown(unsigned int button)const
 	{
+		if (button > m_currentState.size()) return false;
 		return m_currentState[button];
 	}
 

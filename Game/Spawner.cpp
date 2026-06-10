@@ -10,7 +10,11 @@ namespace digger
 		, spawnPos{x,y}
 		, grid{&tilegrid }
 		, numToSpawn{load}
+		, maxToSpawn{ load }
 	{
+		GetGameObject()->objectName = "spawner";
+
+		//GetGameObject()->ResreveCHildren(numToSpawn);
 
 	}
 	void Spawner::Update(float delta)
@@ -22,12 +26,19 @@ namespace digger
 		{
 			timer = 0;
 			if (numToSpawn > 0) numToSpawn--;
-			auto nob = LevelDataContainer::MakeNobbin_ai(*grid, spawnPos.x, spawnPos.y);
+			auto nob = LevelDataContainer::MakeNobbin_ai(*grid, this, spawnPos.x, spawnPos.y);
 
 			// could do a set parent and making this nob release. but this is safe even if working in the non-active scene.
-			if(auto parent = GetGameObject()->GetParentAsObject()) parent->Add(std::move(nob));
-			else GetGameObject()->GetParentAsScene()->Add(std::move(nob));
+			GetGameObject()->Add(std::move(nob));
 			// spawn nobbin
+		}
+	}
+	void Spawner::ReturnNobin()
+	{
+		numToSpawn++;
+		if (numToSpawn > maxToSpawn)
+		{
+			numToSpawn = maxToSpawn;
 		}
 	}
 }

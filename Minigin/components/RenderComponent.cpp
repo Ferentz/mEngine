@@ -27,7 +27,7 @@ namespace dae
 	
 	void TextureComponent::Render()
 	{
-		if (m_texture != nullptr)
+		if (isVisible && m_texture != nullptr)
 		{
 			const auto& pos = GetGameObject()->GetWorldTransform()->GetPosition() + m_offset.GetPosition();
 			auto size = GetRenderSize();

@@ -19,7 +19,7 @@ namespace dae
 		glm::ivec2 const& GetClosestPoint() const { return closestPoint; }
 
 
-		virtual bool Move(bool horizontal, int direction, bool influenced = false, float useSpeed = -1);
+		virtual bool Move(bool horizontal, int direction, bool careAboutTile = true, bool influenced = false, float useSpeed = -1);
 
 		
 		glm::ivec2 DirectionToClosest();

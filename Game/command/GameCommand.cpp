@@ -31,7 +31,7 @@ void digger::DiggerMoveCommnad::Execute()
 
 	auto gridMove = GetSubject();
 
-	if (gridMove->Move(horizontal, direction))
+	if (gridMove->Move(horizontal, direction, false))
 	{
 		auto tile = gridMove->GetGrid()->GetTile(gridMove->GetClosestPoint())->GetComponent<GameTile>();
 		if (tile)

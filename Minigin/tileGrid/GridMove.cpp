@@ -19,7 +19,7 @@ namespace dae
 		GetGameObject()->m_transform.SetLocalPosition(pos.x, pos.y);
 	}
 
-	bool GridMove::Move(bool horizontal, int direction, bool influenced, float useSpeed)
+	bool GridMove::Move(bool horizontal, int direction, bool careAboutTile, bool influenced, float useSpeed)
 	{
 		if (!canMove) return false;
 
@@ -27,6 +27,7 @@ namespace dae
 
 		glm::ivec2 moveVec;
 
+		CheckPosition();
 
 		if (horizontal && m_horizontal)
 		{
@@ -53,6 +54,7 @@ namespace dae
 		/*std::cout << newPoint.x << "," << newPoint.y << "\n";*/
 
 		if (!grid->IsPointValid(newPoint)) return false;
+		if (careAboutTile && !grid->GetTile(newPoint)->GetComponent<Tile>()->CanMoveToTile())return false;
 
 		float deltaSpeed = useSpeed * dae::Minigin::GetDeltaTime();
 		if (collider != nullptr && !CheckCollisions(moveVec, horizontal, direction,useSpeed, influenced))
@@ -124,7 +126,7 @@ namespace dae
 			{
 				if (auto otherMove = other->GetGameObject()->GetComponent<GridMove>())
 				{
-					if (!otherMove->Move(horizontal, direction, true, useSpeed))
+					if (!otherMove->Move(horizontal, direction, true, true, useSpeed))
 					{
 						return false; // if the other thing can't move, neither can we
 					}

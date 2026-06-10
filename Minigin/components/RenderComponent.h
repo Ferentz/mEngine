@@ -25,6 +25,8 @@ namespace dae
 
 		Transform m_offset{};
 
+		bool isVisible;
+
 	private:
 		
 

@@ -12,22 +12,29 @@
 #include <GameTile.h>
 #include <Digger.h>
 #include <GoldBag.h>
+#include "Spawner.h"
 
 #include <iostream>
 
 namespace digger
 {
-	Nobbin::Nobbin(dae::GameObject& parent, dae::GridMove& movement, dae::Collider& collider, dae::TextureComponent& tex)
-		:Entity(parent)
+	Nobbin::Nobbin(dae::GameObject& parent, dae::GridMove& movement, dae::Collider& collider, glm::ivec2 base, Spawner* origin, dae::TextureComponent& tex)
+		:Entity(parent, base)
 		, gridMove{ &movement }
+		, home{origin}
 		, texture{ &tex }
 	{
+		//if (!home) removeOnDie = false;
+
 		auto tile = movement.GetGrid()->GetTile(movement.GetClosestPoint())->GetComponent<GameTile>();
 		tile->SetTraversed();
 		//movement.m_signal.Register(*this);
 		collider.m_signal.Register(*this);
 		texture->SetTexture("nobbin.png");
+
+		GetGameObject()->objectName = "nobbin";
 	}
+
 
 	void Nobbin::Update(float delta)
 	{
@@ -79,11 +86,29 @@ namespace digger
 
 	void Nobbin::Die()
 	{
-		if (removeOnDie) GetGameObject()->MarkForDelete();
-
+		gridMove->canMove = false;
 		dae::EventStack::GetEventStack().PushEvent(dae::Event{ dae::make_sdbm_hash("death enemy"),GetGameObject() });
 		auto collider = GetGameObject()->GetComponent<dae::Collider>();
 		collider->canCollide = false;
 		isAllive = false;
+		if (home)
+		{
+			GetGameObject()->MarkForDelete();
+		}
+	}
+	void Nobbin::Respawn()
+	{
+		if (home)
+		{
+			home->ReturnNobin();
+			GetGameObject()->MarkForDelete();
+			return;
+		}
+		else
+		{
+			auto newPos{ gridMove->GetGrid()->GetGridLocationOfPoint(basePos) };
+			GetGameObject()->m_transform.SetLocalPosition(newPos.x, newPos.y);
+			gridMove->canMove = true;
+		}
 	}
 }

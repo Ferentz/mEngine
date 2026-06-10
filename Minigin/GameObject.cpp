@@ -12,7 +12,7 @@
 #include "Renderer.h"
 
 
-
+#include <iostream>
 
 //#include "components/GameComponent.h"
 //#include "components/RenderComponent.h"
@@ -43,15 +43,23 @@ namespace dae
 
 	void GameObject::Update(float deltaTime)
 	{
-		
+		//std::cout << objectName << " update\n";
 		for (std::unique_ptr<GameComponent>& pComponent : m_components)
 		{
 			pComponent->Update(deltaTime);
 		}
 
+		//int i{};
 		for (auto& child : m_children)
+		//for (size_t idx{} ; idx < m_children.size() ; idx ++) // this is slower than the ranegd, as it needs to do more checks. but as it stands i'm not making a system where new children get added in the next update if they tip the capacity over.
 		{
+			/*if (i == 206)
+			{
+				std::cout << i << " child idx is " << m_children[idx]->objectName << "\n children size is " << m_children.size() << ", capacity is " << m_children.capacity() << "\n";
+			}*/
+			
 			child->Update(deltaTime);
+			//i++;
 		}
 		//if (m_Dirty)
 		//{

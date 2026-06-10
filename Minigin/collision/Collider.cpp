@@ -1,11 +1,13 @@
 #include "Collider.h"
+#include "Renderer.h"
 
+#include <SDL3/SDL.h>
 namespace dae
 {
 	std::vector<Collider*> Collider::s_colliders{};
 
 	Collider::Collider(GameObject& object)
-		:GameComponent(object)
+		:RenderComponent(object)
 	{
 		s_colliders.push_back(this);
 	}
@@ -34,35 +36,21 @@ namespace dae
 
 	bool Collider::Overlap(Collider& other)
 	{
-		if (!other.canCollide) return false;
+		if (!other.canCollide)
+			return false;
 
-		if (other.isTrigger) return false;
-		auto const& mypos = GetGameObject()->m_transform.GetWorldTransform()->GetPosition();
-		auto const& otherPos = other.GetGameObject()->m_transform.GetWorldTransform()->GetPosition();
+		if (other.isTrigger)
+			return false;
 
-		if (
-			isPointInsideAABB(
-				glm::vec2(mypos.x, mypos.y), glm::vec2(otherPos.x, otherPos.y)
-			)
-			) return true;
+		const auto& myPos =GetGameObject()->m_transform.GetWorldTransform()->GetPosition();
 
-		if (
-			isPointInsideAABB(
-				glm::vec2(mypos.x, mypos.y), glm::vec2(otherPos.x + other.size.x, otherPos.y)
-			)
-			) return true;
-		if (
-			isPointInsideAABB(
-				glm::vec2(mypos.x, mypos.y), glm::vec2(otherPos.x, otherPos.y + other.size.y)
-			)
-			) return true;
-		if (
-			isPointInsideAABB(
-				glm::vec2(mypos.x, mypos.y), glm::vec2(otherPos.x + other.size.x, otherPos.y + other.size.y)
-			)
-			) return true;
+		const auto& otherPos =other.GetGameObject()->m_transform.GetWorldTransform()->GetPosition();
 
-		return false;
+		return
+			myPos.x < otherPos.x + other.size.x &&
+			myPos.x + size.x > otherPos.x &&
+			myPos.y < otherPos.y + other.size.y &&
+			myPos.y + size.y > otherPos.y;
 	}
 	bool Collider::isPointInsideAABB(glm::vec2 pos2d, glm::vec2 point) {
 		return
@@ -71,6 +59,49 @@ namespace dae
 			point.y >= pos2d.y &&
 			point.y <= pos2d.y + size.y
 			;
+	}
+
+	void dae::Collider::Render()
+	{
+
+		SDL_Renderer* renderer = Renderer::GetInstance().GetSDLRenderer();
+
+		if (!renderer)
+			return;
+
+		const auto& pos = GetGameObject()->m_transform.GetWorldTransform()->GetPosition();
+
+		SDL_FRect rect
+		{
+			pos.x,
+			pos.y,
+			size.x,
+			size.y
+		};
+
+		// Choose color
+		if (isTrigger)
+		{
+			SDL_SetRenderDrawColor(
+				renderer,
+				0, 255, 255, 255); // cyan
+		}
+		else if (!collisions.empty())
+		{
+			SDL_SetRenderDrawColor(
+				renderer,
+				255, 0, 0, 255); // red = colliding
+		}
+		else
+		{
+			SDL_SetRenderDrawColor(
+				renderer,
+				0, 255, 0, 255); // green = normal
+		}
+
+
+
+		SDL_RenderRect(renderer, &rect);
 	}
 
 }

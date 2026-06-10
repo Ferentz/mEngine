@@ -11,6 +11,7 @@ namespace digger
 		, collider{ &col }
 	{
 		collider->m_signal.Register(*this);
+		GetGameObject()->objectName = "tile";
 	}
 
 	void digger::Gem::TuneIn(dae::EventId , dae::GameObject* )

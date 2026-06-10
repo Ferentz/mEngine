@@ -31,10 +31,10 @@ void digger::NobbinMoveCommnad::Execute()
 	}
 	
 	auto gridMove = GetSubject();
-
-	if (gridMove->Move(horizontal, direction))
+	bool canDig{ nobbin->CanDig() };
+	if (gridMove->Move(horizontal, direction, !canDig))
 	{
-		if (nobbin->CanDig())
+		if (canDig)
 		{
 			auto tile = gridMove->GetGrid()->GetTile(gridMove->GetClosestPoint())->GetComponent<GameTile>();
 			if (tile)

@@ -21,6 +21,7 @@ namespace dae
 namespace digger
 {
 	enum class gameMode;
+	class Spawner;
 
 	enum class levelType
 	{
@@ -75,9 +76,9 @@ namespace digger
 
 		static std::unique_ptr<dae::GameObject> MakeDigger(dae::InputMethod* input, dae::Tilegrid& in_grid, int x, int y);
 
-		static std::unique_ptr<dae::GameObject> MakeNobbin(dae::Tilegrid& in_grid, int x, int y);
+		static std::unique_ptr<dae::GameObject> MakeNobbin(dae::Tilegrid& in_grid, Spawner* home, int x, int y);
 
-		static std::unique_ptr<dae::GameObject> MakeNobbin_ai(dae::Tilegrid& in_grid, int x, int y);
+		static std::unique_ptr<dae::GameObject> MakeNobbin_ai(dae::Tilegrid& in_grid, Spawner* home,int x, int y);
 
 		static std::unique_ptr<dae::GameObject> MakeNobbin_player(dae::InputMethod* input, dae::Tilegrid& in_grid, int x, int y);
 
@@ -87,7 +88,7 @@ namespace digger
 
 		static std::unique_ptr<dae::GameObject> MakeSpawner(dae::Tilegrid& in_grid, int x, int y, int amount = -1);
 
-		std::unique_ptr<dae::GameObject> MakeGameEssentials(dae::GameObject* root);
+		std::unique_ptr<dae::GameObject> MakeGameEssentials(dae::GameObject* root, gameMode m, dae::InputMethod* player1, dae::InputMethod* player2);
 	};
 
 	

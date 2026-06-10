@@ -1,3 +1,4 @@
+#include "ServiceComponent.h"
 #include <components/ServiceComponent.h>
 #include <sound/sound.h>
 #include "eventSystem/EventHash.h"
@@ -11,6 +12,10 @@ namespace dae
 		Listener{}
 	{
 		EventStack::GetEventStack().Register(*this);
+	}
+	ServiceComponent::~ServiceComponent()
+	{
+		EventStack::GetEventStack().Unregister(this);
 	}
 	void ServiceComponent::TuneIn(EventId message, GameObject* )
 	{

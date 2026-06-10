@@ -46,22 +46,44 @@
 
 namespace digger
 {
-	static void function()
+	static void StartGame(gameMode m)
 	{
 		auto& scene = dae::SceneManager::GetInstance().CreateScene();
 		auto& inputs = dae::InputManager::GetInstance().m_inputs;
-		auto & player1 = inputs[0];
+
+		auto& player1 = inputs[0];
 		auto& player2 = inputs.size() > 1 ? inputs[1] : inputs[0];
-		dae::SceneManager::GetInstance().SetActiveScene(1);
+
+
+		dae::SceneManager::GetInstance().SetActiveScene(1, false);
 
 		auto go = std::make_unique<dae::GameObject>();
 		auto rootptr{ go.get() };
 		scene.Add(std::move(go));
-		LevelDataContainer::GetInstance().BuildLevel(0, *rootptr, gameMode::normal, player1.get(), player2.get());
-	
-		scene.Add(LevelDataContainer::GetInstance().MakeGameEssentials(rootptr));
+		LevelDataContainer::GetInstance().BuildLevel(0, *rootptr, m, player1.get(), player2.get());
+
+		scene.Add(LevelDataContainer::GetInstance().MakeGameEssentials(rootptr, m, player1.get(), player2.get()));
+	}
+	static void normalMode()
+	{
+
+		StartGame(gameMode::normal);
 
 	}
+	static void vslMode()
+	{
+
+		StartGame(gameMode::vs);
+
+	}
+	static void cooplMode()
+	{
+
+		StartGame(gameMode::coop);
+
+	}
+
+	
 
 	void LevelDataContainer::LoadData(std::string file)
 	{
@@ -160,22 +182,32 @@ namespace digger
 		auto selector = go->AddNGetComponent<dae::ButtonSelector>();
 
 		auto but = std::make_unique<dae::GameObject>();
-		auto button = but->AddNGetComponent<dae::Button>("play", font, SDL_Color{ 255, 210, 0, 255 }, SDL_Color{ 255, 0,0,255 }, & function);
+		auto button = but->AddNGetComponent<dae::Button>("play", font, SDL_Color{ 255, 210, 0, 255 }, SDL_Color{ 255, 0,0,255 }, &normalMode);
 
 		selector->AddButton(*button);
-		selector->SetSelected(0);
 
-		but->m_transform.SetLocalPosition(500, 200);
+
+		but->m_transform.SetLocalPosition(0, 200);
 		go->Add(std::move(but));
 
 		but = std::make_unique<dae::GameObject>();
-		button = but->AddNGetComponent<dae::Button>("vs", font, SDL_Color{ 255, 210, 0, 255 }, SDL_Color{ 255, 0,0,255 }, &function);
+		button = but->AddNGetComponent<dae::Button>("vs", font, SDL_Color{ 255, 210, 0, 255 }, SDL_Color{ 255, 0,0,255 }, &vslMode);
 
 		selector->AddButton(*button);
-		selector->SetSelected(0);
 
-		but->m_transform.SetLocalPosition(500, 300);
+		but->m_transform.SetLocalPosition(0, 300);
 		go->Add(std::move(but));
+
+		but = std::make_unique<dae::GameObject>();
+		button = but->AddNGetComponent<dae::Button>("co-op", font, SDL_Color{ 255, 210, 0, 255 }, SDL_Color{ 255, 0,0,255 }, &cooplMode);
+
+		selector->AddButton(*button);
+
+		but->m_transform.SetLocalPosition(0, 400);
+		go->Add(std::move(but));
+
+		go->m_transform.SetLocalPosition(600, 0);
+		selector->SetSelected(0);
 
 		/*auto button = go->AddNGetComponent<dae::TextComponent>(std::to_string(score.score), font);
 		textComponent2->SetColor({ 255, 220, 0, 255 });
@@ -362,7 +394,7 @@ namespace digger
 
 	
 
-	std::unique_ptr<dae::GameObject> LevelDataContainer::MakeGameEssentials(dae::GameObject* root)
+	std::unique_ptr<dae::GameObject> LevelDataContainer::MakeGameEssentials(dae::GameObject* root, gameMode m, dae::InputMethod* player1, dae::InputMethod* player2)
 	{
 		auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
 		auto points = std::make_unique<dae::GameObject>();
@@ -370,7 +402,7 @@ namespace digger
 		auto render = points->AddNGetComponent<dae::TextComponent>("points", font, SDL_Color{ 255,255,0,255 });
 		auto p = points->AddNGetComponent<digger::PointsTracker>(*render);
 		points->m_transform.SetLocalPosition(0, 10);
-		points->AddNGetComponent<GameManager>(*p, *root, gameMode::normal);
+		points->AddNGetComponent<GameManager>(*p, *root, m, player1, player2);
 
 		return std::move(points);
 	}
@@ -389,7 +421,7 @@ namespace digger
 
 		auto gridmove = player->AddNGetComponent<dae::GridMove>(in_grid, *col, glm::ivec2(x, y), 60.f);
 		gridmove->SetInfluence(false, false);
-		player->AddNGetComponent<digger::Digger>(*gridmove, *col);
+		player->AddNGetComponent<digger::Digger>(*gridmove, *col, glm::ivec2(x, y));
 
 
 		auto healthComponent = player->AddNGetComponent<dae::IntTracker>(3, 3, 0);
@@ -458,7 +490,7 @@ namespace digger
 		return player;
 	}
 
-	std::unique_ptr<dae::GameObject> LevelDataContainer::MakeNobbin(dae::Tilegrid& in_grid, int x, int y)
+	std::unique_ptr<dae::GameObject> LevelDataContainer::MakeNobbin(dae::Tilegrid& in_grid, Spawner* home, int x, int y)
 	{
 		auto nob = std::make_unique<dae::GameObject>();
 
@@ -470,14 +502,14 @@ namespace digger
 
 		auto gridmove = nob->AddNGetComponent<dae::GridMove>(in_grid, *col, glm::ivec2(x, y), 40.f);
 		gridmove->SetInfluence(false, false);
-		nob->AddComponent<digger::Nobbin>(*gridmove, *col, *imgComp);
+		nob->AddComponent<digger::Nobbin>(*gridmove, *col, glm::ivec2(x, y), home, *imgComp);
 
 		return nob;
 	}
 
-	std::unique_ptr<dae::GameObject> LevelDataContainer::MakeNobbin_ai(dae::Tilegrid& in_grid, int x, int y)
+	std::unique_ptr<dae::GameObject> LevelDataContainer::MakeNobbin_ai(dae::Tilegrid& in_grid, Spawner* home, int x, int y)
 	{
-		auto nob = MakeNobbin(in_grid, x, y);
+		auto nob = MakeNobbin(in_grid, home, x, y);
 		auto nobbin = nob->GetComponent<digger::Nobbin>();
 		auto gridmove = nob->GetComponent<dae::GridMove>();
 
@@ -490,7 +522,7 @@ namespace digger
 
 	std::unique_ptr<dae::GameObject> LevelDataContainer::MakeNobbin_player(dae::InputMethod* input, dae::Tilegrid& in_grid, int x, int y)
 	{
-		auto nob = MakeNobbin(in_grid, x, y);
+		auto nob = MakeNobbin(in_grid, nullptr, x, y);
 
 		auto healthComponent = nob->AddNGetComponent<dae::IntTracker>(3, 3, 0);
 		auto pointsComponent = nob->AddNGetComponent<dae::IntTracker>(0, 500, 0);

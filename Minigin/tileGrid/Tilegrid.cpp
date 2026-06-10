@@ -10,6 +10,7 @@ namespace dae
 		tileScale{ tileScale }
 	{
 		tiles.resize(width * height);
+		GetGameObject()->objectName = "grid";
 	}
 
 	GameObject* Tilegrid::GetTile(glm::ivec2 point)

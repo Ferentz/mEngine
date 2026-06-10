@@ -62,6 +62,7 @@ namespace dae
 		//template<class T, typename ...Args>
 		virtual void AddAction(std::unique_ptr<Command> command, unsigned int keybind, KeyState triggerState) = 0;
 		virtual void ClearActions() { m_actions.clear(); };
+		std::vector<std::unique_ptr<BaseAction>> const & GetActions() { return m_actions; }
 
 	protected:
 

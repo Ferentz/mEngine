@@ -78,6 +78,7 @@ set(GAME_SOURCES
   Game/NobbinAi.cpp
   Game/command/GameCommand.cpp
   Game/command/NobbinMoveCommand.cpp
+  Game/command/SkipCommand.cpp
   Game/GameTile.cpp
   Game/Gem.cpp
   Game/Spawner.cpp

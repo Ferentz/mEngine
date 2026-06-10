@@ -9,6 +9,8 @@
 #include <type_traits>
 #include <concepts>
 
+#include <string>
+
 namespace dae
 {
 	//class GameComponent;
@@ -40,6 +42,11 @@ namespace dae
 		void SetParent(GameObject *newParent, bool keepWorldPos = false);
 		void SetParent(Scene& newParent, bool keepWorldPos = false);
 		void Add(std::unique_ptr<GameObject> && object, bool keepWorldPos = false);
+		void ResreveCHildren(size_t nbr)
+		{
+			minChidren += nbr;
+			m_children.reserve(minChidren);
+		}
 
 
 		bool IsChild(GameObject* object);
@@ -77,6 +84,7 @@ namespace dae
 		std::vector<T*> GetComponents()
 		{
 			std::vector<T*> result;
+			if (m_toDelete) return result;
 
 			for (auto& component : m_components)
 			{
@@ -93,6 +101,8 @@ namespace dae
 			requires std::is_base_of_v<GameComponent, T>
 		T* GetComponent()
 		{
+			if(m_toDelete)return nullptr;
+
 			for (auto& component : m_components)
 			{
 				if (auto ptr = dynamic_cast<T*>(component.get())) // get retrives the pointer fro the unique pointer
@@ -107,13 +117,8 @@ namespace dae
 			requires std::is_base_of_v<GameComponent, T>
 		T* GetComponent_ChildrenInclusive()
 		{
-			for (auto& component : m_components)
-			{
-				if (auto ptr = dynamic_cast<T*>(component.get())) // get retrives the pointer fro the unique pointer
-				{
-					return ptr;
-				}
-			}
+			if (auto ptr = GetComponent<T>()) return ptr;
+
 			for (auto& child : m_children)
 			{
 				if (T* component = child->GetComponent_ChildrenInclusive<T>()) return component;
@@ -123,15 +128,48 @@ namespace dae
 
 		template<class T>
 			requires std::is_base_of_v<GameComponent, T>
-		int CountComponents_childrenInclusive()
+		std::vector<T*> GetComponents_ChildrenInclusive()
 		{
-			int result{};
+			std::vector<T*> result;
 
+			if (m_toDelete)
+				return result;
+
+			// Add this object's matching components
 			for (auto& component : m_components)
 			{
 				if (auto ptr = dynamic_cast<T*>(component.get()))
 				{
-					result++;
+					result.push_back(ptr);
+				}
+			}
+
+			// Recursively collect from children
+			for (auto& child : m_children)
+			{
+				auto childResults =
+					child->GetComponents_ChildrenInclusive<T>();
+
+				result.insert( result.end(), childResults.begin(), childResults.end());
+			}
+
+			return result;
+		}
+
+		template<class T>
+			requires std::is_base_of_v<GameComponent, T>
+		int CountComponents_childrenInclusive()
+		{
+			int result{};
+
+			if (!m_toDelete)
+			{
+				for (auto& component : m_components)
+				{
+					if (auto ptr = dynamic_cast<T*>(component.get()))
+					{
+						result++;
+					}
 				}
 			}
 
@@ -163,6 +201,8 @@ namespace dae
 
 		SmartTransform m_transform;
 
+		std::string objectName{"unnamed"};
+
 	private:
 		
 		bool m_toDelete{};
@@ -170,6 +210,7 @@ namespace dae
 		std::vector<std::unique_ptr<GameComponent>> m_components{};
 		std::vector<RenderComponent*> m_renderComponents{};
 		std::vector<std::unique_ptr<GameObject>> m_children{};
+		size_t minChidren{};
 
 	private:
 		void AddChild(GameObject* newChild);

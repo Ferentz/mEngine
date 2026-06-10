@@ -11,9 +11,12 @@
 
 namespace dae
 {
+	int ButtonSelector::count{};
+
 	ButtonSelector::ButtonSelector(GameObject& obj)
 		:GameComponent{obj}
 	{
+		count++;
 	}
 
 	void ButtonSelector::Update(float)
@@ -52,7 +55,7 @@ namespace dae
 				}
 			}
 
-			if (input->IsButtonReleasedThisFrame(inputCodes[0]))
+			if (input->IsButtonPressedThisFrame(inputCodes[0]))
 			{
 				// up
 				buttons[selectedButtonIDX]->Unselect();
@@ -60,8 +63,9 @@ namespace dae
 				if (selectedButtonIDX >= buttons.size())
 					selectedButtonIDX = buttons.size() - 1;
 				buttons[selectedButtonIDX]->Sellect();
+				break;
 			}
-			else if (input->IsButtonReleasedThisFrame(inputCodes[1]))
+			else if (input->IsButtonPressedThisFrame(inputCodes[1]))
 			{
 				// down
 				buttons[selectedButtonIDX]->Unselect();
@@ -69,11 +73,13 @@ namespace dae
 				if (selectedButtonIDX >= buttons.size())
 					selectedButtonIDX = 0;
 				buttons[selectedButtonIDX]->Sellect();
+				break;
 			}
-			else if (input->IsButtonReleasedThisFrame(inputCodes[2]))
+			else if (input->IsButtonPressedThisFrame(inputCodes[2]))
 			{
 				// press
 				buttons[selectedButtonIDX]->Execute();
+				break;
 			}
 		}
 	}

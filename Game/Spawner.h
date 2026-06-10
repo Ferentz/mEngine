@@ -14,6 +14,7 @@ namespace digger
 		glm::ivec2 spawnPos;
 		dae::Tilegrid* grid;
 		int numToSpawn;
+		int const maxToSpawn;
 		float timer{3.f};
 		float interval{5.f};
 	public:
@@ -21,5 +22,7 @@ namespace digger
 
 		void Update(float) override;
 		int NumToSpawn() { return numToSpawn; }
+
+		void ReturnNobin();
 	};
 }

@@ -3,6 +3,8 @@
 #include <eventSystem/EventHash.h>
 #include <eventSystem/EventStack.h>
 
+#include <GameObject.h>
+
 namespace digger
 {
 	PointsTracker::PointsTracker(dae::GameObject& parent, dae::TextComponent& textcomp)
@@ -11,6 +13,8 @@ namespace digger
 	{
 		text->SetText("00000");
 		dae::EventStack::GetEventStack().Register(*this);
+
+		GetGameObject()->objectName = "ptTracker";
 	}
 	PointsTracker::~PointsTracker()
 	{

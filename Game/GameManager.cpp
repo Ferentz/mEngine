@@ -1,12 +1,18 @@
 #include "GameManager.h"
 #include "Scene.h"
 #include "SceneManager.h"
+#include <components/RenderComponent.h>
 
 #include "Gem.h"
 #include "Spawner.h"
 #include "PointsTracker.h"
 #include "LevelDataContainer.h"
 #include "HighScoreHandler.h"
+#include "Digger.h"
+#include "NobbinAi.h"
+#include "Nobbin.h"
+#include "command/SkipCommand.h"
+#include <tileGrid/GridMove.h>
 
 #include <eventSystem/EventHash.h>
 #include <eventSystem/EventStack.h>
@@ -17,20 +23,55 @@
 namespace digger
 {
 
-	GameManager::GameManager(dae::GameObject& parent, PointsTracker& pt, dae::GameObject& levelroot, gameMode m)
+	GameManager::GameManager(dae::GameObject& parent, PointsTracker& pt, dae::GameObject& levelroot, gameMode m, dae::InputMethod * p1, dae::InputMethod* p2)
 		:GameComponent{ parent }
 		, pointsTracker{&pt }
 		, levelRoot{ &levelroot }
 		, mode{m}
+		, player1{p1}
+		, player2{p2}
 	{
 
 		dae::EventStack::GetEventStack().Register(*this);
 
-		auto& inputs = dae::InputManager::GetInstance().m_inputs;
+		/*auto& inputs = dae::InputManager::GetInstance().m_inputs;
 		player1 = inputs[0].get();
-		player2 = inputs.size() > 1 ? inputs[1].get() : inputs[0].get();
+		player2 = inputs.size() > 1 ? inputs[1].get() : inputs[0].get();*/
 
+		
+		lifeDisplays.emplace_back();
+		if (m == gameMode::coop)
+		{
+			lifeDisplays.emplace_back();
+			remainingLives2 = remainingLives;
+		}
+
+		int start{ 120 };
+		int spacing{ 40 };
+
+		for (auto& disp : lifeDisplays)
+		{
+			for (int i{}; i < maxLives-1; i++)
+			{
+				disp.push_back(GetGameObject()->AddNGetComponent<dae::TextureComponent>());
+				disp.back()->SetTexture("digger.png");
+				disp.back()->m_offset.SetPosition(float(start + spacing*i), 0);
+			}
+			start = 800;
+			spacing = -spacing;
+		}
+
+		updateLife();
+
+		auto keyboard{ dae::InputManager::GetInstance().GetInputMethod(dae::InputType::keyboard) };
+		keyboard->AddAction(std::make_unique<SkipCommand>(this), SDL_SCANCODE_F1, dae::KeyState::presed);
 	}
+
+	GameManager::~GameManager()
+	{
+		dae::EventStack::GetEventStack().Unregister(this);
+	}
+
 
 	void GameManager::Start()
 	{
@@ -47,44 +88,100 @@ namespace digger
 
 	void GameManager::TuneIn(dae::EventId id , dae::GameObject* subject)
 	{
-		if (id == dae::make_sdbm_hash("died player"))
+		switch (id)
 		{
-			EndGame();
-			remainingLives--;
-			if (remainingLives == 0)
+			case dae::make_sdbm_hash("died player"):
 			{
-				//end game;
-				
-			}
-		}
-		else if (id == dae::make_sdbm_hash("treshhold collected"))
-		{
-			if (remainingLives >= maxLives) return;
-			remainingLives++;
-		}
-		else if (id == dae::make_sdbm_hash("collect gem"))
-		{
-			remainingGems--;
-			if (remainingGems <= 0)
-			{
-				//next level
-				NextLevel();
 
+				if (GetObject(player1) == subject)
+				{
+					remainingLives--;
+				}
+				else
+				{
+					remainingLives2--;
+				}
+
+				
+				if (remainingLives + remainingLives2 == 0)
+				{
+					//end game;
+					EndGame();
+					return;
+				}
+				//subject->GetComponent<Digger>()->Respawn();
+				ReturnNobbins();
+				updateLife();
+				break;
 			}
-		}
-		else if (id == dae::make_sdbm_hash("death enemy"))
-		{
-			remainingNobbins--;
-			if (remainingNobbins <= 0)
+			case dae::make_sdbm_hash("treshhold collected"):
 			{
-				// next level
-				NextLevel();
+				if (remainingLives < maxLives)
+				remainingLives++;
+				if (remainingLives2 < maxLives)
+				remainingLives2++;
+				break;
+			}
+			case dae::make_sdbm_hash("collect gem"):
+			{
+				remainingGems--;
+				if (remainingGems <= 0)
+				{
+					//next level
+					NextLevel();
+					return;
+				}
+				break;
+			}
+			case dae::make_sdbm_hash("death enemy"):
+			{
+				remainingNobbins--;
+				if (remainingNobbins <= 0)
+				{
+					// next level
+					NextLevel();
+					return;
+				}
+				break;
+			}
+			case dae::make_sdbm_hash("name entered"):
+			{
+				std::cout << "name enteredd\n";
+				SaveHighScore(subject->GetComponent<HighScoreHandler>()->GetUsername());
+				break;
 			}
 		}
-		else if (id == dae::make_sdbm_hash("name entered"))
+	}
+
+	void GameManager::ReturnNobbins()
+	{
+		//auto& objects{ dae::SceneManager::GetInstance().GetActiveScene()->GetObjects() };
+
+
+		auto nobbins{ levelRoot->GetComponents_ChildrenInclusive<Nobbin>() };
+		for (auto& nobbin : nobbins)
 		{
-			SaveHighScore(subject->GetComponent<HighScoreHandler>()->GetUsername());
+			nobbin->Respawn();
 		}
+
+		if (remainingLives>0)
+		{
+			GetObject(player1)->GetComponent<Digger>()->Respawn();
+		}
+		/*else if (remainingLives == 0)
+		{
+			GetObject(player1)->MarkForDelete();
+		}*/
+
+		if(remainingLives2 > 0)
+		{
+			GetObject(player2)->GetComponent<Digger>()->Respawn();
+		}
+		/*else if (remainingLives2 == 0)
+		{
+			GetObject(player2)->MarkForDelete();
+		}*/
+		
 	}
 
 	void GameManager::GetAllNeeded()
@@ -100,11 +197,14 @@ namespace digger
 				remainingNobbins += spawner->NumToSpawn();
 			}
 		}
-
+		std::cout << remainingNobbins << " remaining nobbins\n";
+		std::cout << remainingGems << " remaining gems\n";
 	}
 
 	void GameManager::NextLevel()
 	{
+
+		std::cout << "\nnext level";
 		auto const& sceneObjects{ levelRoot->GetChildren() };
 
 		for (auto& object : sceneObjects)
@@ -114,6 +214,13 @@ namespace digger
 
 		player1->ClearActions();
 		player2->ClearActions();
+		EnsureSkipFunc();
+
+		if (mode == gameMode::coop)
+		{
+			if (remainingLives == 0) remainingLives++;
+			if (remainingLives2 == 0) remainingLives2++;
+		}
 
 		curentLevel++;
 
@@ -128,8 +235,19 @@ namespace digger
 		GetAllNeeded();
 	}
 
+	void GameManager::EnsureSkipFunc()
+	{
+		auto keyboard{ dae::InputManager::GetInstance().GetInputMethod(dae::InputType::keyboard) };
+		if (player1 == keyboard || player2 == keyboard)
+		{
+			std::cout << "\nadding skip func";
+			keyboard->AddAction(std::make_unique<SkipCommand>(this), SDL_SCANCODE_F1, dae::KeyState::presed);
+		}
+	}
+
 	void GameManager::EndGame()
 	{
+		std::cout << "\nendgame";
 		//levelRoot->MarkForDelete();
 
 		auto& highscores{ LevelDataContainer::GetInstance().GetHighScores() };
@@ -202,5 +320,34 @@ namespace digger
 		LevelDataContainer::GetInstance().SaveHighScores("new_highScores.csv", highscores);
 
 		dae::SceneManager::GetInstance().SetActiveScene(0);
+	}
+
+	void GameManager::updateLife()
+	{
+		int remLife = remainingLives;
+		for (auto& disp : lifeDisplays)
+		{
+			int displayed{};
+			for (auto life : disp)
+			{
+				if (remLife - 1 > displayed)
+				{
+					life->isVisible = true;
+				}
+				else
+				{
+					life->isVisible = false;;
+				}
+				displayed++;
+			}
+			remLife = remainingLives2;
+		}
+		
+	}
+
+	dae::GameObject* GameManager::GetObject(dae::InputMethod * playerInput)
+	{
+		auto com = dynamic_cast<dae::GameCommand<dae::GridMove> const*>(playerInput->GetActions()[1]->m_commands.get());
+		return com->GetSubject()->GetGameObject();
 	}
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "components/GameComponent.h"
+#include "components/RenderComponent.h"
 #include <GameObject.h>
 #include <glm/glm.hpp>
 #include <SceneManager.h>
@@ -9,7 +9,7 @@
 namespace dae
 {
 
-	class Collider final: public GameComponent
+	class Collider final: public RenderComponent
 	{
 		static std::vector<Collider*> s_colliders;
 
@@ -24,6 +24,8 @@ namespace dae
 		
 		
 		void Update(float) override;
+
+		void Render() override;
 
 		std::vector<Collider*> const& GetCollisions()
 		{

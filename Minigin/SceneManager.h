@@ -13,7 +13,7 @@ namespace dae
 	public:
 		Scene& CreateScene();
 		Scene* GetActiveScene();
-		void SetActiveScene(size_t i);
+		void SetActiveScene(size_t i, bool cleanOldScene = true);
 
 		void CheckForSwitch();
 		void Update(float deltaTime);
@@ -22,6 +22,7 @@ namespace dae
 
 	private:
 		bool switchScene{};
+		bool killOldScene{};
 		friend class Singleton<SceneManager>;
 		SceneManager() = default;
 		size_t activeScene{};

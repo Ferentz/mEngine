@@ -179,6 +179,7 @@ void dae::Minigin::RunOneFrame()
 	{
 		SceneManager::GetInstance().FixedUpdate(m_fixed_time_step);
 		m_lag -= m_fixed_time_step;
+		m_quit = !InputManager::GetInstance().ProcessInput();
 	}
 	EventStack::GetEventStack().BroadCastEvents();
 	SceneManager::GetInstance().Update(m_deltaTime);

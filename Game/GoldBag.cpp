@@ -23,6 +23,8 @@ namespace digger
 	{
 		dae::EventStack::GetEventStack().Register(*this, dae::make_sdbm_hash("ground dug"));
 		collisionBox.m_signal.Register(*this);
+		GetGameObject()->objectName = "goldbag";
+
 	}
 
 	GoldBag::~GoldBag()
@@ -46,8 +48,8 @@ namespace digger
 
 		if (id == dae::make_sdbm_hash("ground dug"))
 		{
-			std::cout << "heard dig\n";
-			std::cout << " at tile " << m_pState->m_gridMove->GetClosestPoint().x << "," << m_pState->m_gridMove->GetClosestPoint().y << "\n";
+			//std::cout << "heard dig\n";
+			//std::cout << " at tile " << m_pState->m_gridMove->GetClosestPoint().x << "," << m_pState->m_gridMove->GetClosestPoint().y << "\n";
 			if (auto newState = m_pState->OnDug();
 				newState.get() != nullptr)
 			{
@@ -187,8 +189,8 @@ namespace digger
 	GoldBag::GoingToFallState::GoingToFallState(GoldBag& bag, dae::GridMove* gridmove)
 		:BagState(bag, gridmove)
 	{
-		std::cout << "\n going to fall \n";
-		std::cout << " at tile " << m_gridMove->GetClosestPoint().x << "," << m_gridMove->GetClosestPoint().y << "\n";
+		//std::cout << "\n going to fall \n";
+		//std::cout << " at tile " << m_gridMove->GetClosestPoint().x << "," << m_gridMove->GetClosestPoint().y << "\n";
 	}
 
 	std::unique_ptr<GoldBag::BagState> GoldBag::GoingToFallState::Update(float delta)

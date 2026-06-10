@@ -20,13 +20,16 @@ namespace dae
 	{
 		T* m_subject;
 	protected:
-		T* GetSubject() const { return m_subject; }
+		
 	public:
+		
 		GameCommand(T* object)
 			:m_subject{ object }
 		{
 		};
 		virtual ~GameCommand() override = default;
+
+		T* GetSubject() const { return m_subject; }
 	};
 
 	enum class Direction

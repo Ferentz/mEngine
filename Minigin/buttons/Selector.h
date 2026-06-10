@@ -11,6 +11,7 @@ namespace dae
 
 	class ButtonSelector : public GameComponent
 	{
+		static int count;
 		size_t selectedButtonIDX{};
 		std::vector<Button*> buttons{};
 
@@ -24,4 +25,6 @@ namespace dae
 
 		void SetSelected(size_t idx);
 	};
+
+	
 }

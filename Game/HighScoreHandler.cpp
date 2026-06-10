@@ -71,7 +71,7 @@ namespace digger
 	}
     HighScoreHandler::~HighScoreHandler()
     {
-        std::cout << "goodbye";
+        //std::cout << "goodbye";
     }
 	void HighScoreHandler::Update(float)
 	{
