@@ -21,7 +21,7 @@ namespace dae
 		void Render();
 
 	private:
-		bool switchScene{};
+		bool switchScene{true};
 		bool killOldScene{};
 		friend class Singleton<SceneManager>;
 		SceneManager() = default;

@@ -10,7 +10,7 @@ namespace  dae
 		static std::unique_ptr<SoundSystem> _ss_instance;
 	public:
 
-		static SoundSystem& get_sound_system();
+		static SoundSystem* get_sound_system();
 
 		static void register_sound_system(std::unique_ptr<SoundSystem>&& ss);
 	};

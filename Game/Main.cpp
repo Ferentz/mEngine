@@ -49,11 +49,8 @@ namespace fs = std::filesystem;
 static void load()
 {
 	std::cout << "hifrommain";
-	std::vector<std::string> paths{ "sci_fi_door-6451.mp3" };
-	dae::servicelocator soundService{};
-
-	soundService.register_sound_system(std::make_unique<dae::SoundSystem_Logging>(paths));
-
+	std::vector<std::string> paths{"select.mp3", "start.mp3", "music.mp3", "dead.mp3", "collect.mp3"};
+	
 	auto& scene = dae::SceneManager::GetInstance().CreateScene();
 
 	digger::LevelDataContainer::GetInstance().LoadData("levels.txt");
@@ -75,9 +72,9 @@ static void load()
 
 		//================ ui/event stuff
 		auto smallFont = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 20);
-	auto player1_HealthDisplay = std::make_unique<dae::GameObject>();
+	/*auto player1_HealthDisplay = std::make_unique<dae::GameObject>();
 	player1_HealthDisplay->AddComponent<dae::FPSComponent>("fps" , font);
-	player1_HealthDisplay->SetPosition(50, 300);
+	player1_HealthDisplay->SetPosition(50, 300);*/
 	//auto explenation1 =
 	//player1_HealthDisplay->AddNGetComponent<dae::TextComponent>("wasd to move. e to take damage. q to collect points", smallFont);
 	/*auto healthDisplayComponent =
@@ -89,14 +86,14 @@ static void load()
 	pointsDisplayComponent->SetPosition(100, 55);
 	player1_HealthDisplay->AddComponent<dae::ServiceComponent>();*/
 
-	scene.Add(std::move(player1_HealthDisplay));
+	//scene.Add(std::move(player1_HealthDisplay));
 
 
 
 	auto player2_HealthDisplay = std::make_unique<dae::GameObject>();
 	player2_HealthDisplay->SetPosition(50, 420);
 	//auto explenation2 =
-	player2_HealthDisplay->AddNGetComponent<dae::TextComponent>("d-pad to move. right shoulder to take damage. left shoulder to collect points", smallFont);
+	player2_HealthDisplay->AddNGetComponent<dae::TextComponent>("wasd to ove / d-pad. space/south to confirm", smallFont);
 	/*auto healthDisplayComponent2 =
 		player2_HealthDisplay->AddNGetComponent<dae::HealthDisplay>("health", font, *healthComponent2);
 	healthDisplayComponent2->SetPosition(100, 25);

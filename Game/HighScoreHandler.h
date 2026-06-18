@@ -8,8 +8,8 @@ namespace digger
 	class HighScoreHandler : public dae::GameComponent
 	{
 		std::string username{};
-		int x_offset{};
-		int spacing{ 50 };
+		int x_offset{400};
+		int spacing{ 90 };
 
 	public:
 		HighScoreHandler(dae::GameObject& parent);

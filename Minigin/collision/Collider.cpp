@@ -20,9 +20,8 @@ namespace dae
 
 	void Collider::Update(float)
 	{
-		if (!canCollide) return;
 		collisions.clear();
-
+		if (!canCollide) return;
 		for (auto collider : s_colliders)
 		{
 			if (this == collider) continue;
@@ -63,7 +62,7 @@ namespace dae
 
 	void dae::Collider::Render()
 	{
-
+		if (!debug) return;
 		SDL_Renderer* renderer = Renderer::GetInstance().GetSDLRenderer();
 
 		if (!renderer)

@@ -3,6 +3,7 @@
 #include <inputsystems/InputManager.h>
 #include <buttons/Button.h>
 
+
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_scancode.h>
@@ -58,21 +59,19 @@ namespace dae
 			if (input->IsButtonPressedThisFrame(inputCodes[0]))
 			{
 				// up
-				buttons[selectedButtonIDX]->Unselect();
-				selectedButtonIDX--;
-				if (selectedButtonIDX >= buttons.size())
-					selectedButtonIDX = buttons.size() - 1;
-				buttons[selectedButtonIDX]->Sellect();
+				size_t newIDX = selectedButtonIDX - 1;
+				if (newIDX >= buttons.size())
+					newIDX = buttons.size() - 1;
+				SetSelected(newIDX);
 				break;
 			}
 			else if (input->IsButtonPressedThisFrame(inputCodes[1]))
 			{
 				// down
-				buttons[selectedButtonIDX]->Unselect();
-				selectedButtonIDX++;
-				if (selectedButtonIDX >= buttons.size())
-					selectedButtonIDX = 0;
-				buttons[selectedButtonIDX]->Sellect();
+				size_t newIDX = selectedButtonIDX + 1;
+				if (newIDX >= buttons.size())
+					newIDX = 0;
+				SetSelected(newIDX);
 				break;
 			}
 			else if (input->IsButtonPressedThisFrame(inputCodes[2]))
@@ -93,5 +92,6 @@ namespace dae
 		buttons[selectedButtonIDX]->Unselect();
 		selectedButtonIDX = idx;
 		buttons[selectedButtonIDX]->Sellect();
+
 	}
 }

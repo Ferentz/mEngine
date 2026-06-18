@@ -27,7 +27,9 @@ namespace  dae
 			so you dont bloat it with an extra function pointer that it doesnt need
 		*/
 		virtual void Load(sound_id id) = 0;
-		virtual void Play(sound_id id, float volume) = 0;
+		virtual void Play(sound_id id, bool loop = false) = 0;
+		virtual void Stop(sound_id id) = 0;
+		virtual void Mute() = 0;
 	};
 
 
@@ -39,13 +41,20 @@ namespace  dae
 		std::unique_ptr<SoundImpl> m_impl;
 
 		std::vector<std::string> m_audioPaths;
-
+		bool mute{ false };
 	public:
 		SoundSystem_Pimpled(std::vector<std::string>& paths);
 
 		virtual ~SoundSystem_Pimpled() override;
 		virtual void Load(sound_id id) override;
-		virtual void Play(sound_id id, float volume) override;
+		virtual void Play(sound_id id, bool loop = false) override;
+		virtual void Stop(sound_id id);
+		virtual void Mute() override;
+
+
+		void SetSounds(std::vector<std::string>&& paths) { m_audioPaths = paths; }
+
+		
 	};
 
 	class SoundSystem_Logging final : public SoundSystem_Pimpled
@@ -55,7 +64,9 @@ namespace  dae
 		SoundSystem_Logging(std::vector<std::string>& paths);
 		virtual ~SoundSystem_Logging() override = default;
 		virtual void Load(sound_id id) override;
-		virtual void Play(sound_id id, float volume) override;
+		virtual void Play(sound_id id, bool loop = false) override;
+		virtual void Stop(sound_id id) override;
+		virtual void Mute() override;
 	};
 
 }

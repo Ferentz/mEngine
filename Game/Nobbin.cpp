@@ -109,6 +109,8 @@ namespace digger
 			auto newPos{ gridMove->GetGrid()->GetGridLocationOfPoint(basePos) };
 			GetGameObject()->m_transform.SetLocalPosition(newPos.x, newPos.y);
 			gridMove->canMove = true;
+			auto collider = GetGameObject()->GetComponent<dae::Collider>();
+			collider->canCollide = true;
 		}
 	}
 }

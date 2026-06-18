@@ -62,11 +62,13 @@ namespace digger
 
 		void BuildStartScreen(dae::Scene& scene);
 
+		void CreateLeaderBoard(dae::Scene* scene = nullptr);
+
 		void BuildEndScreen(dae::GameObject& scene);
 
-		std::vector<HighScore> loadHighScores(std::string filename);
+		std::vector<HighScore> loadHighScores();
 
-		bool SaveHighScores(std::string filename, std::vector<HighScore> const& scores);
+		bool SaveHighScores( std::vector<HighScore> const& scores);
 
 		
 		std::vector<LevelData> const& GetLeveles() { return levels; }

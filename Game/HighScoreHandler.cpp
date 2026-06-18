@@ -109,7 +109,7 @@ namespace digger
 
         // make render component
         auto text = go->AddNGetComponent<dae::TextComponent>(std::string(1, in), font);
-        text->m_offset.Translate(float(x_offset), 0);
+        text->m_offset.Translate(float(x_offset), 370);
         GetGameObject()->Add(std::move(go));
         x_offset += spacing;
         username.push_back(in);

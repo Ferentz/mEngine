@@ -79,6 +79,7 @@ set(GAME_SOURCES
   Game/command/GameCommand.cpp
   Game/command/NobbinMoveCommand.cpp
   Game/command/SkipCommand.cpp
+  Game/command/MuteCommand.cpp
   Game/GameTile.cpp
   Game/Gem.cpp
   Game/Spawner.cpp

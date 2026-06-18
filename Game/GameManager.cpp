@@ -12,6 +12,10 @@
 #include "NobbinAi.h"
 #include "Nobbin.h"
 #include "command/SkipCommand.h"
+#include "command/MuteCommand.h"
+
+#include "SoundManager.h"
+
 #include <tileGrid/GridMove.h>
 
 #include <eventSystem/EventHash.h>
@@ -77,6 +81,8 @@ namespace digger
 	{
 		// we wanna get all gems and 
 		GetAllNeeded();
+		dae::EventStack::GetEventStack().PushEvent(dae::Event{ dae::make_sdbm_hash("start game"), nullptr });
+		dae::EventStack::GetEventStack().PushEvent(dae::Event{ dae::make_sdbm_hash("start level"), nullptr });
 	}
 
 	void GameManager::Update(float )
@@ -203,7 +209,7 @@ namespace digger
 
 	void GameManager::NextLevel()
 	{
-
+		dae::EventStack::GetEventStack().PushEvent(dae::Event{ dae::make_sdbm_hash("start level"), nullptr });
 		std::cout << "\nnext level";
 		auto const& sceneObjects{ levelRoot->GetChildren() };
 
@@ -242,11 +248,14 @@ namespace digger
 		{
 			std::cout << "\nadding skip func";
 			keyboard->AddAction(std::make_unique<SkipCommand>(this), SDL_SCANCODE_F1, dae::KeyState::presed);
+			keyboard->AddAction(std::make_unique<digger::MuteCommand>(),
+				static_cast<unsigned int>(SDL_SCANCODE_F2), dae::KeyState::presed);
 		}
 	}
 
 	void GameManager::EndGame()
 	{
+		dae::EventStack::GetEventStack().PushEvent(dae::Event{ dae::make_sdbm_hash("end game"), nullptr });
 		std::cout << "\nendgame";
 		//levelRoot->MarkForDelete();
 
@@ -317,9 +326,11 @@ namespace digger
 			highscores.resize(5);
 		}
 
-		LevelDataContainer::GetInstance().SaveHighScores("new_highScores.csv", highscores);
+		LevelDataContainer::GetInstance().SaveHighScores( highscores);
 
 		dae::SceneManager::GetInstance().SetActiveScene(0);
+
+		LevelDataContainer::GetInstance().CreateLeaderBoard();
 	}
 
 	void GameManager::updateLife()
@@ -347,7 +358,7 @@ namespace digger
 
 	dae::GameObject* GameManager::GetObject(dae::InputMethod * playerInput)
 	{
-		auto com = dynamic_cast<dae::GameCommand<dae::GridMove> const*>(playerInput->GetActions()[1]->m_commands.get());
+		auto com = dynamic_cast<dae::GameCommand<dae::GridMove> const*>(playerInput->GetActions()[2]->m_commands.get());
 		return com->GetSubject()->GetGameObject();
 	}
 }

@@ -1,5 +1,7 @@
 #include "sound.h"
-#include <sound/sound.h>
+#include "sound.h"
+#include "sound.h"
+//#include <sound/sound.h>
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_stdinc.h>
@@ -17,8 +19,21 @@
 #include <thread>
 #include <ResourceManager.h>
 
+#include <unordered_map>
+
 namespace  dae
 {
+    struct PlayRequest
+    {
+        int id;
+        bool loop;
+    };
+    struct TrackInfo
+    {
+        MIX_Track* track;
+        bool looping;
+    };
+
 
     class SoundSystem_Pimpled::SoundImpl
     {
@@ -31,7 +46,20 @@ namespace  dae
         std::condition_variable gotLoadedVar;
 
         std::queue<int> m_audioLoadQueue;
-        std::queue<int> m_audioPlayQueue;
+        std::queue<PlayRequest> m_audioPlayQueue;
+
+        std::mutex activeTracksMtx;
+        std::unordered_map<sound_id, TrackInfo>m_activeTracks;
+
+
+        std::mutex trackMtx;
+
+        std::vector<MIX_Track*> m_freeTracks;
+        std::vector<
+                std::unique_ptr<
+                        MIX_Track, decltype(&MIX_DestroyTrack)>> m_allTracks;
+
+
 
         void LoadThreaded(std::stop_token stopToken)
         {
@@ -66,11 +94,11 @@ namespace  dae
                 
                 std::unique_lock<std::mutex> lck_audio(audioMtx); // new lock to write;
                 m_audioFiles[audioIdx].second = true;
-                m_audios.push_back(localAudio);
-                if (!m_audios.back()) {
+                m_audios[audioIdx] = localAudio;
+                if (!m_audios[audioIdx]) {
                     SDL_Log("Couldn't load %s: %s", path, SDL_GetError());
                     SDL_free(path);
-                    m_audios.pop_back();
+                    m_audios[audioIdx] = nullptr;
                     continue;
                 }
                 SDL_free(path);  /* done with this, the file is loaded. */
@@ -81,11 +109,12 @@ namespace  dae
 
         void PlayThreaded(std::stop_token stopToken)
         {
-            //every thread can have it's own track.
-            MIX_Track* track = MIX_CreateTrack(m_mixer);
-            if (!track) {
-                SDL_Log("Couldn't create a mixer track: %s", SDL_GetError());
-            }
+            ////every thread can have it's own track.
+            //MIX_Track* track = MIX_CreateTrack(m_mixer);
+            //if (!track) {
+            //    SDL_Log("Couldn't create a mixer track: %s", SDL_GetError());
+            //}
+            // pool time
 
             /* we need a track on the mixer to play the audio. Each track has audio assigned to it, and
             all playing tracks are mixed together for the final output. */
@@ -100,7 +129,7 @@ namespace  dae
                     bool empty{ m_audioPlayQueue.empty() };
                     if (!empty)
                     {
-                        return m_audioFiles[m_audioPlayQueue.front()].second; // dont pass if the sound isnt loaded
+                        return m_audioFiles[m_audioPlayQueue.front().id].second; // dont pass if the sound isnt loaded
                     }
                     return stopToken.stop_requested(); });
 
@@ -111,23 +140,114 @@ namespace  dae
                     continue;
                 }
 
-                int audioIdx = m_audioPlayQueue.front();
+                auto &req = m_audioPlayQueue.front();
                 m_audioPlayQueue.pop();
+
+                int audioIdx = req.id;
+                bool loop = req.loop;
+
                 lck.unlock(); // we no longer need to be in the shared stuff, can rlease while teh thread continues.
 
-                
+
+                MIX_Track* track = AcquireTrack();
+                if (!track) continue; // if there is no track available the sound is effectively skipped
 
 
+                auto it = m_activeTracks.find(unsigned short(audioIdx));
+
+                if (it != m_activeTracks.end())
+                {
+                    MIX_StopTrack(it->second.track, 1);
+                    it->second.looping = false;
+                }
+
+                //MIX_SetTrackAudio(track, m_audios[audioIdx]);
+               ///* start the audio playing! */
+               //MIX_PlayTrack(track, 0);  /* no extra options this time, so a zero for the second argument. */
                 MIX_SetTrackAudio(track, m_audios[audioIdx]);
-                /* start the audio playing! */
-                MIX_PlayTrack(track, 0);  /* no extra options this time, so a zero for the second argument. */
+                {
+                    std::scoped_lock lock(activeTracksMtx);
+                    m_activeTracks[unsigned short(audioIdx)] = {track, loop};
+                }
+                SDL_PropertiesID options = SDL_CreateProperties();
+                SDL_SetNumberProperty(options, MIX_PROP_PLAY_LOOPS_NUMBER, loop ? -1 : 0);
+                MIX_PlayTrack(track, options);
             }
         }
+        
+        void CleanupTracks(std::stop_token stopToken)
+        {
+            while (!stopToken.stop_requested())
+            {
+                {
+                    std::scoped_lock lock(activeTracksMtx);
+
+                    for (auto it = m_activeTracks.begin(); it != m_activeTracks.end(); )
+                    {
+                        TrackInfo& info = it->second;
+
+                        bool finished = !MIX_TrackPlaying(info.track);
+
+                        if (finished && !info.looping)
+                        {
+                            ReleaseTrack(info.track);
+
+                            it = m_activeTracks.erase(it);
+                        }
+                        else
+                        {
+                            ++it;
+                        }
+                    }
+                }
+
+                SDL_Delay(10);
+            }
+        }
+
+        MIX_Track* AcquireTrack()
+        {
+            std::scoped_lock lock(trackMtx);
+
+            if (!m_freeTracks.empty())
+            {
+                MIX_Track* track = m_freeTracks.back();
+
+                m_freeTracks.pop_back();
+
+                return track;
+            }
+
+            return nullptr;
+
+            /*MIX_Track* track =
+                MIX_CreateTrack(m_mixer);
+
+            if (!track)
+            {
+                SDL_Log(  "Couldn't create track: %s", SDL_GetError());
+
+                return nullptr;
+            }
+
+            m_allTracks.emplace_back( track, MIX_DestroyTrack);
+
+            return track;*/
+        }
+
+        void ReleaseTrack(MIX_Track* track)
+        {
+            std::scoped_lock lock(trackMtx);
+
+            m_freeTracks.push_back(track);
+        }
+        
         std::stop_source stopSource;
         
 
         std::vector<std::jthread> loadThreads;
         std::vector<std::jthread> playThreads;
+        std::jthread cleanupThread;
 
     public:
         std::vector<std::pair<std::string, bool >> m_audioFiles;
@@ -150,7 +270,8 @@ namespace  dae
             {
                 thread.join();
             }
-
+            //cleanupThread.request_stop();
+            cleanupThread.join();
         }
         SoundImpl(std::vector<std::string>& paths)
         {
@@ -164,7 +285,7 @@ namespace  dae
                 SDL_Log("Couldn't create mixer on default device: %s", SDL_GetError());
             }
 
-            for (auto string : paths) // copy of the strings
+            for (auto & string : paths) // copy of the strings
             {
                 m_audioFiles.emplace_back(string, false);
             }
@@ -182,7 +303,25 @@ namespace  dae
             playThreads.emplace_back(std::jthread(&SoundImpl::PlayThreaded, this, stopToken)); // this pointer, can use std::bind.
             playThreads.emplace_back(std::jthread(&SoundImpl::PlayThreaded, this, stopToken));
 
+            cleanupThread = std::jthread( &SoundImpl::CleanupTracks, this, stopToken);
 
+
+            for (int i{}; i < 5; i++)
+            {
+                MIX_Track* track =
+                    MIX_CreateTrack(m_mixer);
+
+                if (!track)
+                {
+                    SDL_Log("Couldn't create track: %s", SDL_GetError());
+
+                    continue;
+                }
+
+                m_allTracks.emplace_back(track, MIX_DestroyTrack);
+                m_freeTracks.push_back(track);
+            }
+            
         }
 
         void Load(sound_id id)
@@ -193,11 +332,43 @@ namespace  dae
             //LoadThreaded();
         }
 
-        void Play(sound_id id, float)
+        void Play(sound_id id, bool looping)
         {
-            m_audioPlayQueue.push(id);
+            m_audioPlayQueue.push({ id, looping });
             playVar.notify_one();
+
+           
         }
+
+        void Stop(sound_id id)
+        {
+            std::scoped_lock lock(activeTracksMtx);
+
+            auto it = m_activeTracks.find(id);
+            if (it == m_activeTracks.end())
+                return;
+
+            MIX_StopTrack(it->second.track, 1);
+
+            it->second.looping = false; // let cleanup do th ething
+        }
+
+        void Mute()
+        {
+            for (auto& track : m_allTracks)
+            {
+                MIX_SetTrackGain(track.get(), 0);
+            }
+        }
+
+        void UnMute()
+        {
+            for (auto& track : m_allTracks)
+            {
+                MIX_SetTrackGain(track.get(), 1);
+            }
+        }
+
     };
 
     SoundSystem_Logging::SoundSystem_Logging(std::vector<std::string>& paths)
@@ -209,6 +380,7 @@ namespace  dae
         :m_impl{ std::make_unique<SoundImpl>(paths) },
         m_audioPaths{ paths }
     {
+        m_impl->m_audios.resize(paths.size());
     }
 
     SoundSystem_Pimpled::~SoundSystem_Pimpled()
@@ -223,7 +395,7 @@ namespace  dae
         m_impl->Load(id);
     }
 
-    void SoundSystem_Pimpled::Play(sound_id id, float volume)
+    void SoundSystem_Pimpled::Play(sound_id id, bool loop)
     {
         // and then play on a different thread.
         // ... code that plays sound "id" at given volume ...
@@ -233,8 +405,27 @@ namespace  dae
         {
             m_impl->Load(id);
         }
-        m_impl->Play(id, volume);
+        m_impl->Play(id, loop);
     }
+
+    void SoundSystem_Pimpled::Stop(sound_id id)
+    {
+        m_impl->Stop(id);
+    }
+
+    void SoundSystem_Pimpled::Mute()
+    {
+        mute = !mute;
+        if (mute)
+        {
+            m_impl->Mute();
+        }
+        else
+        {
+            m_impl->UnMute();
+        }
+    }
+
 }
 
 

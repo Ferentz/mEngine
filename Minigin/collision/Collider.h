@@ -41,7 +41,7 @@ namespace dae
 		bool canCollide{ true };
 		bool isTrigger{ false };
 		BroadCaster m_signal;
-
+		bool debug{ false };
 	private:
 		
 		std::vector<Collider*> collisions{};

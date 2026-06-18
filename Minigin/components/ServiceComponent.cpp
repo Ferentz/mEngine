@@ -17,9 +17,9 @@ namespace dae
 	{
 		EventStack::GetEventStack().Unregister(this);
 	}
-	void ServiceComponent::TuneIn(EventId message, GameObject* )
+	void ServiceComponent::TuneIn(EventId, GameObject* )
 	{
-		if (message == make_sdbm_hash("health changed"))
-			soundService.get_sound_system().Play(0, 0.f);
+		//if (message == make_sdbm_hash("health changed"))
+			//soundService.get_sound_system().Play(0, 0.f);
 	}
 }

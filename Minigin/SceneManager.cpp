@@ -57,8 +57,9 @@ dae::Scene& dae::SceneManager::CreateScene()
 
 dae::Scene* dae::SceneManager::GetActiveScene()
 {
-	if (switchScene) return nullptr; // no active scene/in the middle of switching scenes
+	
 	if (m_scenes.size() <= 0) return nullptr;
+	if (switchScene && m_scenes.size() >= nextScene) return m_scenes[nextScene].get(); // no active scene/in the middle of switching scenes
 	if(m_scenes.size() >= activeScene)
 	return m_scenes[activeScene].get();
 

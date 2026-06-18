@@ -40,19 +40,35 @@
 #include "PointsTracker.h"
 #include "HighScoreHandler.h"
 #include "GameManager.h"
+#include "SoundManager.h"
+#include "command/MuteCommand.h"
 
 #include <iostream>
 
 
 namespace digger
 {
+	constexpr char highscorefile[]{ "highScores.csv"};
+
 	static void StartGame(gameMode m)
 	{
 		auto& scene = dae::SceneManager::GetInstance().CreateScene();
 		auto& inputs = dae::InputManager::GetInstance().m_inputs;
 
-		auto& player1 = inputs[0];
-		auto& player2 = inputs.size() > 1 ? inputs[1] : inputs[0];
+		auto player1 = inputs[0].get();
+		auto player2 = inputs.size() > 1 ? inputs[1].get() : inputs[0].get();
+
+		if (m == gameMode::normal && inputs.size() >= 2)
+		{
+			player1 = inputs[1].get(); // 0 is always keyboard, beyond is gamepad
+		}
+		else if(inputs.size() >= 3)
+		{
+			
+			player1 = inputs[1].get();
+			player2 = inputs[2].get();
+			
+		}
 
 
 		dae::SceneManager::GetInstance().SetActiveScene(1, false);
@@ -60,9 +76,9 @@ namespace digger
 		auto go = std::make_unique<dae::GameObject>();
 		auto rootptr{ go.get() };
 		scene.Add(std::move(go));
-		LevelDataContainer::GetInstance().BuildLevel(0, *rootptr, m, player1.get(), player2.get());
+		LevelDataContainer::GetInstance().BuildLevel(0, *rootptr, m, player1, player2);
 
-		scene.Add(LevelDataContainer::GetInstance().MakeGameEssentials(rootptr, m, player1.get(), player2.get()));
+		scene.Add(LevelDataContainer::GetInstance().MakeGameEssentials(rootptr, m, player1, player2));
 	}
 	static void normalMode()
 	{
@@ -127,54 +143,29 @@ namespace digger
 		auto go = std::make_unique<dae::GameObject>();
 		go->AddComponent<dae::TextureComponent>();
 		go->GetComponents<dae::TextureComponent>()[0]->SetTexture("digger_score_bg.png");
+		go->AddNGetComponent<digger::SoundManager>();
 		scene.Add(std::move(go));
 
 
+		CreateLeaderBoard(&scene);
+
 		auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
 
-		highscores = loadHighScores("highScores.csv");
-
-		float xBaseOffset{ 120.f };
-		float xOffset{ 200.f };
-		float yOffset{ 170.f };
-		for (auto& score : highscores)
-		{
-			go = std::make_unique<dae::GameObject>();
-			//go2->SetParent(*go.get());
-			auto textComponent = go->AddNGetComponent<dae::TextComponent>(score.name, font);
-			textComponent->SetColor({ 255, 220, 0, 255 });
-			textComponent->m_offset.SetPosition(glm::vec2(xBaseOffset, yOffset));
-
-			auto textComponent2 = go->AddNGetComponent<dae::TextComponent>(std::to_string(score.score), font);
-			textComponent2->SetColor({ 255, 220, 0, 255 });
-			textComponent2->m_offset.SetPosition( glm::vec2(xBaseOffset + xOffset, yOffset));
-
-			scene.Add(std::move(go));
-			yOffset += 50;
-		}
-
+	
 		auto inputTypes{ dae::InputMethod::GetAvailableInputs() };
 
 		
 		for (auto & inputType : inputTypes)
 		{
+			
 			dae::InputManager::GetInstance().AddInputMethod(inputType);
+			if (inputType == dae::InputType::keyboard)
+			{
+				dae::InputManager::GetInstance().GetInputMethod(inputType)->AddAction(std::make_unique<digger::MuteCommand>(),
+					static_cast<unsigned int>(SDL_SCANCODE_F2), dae::KeyState::presed);
+			}
 		}
 
-
-
-		//const int gamepadCount = dae::ControllerInput::GetConnectedGamePadCount();
-		//bool const hasKeyBoard = dae::KeyBoardInput::HasKeyboard();
-
-		//if (gamepadCount < 1)
-		//{
-		//	// only 1 player option
-		//}
-
-		//if (gamepadCount >= 2)
-		//{
-		//	//use gamepad for player 2
-		//}
 
 		go = std::make_unique<dae::GameObject>();
 
@@ -215,6 +206,43 @@ namespace digger
 
 		scene.Add(std::move(go));
 		
+	}
+
+	void LevelDataContainer::CreateLeaderBoard(dae::Scene * scene)
+	{
+		if (scene == nullptr) scene = dae::SceneManager::GetInstance().GetActiveScene();
+		auto& objects = scene->GetObjects();
+		for (auto& object : objects)
+		{
+			if (object->objectName == "LBOBJ")
+			{
+				object->MarkForDelete();
+			}
+		}
+
+		auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
+
+		highscores = loadHighScores();
+
+		float xBaseOffset{ 120.f };
+		float xOffset{ 200.f };
+		float yOffset{ 170.f };
+		for (auto& score : highscores)
+		{
+			auto go = std::make_unique<dae::GameObject>();
+			go->objectName = "LBOBJ";
+			//go2->SetParent(*go.get());
+			auto textComponent = go->AddNGetComponent<dae::TextComponent>(score.name, font);
+			textComponent->SetColor({ 255, 220, 0, 255 });
+			textComponent->m_offset.SetPosition(glm::vec2(xBaseOffset, yOffset));
+
+			auto textComponent2 = go->AddNGetComponent<dae::TextComponent>(std::to_string(score.score), font);
+			textComponent2->SetColor({ 255, 220, 0, 255 });
+			textComponent2->m_offset.SetPosition(glm::vec2(xBaseOffset + xOffset, yOffset));
+
+			scene->Add(std::move(go));
+			yOffset += 50;
+		}
 	}
 
 	void LevelDataContainer::BuildEndScreen(dae::GameObject& scene)
@@ -318,11 +346,12 @@ namespace digger
 	}
 
 
+	
 
-	std::vector<HighScore> LevelDataContainer::loadHighScores(std::string filename)
+	std::vector<HighScore> LevelDataContainer::loadHighScores()
 	{
 		std::vector<HighScore> scores;
-
+		std::string filename = highscorefile;
 		std::ifstream file(dae::ResourceManager::GetInstance().GetFullDataPath(filename));
 
 		if (!file.is_open())
@@ -372,8 +401,10 @@ namespace digger
 		return scores;
 	}
 
-	bool LevelDataContainer::SaveHighScores( std::string filename, std::vector<HighScore> const &scores)
+	
+	bool LevelDataContainer::SaveHighScores( std::vector<HighScore> const &scores)
 	{
+		std::string filename = highscorefile;
 		std::ofstream file(dae::ResourceManager::GetInstance().GetFullDataPath(filename));
 
 		if (!file.is_open())
@@ -401,6 +432,7 @@ namespace digger
 
 		auto render = points->AddNGetComponent<dae::TextComponent>("points", font, SDL_Color{ 255,255,0,255 });
 		auto p = points->AddNGetComponent<digger::PointsTracker>(*render);
+		points->AddNGetComponent<digger::SoundManager>();
 		points->m_transform.SetLocalPosition(0, 10);
 		points->AddNGetComponent<GameManager>(*p, *root, m, player1, player2);
 
