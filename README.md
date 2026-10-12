@@ -12,14 +12,14 @@ it makes use of sdl3 as well as xinput(for controller input)
 
 in the engine :
 - sprite drawing
-- sound playing, pausing, looping
+- sound system for playing, pausing, looping using multi threading
 - collision detetction
 - grid functionality (drawing, moving, collision interactions)
-- gamepad and keyboard input
+- gamepad and keyboard input capable of either using sdl or xinput through pImpl
 - scenes + scene graph
 - complete gameloop + fixed time steps in case of lag
-- event system (targeted + broadcasted)
-- game objects and basic object components that can be build from
+- event system (targeted + que)
+- base game object and some basic object components that can be build from.
 
 the Engine makes use of a variety of programing design patterns as specified in the [programing patterns book](https://gameprogrammingpatterns.com/contents.html) and adheres to the c++ guidelines for readable and maintainable code.
 
